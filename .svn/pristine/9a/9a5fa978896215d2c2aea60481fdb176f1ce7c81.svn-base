@@ -1,0 +1,279 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class ProductUnit : MasterDetailPage
+    {
+        public class ProductUnitList
+        {
+            public int id { get; set; }
+            public string unit_code { get; set; }
+            public string unit_name_tha { get; set; }
+            public string unit_name_eng { get; set; }
+            public bool is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+        }
+
+        private DataSet dsResult;
+        public override string PageName { get { return "ProductUnit"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+
+        // ClientInstanceName that use in Script.js
+        private string strClientInstanceName_gridView;
+        private string strClientInstanceName_UserControlEditForm = "";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+            // Set Permission
+            Permission.GetPermission(Convert.ToInt32(ConstantClass.SESSION_USER_GROUP_ID), PageName);
+
+            
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                dsResult = null;
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_PRODUCT_UNIT_MASTER"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_unit_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_PRODUCT_UNIT_MASTER"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string InsertProductUnit(ProductUnitList[] productUnitAddData)
+        {
+            var row = (from t in productUnitAddData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_product_unit_add", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@unit_name_tha", SqlDbType.VarChar, 20).Value = row.unit_name_tha;
+                            cmd.Parameters.Add("@unit_name_eng", SqlDbType.VarChar, 20).Value = row.unit_name_eng;
+                            cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 6).Value = row.unit_code;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static ProductUnitList GetEditProductUnitData(string id)
+        {
+            var productUnitData = new ProductUnitList();
+            var dsDataProductUnit = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                        new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                    };
+                    conn.Open();
+                    dsDataProductUnit = SqlHelper.ExecuteDataset(conn, "sp_product_unit_list", arrParm.ToArray());
+                    conn.Close();
+                }
+
+                if (dsDataProductUnit.Tables.Count > 0)
+                {
+                    var row = dsDataProductUnit.Tables[0].Rows[0];
+                    productUnitData.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    productUnitData.unit_code = Convert.IsDBNull(row["unit_code"]) ? null : Convert.ToString(row["unit_code"]);
+                    productUnitData.unit_name_tha = Convert.IsDBNull(row["unit_name_tha"]) ? null : Convert.ToString(row["unit_name_tha"]);
+                    productUnitData.unit_name_eng = Convert.IsDBNull(row["unit_name_eng"]) ? null : Convert.ToString(row["unit_name_eng"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return productUnitData;
+        }
+
+        [WebMethod]
+        public static string UpdateProductUnit(ProductUnitList[] productUnitUpdateData)
+        {
+            var row = (from t in productUnitUpdateData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_product_unit_edit", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                            cmd.Parameters.Add("@unit_name_tha", SqlDbType.VarChar, 20).Value = row.unit_name_tha;
+                            cmd.Parameters.Add("@unit_name_eng", SqlDbType.VarChar, 20).Value = row.unit_name_eng;
+                            cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 6).Value = row.unit_code;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = true;
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = false;
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string DeleteProductUnit(string id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_product_unit_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = e.Parameters.ToString() },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_unit_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_PRODUCT_UNIT_MASTER"] = dsResult;
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}

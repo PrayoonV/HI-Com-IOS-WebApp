@@ -1,0 +1,51 @@
+﻿using System;
+using System.Drawing;
+using System.Collections;
+using System.ComponentModel;
+using DevExpress.XtraReports.UI;
+using System.Drawing.Text;
+using System.Web;
+
+namespace HicomIOS.Report
+{
+    public partial class Quotaion_Description_Report : DevExpress.XtraReports.UI.XtraReport
+    {
+        public Quotaion_Description_Report()
+        {
+            InitializeComponent();
+            //    Quotaion_Description_Discount_Item_Report report = (Quotaion_Description_Discount_Item_Report)this;
+
+            //    if (report != null)
+            //    {
+            //        foreach (Band b in report.Bands)
+            //        {
+            //            foreach (XRControl c in b.Controls)
+            //            {
+            //                if (FontCollection != null)
+            //                {
+            //                    if (FontCollection.Families.Length > 0)
+            //                    {
+            //                        c.Font = new Font(FontCollection.Families[0], c.Font.Size, c.Font.Style);
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //static PrivateFontCollection fontCollection;
+
+            //public static FontCollection FontCollection
+            //{
+            //    get
+            //    {
+            //        if (fontCollection == null)
+            //        {
+            //            fontCollection = new PrivateFontCollection();
+            //            fontCollection.AddFontFile(HttpContext.Current.Server.MapPath("~/Fonts/THSarabun.ttf"));
+            //        }
+            //        return fontCollection;
+            //    }
+        }
+
+    }
+}

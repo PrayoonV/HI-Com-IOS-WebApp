@@ -1,0 +1,234 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class UserGroup : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public class UserGroupList
+        {
+            public int id { get; set; }
+            public string group_name_tha { get; set; }
+            public string group_name_eng { get; set; }
+            public bool is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+        }
+        public override string PageName { get { return "User Group"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+
+        // ClientInstanceName that use in Script.js
+        private string strClientInstanceName_gridView;
+        private string strClientInstanceName_UserControlEditForm = "";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                dsResult = null;
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)ViewState["dsResult"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                             new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_security_users_group_list", arrParm.ToArray());
+                        ViewState["dsResult"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string InsertUserGroup(UserGroupList[] userGroupAddData)
+        {
+            var row = (from t in userGroupAddData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_security_users_group_add", conn))
+                        { 
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@group_name_tha", SqlDbType.VarChar, 150).Value = row.group_name_tha;
+                            cmd.Parameters.Add("@group_name_eng", SqlDbType.VarChar, 150).Value = row.group_name_eng;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = 1;
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = 0;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static UserGroupList GetEditUserGroupData(string id)
+        {
+            var userGroupData = new UserGroupList();
+            var dsDataUserGroup = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                        new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                    };
+                    conn.Open();
+                    dsDataUserGroup = SqlHelper.ExecuteDataset(conn, "sp_security_users_group_list", arrParm.ToArray());
+                    conn.Close();
+                }
+
+                if (dsDataUserGroup.Tables.Count > 0)
+                {
+                    var row = dsDataUserGroup.Tables[0].Rows[0];
+                    userGroupData.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    userGroupData.group_name_tha = Convert.IsDBNull(row["group_name_tha"]) ? null : Convert.ToString(row["group_name_tha"]);
+                    userGroupData.group_name_eng = Convert.IsDBNull(row["group_name_eng"]) ? null : Convert.ToString(row["group_name_eng"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return userGroupData;
+        }
+
+        [WebMethod]
+        public static string UpdateUserGroup(UserGroupList[] customerGroupUpdateData)
+        {
+            var row = (from t in customerGroupUpdateData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_security_users_group_edit", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                            cmd.Parameters.Add("@group_name_tha", SqlDbType.VarChar, 100).Value = row.group_name_tha;
+                            cmd.Parameters.Add("@group_name_eng", SqlDbType.VarChar, 100).Value = row.group_name_eng;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = true;
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = false;
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string DeleteUserGroup(string id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_security_users_group_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+    }
+
+}

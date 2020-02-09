@@ -1,0 +1,68 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="DocumentEditor.master.cs" Inherits="DocumentEditor" MasterPageFile="~/Site.master" %>
+<%@ Reference Control="~/UserControls/SaveAsDocumentDialog.ascx" %>
+<asp:Content ID="Content" runat="server" ContentPlaceHolderID="ContentPlaceHolder">
+    <form id="form1" runat="server">
+        <div>
+            <table class="DocumentHeadPane">
+                <tr>
+                    <td>
+                        <div class="LogoPane">
+                            <a class="LogoLink" href="Default.aspx">
+                                <dx:ASPxImage runat="server" ID="LogoImage" ImageUrl="~/Content/Images/Icons/DXLogo.png" ShowLoadingImage="true"></dx:ASPxImage>
+                            </a>
+                        </div>
+                    </td>
+                    <td class="TitleContainer">
+                        <dx:ASPxLabel runat="server" ID="TitleLabel" CssClass="TitleLabel"></dx:ASPxLabel>
+                        <div class="StatusMark">
+                            <dx:ASPxLabel runat="server" ID="StatusMarkLabel" ClientInstanceName="StatusMarkLabel" 
+                                CssClass="StatusMarkLabel"></dx:ASPxLabel>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="UserMenuContainer">
+                            <dx:ASPxMenu runat="server" ID="UserMenu" CssClass="UserMenu" OnItemClick="UserMenu_ItemClick" RightToLeft="True"
+                                AppearAfter="9999999">
+                                <ItemStyle CssClass="UserMenuItem" HoverStyle-CssClass="UserMenuHoveredItem" />
+                                <SubMenuStyle CssClass="UserSubMenu" />
+                                <SubMenuItemStyle CssClass="UserSubMenuItem" HoverStyle-CssClass="UserSubMenuHoveredItem" />
+                                <Items>
+                                    <dx:MenuItem Name="User">
+                                        <Image Width="60" Height="60" />
+                                        <Items>
+                                            <dx:MenuItem Name="SignOut" Text="Sign Out"></dx:MenuItem>
+                                        </Items>
+                                    </dx:MenuItem>
+                                </Items>
+                                <ClientSideEvents ItemClick="App.onUserMenuItemClick" />
+                            </dx:ASPxMenu>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <asp:ContentPlaceHolder ID="HeaderHolder" runat="server">
+            </asp:ContentPlaceHolder>
+            <asp:ContentPlaceHolder ID="ContentHolder" runat="server">
+            </asp:ContentPlaceHolder>
+            <dx:ASPxLoadingPanel runat="server" ID="LoadingPanel" ClientInstanceName="LoadingPanel" Modal="true" CssClass="LoadingPanel">
+                <LoadingDivStyle CssClass="LoadingDiv"></LoadingDivStyle>
+                <Template>
+                    <img src="Content/Images/Icons/loading.gif"></img>
+                </Template>
+            </dx:ASPxLoadingPanel>
+            <dx:ASPxCallbackPanel runat="server" ID="DialogCallbackPanel" ClientInstanceName="DialogCallbackPanel" CssClass="DialogCallbackPanel"
+                Height="0" OnCallback="DialogCallbackPanel_Callback">
+                <SettingsLoadingPanel Enabled="false" />
+                <ClientSideEvents BeginCallback="App.onControlBeginCallback" EndCallback="App.onControlEndCallback" />
+                <PanelCollection>
+                    <dx:PanelContent>
+                    </dx:PanelContent>
+                </PanelCollection>
+            </dx:ASPxCallbackPanel>
+            <dx:ASPxCallback runat="server" ID="DocumentEditorCallback" ClientInstanceName="DocumentEditorCallback" 
+                OnCallback="DocumentEditorCallback_Callback">
+                <ClientSideEvents CallbackComplete="App.onDocumentEditorCallbackComplete" />
+            </dx:ASPxCallback>
+        </div>
+    </form>
+</asp:Content>

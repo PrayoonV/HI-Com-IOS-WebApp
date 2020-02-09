@@ -1,0 +1,353 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Root.master.cs" Inherits="HicomIOS.RootMaster" %>
+
+<%-- DXCOMMENT: Page Root.master is a master page that contains the root layout (it includes Header, Cental Area, and Footer) --%>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+    <title></title>
+    <link href="/Lib/js/bootstrap-3.3.7/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/Lib/css/jquery-ui-1.12.1.css" rel="stylesheet" />
+    <link href="/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/CustomStyle.css" rel="stylesheet" type="text/css" />
+    <link href="/Content/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link href="/Lib/js/datetimepicker/jquery.simple-dtpicker.css" rel="stylesheet" />
+    <!-- <link href="/Content/switch/css/bootstrap-switch.min.css" rel="stylesheet" />-->
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet" />
+    <link href="/Content/animate.css" rel="stylesheet" />
+    <!-- DevExtreme dependencies -->
+    <script src="/Lib/js/jquery-3.2.1.min.js" type="text/javascript"></script>
+    <script src="/Lib/js/jquery-ui-1.12.1.js" type="text/javascript"></script>
+    <!-- A DevExtreme library -->
+    <script src="/Lib/js/dx.all.js" type="text/javascript"></script>
+    <script src="/Lib/js/bootstrap-3.3.7/dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/Lib/js/jquery-loading-overlay/loadingoverlay.min.js" type="text/javascript"></script>
+    <script src="/Lib/js/moment.min.js"></script>
+    <script src="/Lib/js/datetimepicker/jquery.simple-dtpicker.js" type="text/javascript"></script>
+    <!-- <script src="/Content/switch/js/bootstrap-switch.min.js"></script> -->
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="Content/sweetalert/sweetalert.js"></script>
+    <script src="/Content/Custom.js"></script>
+    <script src="/Content/notify/bootstrap-notify.min.js"></script>
+    <style type="text/css">
+        .loginControl.userlogin {
+            font-size: 14px !important;
+            margin: 15px !important;
+        }
+
+        .logout {
+            font-size: 12PX;
+            color: #a09898;
+        }
+
+        .none-border {
+            border-bottom: 0px !important;
+        }
+
+        #HeaderPane .headerTop .dropdown .dropdown-menu {
+            left: inherit;
+            right: 0;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function aaa(groupId) {
+            //alert(groupId);
+            groupId = (groupId == -1 ? 2 : groupId);
+            $('.header_menu > .dxm-item#' + groupId).addClass('dxm-selected');
+            $('.menu_group_' + groupId).removeClass('hidden');
+        }
+        $(document).ready(function () {
+            $(".modal-dialog").draggable({
+                handle: ".modal-header"
+            });
+
+            $('.notifyjs-wrapper').remove();
+
+            $.notifyDefaults({
+                allow_dismiss: false,
+                delay: 5000000
+            });
+
+
+            setHeightScreen();
+            setNotification();
+
+            $('.datepicker').appendDtpicker({
+                "autodateOnStart": false,
+                "inline": true,
+                "dateFormat": "DD/MM/YYYY hh:mm",
+                "todayButton": false,
+                "changeMonth": true,
+                "changeYear": true,
+                "calendarMouseScroll": false,
+                "closeOnSelected": true
+            });
+
+            $("#txtAttentionTel").keypress(function () {
+                $(this).val(digits($("#txtAttentionTel").val()));
+            });
+
+            //$("[name='is_enable']").bootstrapSwitch();
+
+        });
+
+
+        function selectTopMenu(e) {
+            /*$.ajax({
+                type: "POST",
+                url: "/Default.aspx/SetSelectedTopMenu",
+                data: '{code: "' + e + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess,
+                failure: function (response) {
+                    //alert(response.d);
+                }
+            });*/
+            var link = $('.menu_link_' + e).eq(0).attr('href');
+            if (link === undefined || link == 'javascript:void(0);') {
+                link = $('.menu_group_' + e).eq(0).attr('href');
+            }
+            window.open(link, '_blank');
+        }
+
+        function OnSuccess(response) {
+            //location.reload();
+            //window.location = "/Default.aspx";
+            window.open('/Default.aspx', '_blank');
+        }
+
+        function logout() {
+
+            $.ajax({
+                type: "POST",
+                url: "/Login.aspx/CheckLogout",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.d == 'success') {
+                        location.reload();
+                    } else {
+                        console.info("data", data.d);
+                    }
+                }
+
+            });
+        }
+
+        function setHeightScreen() {
+            var e = "340";
+            var heightWindow = window.screen.height;
+            if (heightWindow > 480 && heightWindow < 559) {
+                e = "420";
+            } else if (heightWindow > 560 && heightWindow < 800) {
+                e = "440";
+            } else if (heightWindow > 800 && heightWindow < 900) {
+                e = "470";
+            } else if (heightWindow > 900 && heightWindow < 1080) {
+                e = "520";
+            } else if (heightWindow > 1080) {
+                e = "600";
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/Default.aspx/SetHeightScreen",
+                data: '{height: "' + e + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+            });
+        }
+
+        function digits(number) {
+            return number.toString().replace(/(\\d)(?=(\\d\\d\\d)+(?!\\d))/g, "$1,");
+        }
+        function setNotification() {
+            $.ajax({
+                type: "POST",
+                url: "/Default.aspx/GetNotification",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    var timeout = 0;
+                    var time = 0;
+                    var subject = "";
+                    var desc = "";
+                    var id = 0;
+                    var base_url = window.location.origin;
+                    for (var i = 0; i < data.length; i++) {
+                        time = data[i].time;
+                        subject = data[i].subject;
+                        desc = "[" + data[i].customer_code + "] " + data[i].customer_name + "\n" + (data[i].description == null ? '' : data[i].description);
+                        id = data[i].id;
+                        display_date = data[i].display_notice_date;
+                        if (data[i].time < 0) {
+                            timeout = 0;
+                        }
+                        else {
+                            timeout = time;
+                        }
+                        var link = "";
+                        if (data[i].notice_type == "Quotation") {
+                            link = base_url + "/Master/QuotationList.aspx";
+                        }
+                        createNotify(id, subject, desc, timeout, display_date, link);
+                    }
+
+                },
+                error: function (response) {
+                    alert("Session Time out , Please Re-Login");
+                    window.location = "/Login.aspx";
+                }
+
+            });
+        }
+        function createNotify(id, subject, desc, timeout, display_date, link) {
+            //console.log(timeout);
+            if (timeout < 3600000) {
+                setTimeout(function () {
+                    $.notify({
+                        title: subject,
+                        message: desc,
+                    }
+                        , {
+                            type: 'minimalist',
+                            newest_on_top: true,
+                            allow_dismiss: true,
+                            icon_type: 'image',
+                            template: '<div data-notify="container" id="nof-' + id + '" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                                '<img data-notify="icon" class="img-circle pull-left">' +
+                                '<span data-notify="title">' + (link == '' ? '{1}' : '<a href="' + link + '">{1}</a>') + '</span>' +
+                                '<button type="button" aria-hidden="true" id="closenof-' + id + '" class="close" data-notify="dismiss">×</button>' +
+                                '<span data-notify="message">แจ้งเตือน ' + display_date + '</span><br>' +
+                                '<span data-notify="message">{2}</span><br>' +
+                                '<a data-notify="message" data-notify="dismiss" style="float:right" href="#" onclick="readNotice(' + id + ')">รับทราบ</a>' +
+
+                                '</div>',
+                        });
+
+                }, timeout);
+            }
+        }
+        function readNotice(id) {
+            $.ajax({
+                type: "POST",
+                url: "/Default.aspx/ReadNotification",
+                data: "{id : " + id + "}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    //$('#nof-' + id).hide();
+                    $('#closenof-' + id).click();
+                }
+
+            });
+        }
+
+    </script>
+
+</head>
+<body runat="server" id="Body">
+    <form id="form1" runat="server">
+
+        <dx:ASPxPanel ID="HeaderPane" runat="server" FixedPosition="WindowTop" ClientInstanceName="headerPane" CssClass="headerPane" Collapsible="true">
+
+            <SettingsAdaptivity CollapseAtWindowInnerWidth="500" />
+            <Styles>
+                <Panel CssClass="panel"></Panel>
+                <ExpandedPanel CssClass="expandedPanel"></ExpandedPanel>
+                <ExpandBar CssClass="bar"></ExpandBar>
+            </Styles>
+            <PanelCollection>
+                <dx:PanelContent runat="server" SupportsDisabledAttribute="True">
+                    <div class="headerTop">
+                        <div class="templateTitle">
+                            <a id="TitleLink" href="/Default.aspx" runat="server">HI-COM IOS</a>
+                        </div>
+                        <div class="dropdown loginControl userlogin">
+                            <a href="#" class="dropdown-toggle none-border" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                                <img id="img_user" runat="server" style="width: 20px; height: 20px" class="no-padding" src="#" />
+                                <span id="first_name" runat="server"></span>
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-right">
+                                <li>
+                                    <a onclick="logout()" class="logout none-border">
+                                        <i class="fa fa-sign-out"></i>ออกจากระบบ
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="headerMenu">
+                        <%-- DXCOMMENT: Configure the header menu --%>
+                        <%--  <dx:ASPxMenu ID="HeaderMenu" runat="server" CssClass="headerMenu" ClientInstanceName="headerMenu" ItemAutoWidth="False" Width="100%" DataSourceID="XmlDataSourceHeader">
+                        </dx:ASPxMenu>--%>
+                        <div class='dxmLite_Office2010Blue dxm-ltr'>
+                            <div class="dxm-main dxm-horizontal headerMenu" id="HeaderMenu" style="width: 100%;">
+                                <ul class="dx dxm-image-l dxm-noImages">
+                                    <%= BasePage.TopMenu %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </dx:PanelContent>
+            </PanelCollection>
+            <ExpandBarTemplate>
+                <div class="templateTitle">
+                    <a id="TitleLink" href="~/" runat="server">Hi-Com IOS</a>
+                </div>
+            </ExpandBarTemplate>
+        </dx:ASPxPanel>
+
+        <script type="text/javascript">
+            function updateHeaderMenuOrientation() {
+                if (!window.headerMenu) return;
+                var orientation = headerPane.IsExpandable() ? 'Vertical' : 'Horizontal';
+                if (orientation !== headerMenu.GetOrientation())
+                    headerMenu.SetOrientation(orientation);
+            }
+        </script>
+
+        <dx:ASPxGlobalEvents runat="server">
+            <ClientSideEvents ControlsInitialized="updateHeaderMenuOrientation" BrowserWindowResized="updateHeaderMenuOrientation" />
+        </dx:ASPxGlobalEvents>
+
+
+        <dx:ASPxPanel ID="MainPane" runat="server" CssClass="mainContentPane">
+            <PanelCollection>
+                <dx:PanelContent runat="server" SupportsDisabledAttribute="True">
+                    <asp:ContentPlaceHolder ID="Content" runat="server" />
+                </dx:PanelContent>
+            </PanelCollection>
+        </dx:ASPxPanel>
+
+        <dx:ASPxPanel ID="FooterPane" runat="server" FixedPosition="WindowBottom" ClientInstanceName="footerPane" CssClass="footerPane">
+            <SettingsAdaptivity HideAtWindowInnerWidth="500" />
+            <Styles>
+                <Panel CssClass="panel"></Panel>
+            </Styles>
+            <PanelCollection>
+                <dx:PanelContent runat="server" SupportsDisabledAttribute="True">
+                    <div class="footerMenu">
+                    </div>
+                    <div class="copyright">
+                        <dx:ASPxLabel ID="ASPxLabel2" runat="server">
+                        </dx:ASPxLabel>
+                    </div>
+                </dx:PanelContent>
+            </PanelCollection>
+        </dx:ASPxPanel>
+        
+        <%-- DXCOMMENT: Configure a datasource for the header menu --%>
+        <%--  <asp:XmlDataSource ID="XmlDataSourceHeader" runat="server" 
+            XPath="/items/*"></asp:XmlDataSource>--%>
+    </form>
+</body>
+</html>
+

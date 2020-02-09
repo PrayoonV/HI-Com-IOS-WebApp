@@ -1,0 +1,1296 @@
+﻿using DevExpress.Web;
+using DevExpress.Web.Data;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace HicomIOS.Master
+{
+    public partial class AdjustProduct : MasterDetailPage
+    {
+        public override string PageName { get { return "Create Adjust Product"; } }
+
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+
+        private static string guid = Guid.NewGuid().ToString();
+        private const string session_item = "_SESSION_ADJUST_ITEM";
+        private const string session_detail = "_SESSION_ADJUST_DETAIL";
+        private const string session_selected_detail = "_SESSION_ADJUST_SELECTED_DETAIL";
+        private const string session_selected_item = "_SESSION_ADJUST_SELECTED_ITEM";
+        #region Members
+        private int dataId = 0, cloneId = 0;
+        public class AdjustProductDetail
+        {
+            public int id { get; set; }
+            public int sort_no { get; set; }
+            public int item_id { get; set; }
+            public string item_no { get; set; }
+            public string item_name { get; set; }
+            public string item_type { get; set; }
+            public string adjust_type { get; set; }
+            public int quantity { get; set; }
+            public int max_quantity { get; set; }
+            public string quantity_type { get; set; }
+            public string unit_code { get; set; }
+            public string remark { get; set; }
+            public bool is_delete { get; set; }
+
+        }
+
+        public class ProductSparePartDetail
+        {
+            public bool is_selected { get; set; }
+            public int item_id { get; set; }
+            public string item_no { get; set; }
+            public string item_name { get; set; }
+            public string item_type { get; set; }
+            public int quantity { get; set; }
+            public string unit_code { get; set; }
+        }
+
+        public class ProductName
+        {
+            public string name_tha { get; set; }
+            public string name_eng { get; set; }
+            public int quantity_reserve { get; set; }
+            public int quantity_balance { get; set; }
+            public int quantity { get; set; }
+        }
+
+        public class QuotationData
+        {
+            public string quotation_subject { get; set; }
+            public int customer_id { get; set; }
+        }
+
+        List<ProductSparePartDetail> itemDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_item] == null)
+                    Session[guid + session_item] = new List<ProductSparePartDetail>();
+                return (List<ProductSparePartDetail>)Session[guid + session_item];
+            }
+            set
+            {
+                Session[guid + session_item] = value;
+            }
+        }
+        List<ProductSparePartDetail> selectedItemDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_item] == null)
+                    Session[guid + session_item] = new List<ProductSparePartDetail>();
+                return (List<ProductSparePartDetail>)Session[guid + session_item];
+            }
+            set
+            {
+                Session[guid + session_item] = value;
+            }
+        }
+        List<AdjustProductDetail> adjustDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_detail] == null)
+                    Session[guid + session_detail] = new List<AdjustProductDetail>();
+                return (List<AdjustProductDetail>)Session[guid + session_detail];
+            }
+            set
+            {
+                Session[guid + session_detail] = value;
+            }
+        }
+        List<AdjustProductDetail> selectedAdjustDetailList
+        {
+
+            get
+            {
+
+                if (Session[guid + session_selected_detail] == null)
+                    Session[guid + session_selected_detail] = new List<AdjustProductDetail>();
+                return (List<AdjustProductDetail>)Session[guid + session_selected_detail];
+            }
+            set
+            {
+                Session[guid + session_selected_detail] = value;
+            }
+        }
+        #endregion
+
+        #region Inherited Events
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+
+        }
+        #endregion
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        #endregion
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            dataId = Convert.ToInt32(Request.QueryString["dataId"]);
+            cloneId = Convert.ToInt32(Request.QueryString["cloneId"]);
+            hdDataId.Value = Convert.ToString(dataId);
+            if (!IsPostBack)
+            {
+                ClearWorkingSession();
+                PrepareData();
+                LoadData();
+            }
+            else
+            {
+                BindGridView();
+                BindGridSelectedItem();
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+                SPlanetUtil.BindASPxComboBox(ref cbbCustomer, DataListUtil.DropdownStoreProcedureName.Customer);
+                cbbCustomer.Items.Insert(0, new ListEditItem("ไม่ระบุ", "0"));
+                cbbCustomer.Value = "0";
+                //SPlanetUtil.BindASPxComboBox(ref cbbProductNoID, DataListUtil.DropdownStoreProcedureName.Product_No);
+                SPlanetUtil.BindASPxComboBox(ref cbbQuotation, DataListUtil.DropdownStoreProcedureName.Quotation_Document);
+                cbbQuotation.Items.Insert(0, new ListEditItem("ไม่ระบุ", "0"));
+                cbbQuotation.Value = "0";
+
+                var dtSource = new DataTable();
+                dtSource.Columns.Add("data_value", typeof(string));
+                dtSource.Columns.Add("data_text", typeof(string));
+                var serviceType = Session["DEPARTMENT_SERVICE_TYPE"].ToString();
+                if (serviceType.Contains("P"))
+                {
+                    dtSource.Rows.Add("P", "Product");
+                }
+                if (serviceType.Contains("S"))
+                {
+                    dtSource.Rows.Add("S", "Spare Part");
+                }
+                cbbProductType.DataSource = dtSource;
+                cbbProductType.DataBind();
+
+                cbbProductType.Value = (serviceType.Contains("P") ? "P" : "S");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void LoadData()
+        {
+            try
+            {
+                if (dataId == 0 && cloneId == 0)
+                {
+                    btnSave.Visible = false;
+                }
+                else
+                {
+                    if (dataId != 0)
+                    {
+                        btnAdjust.Visible = true;
+                    }
+
+                    var dsResult = new DataSet();
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = dataId == 0 ? cloneId : dataId },
+                            new SqlParameter("@user_id", SqlDbType.Int) { Value = ConstantClass.SESSION_USER_ID },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_adjust_item_list_data", arrParm.ToArray());
+                        conn.Close();
+                    }   
+                    if (dsResult.Tables.Count > 0)
+                    {
+                        var header = dsResult.Tables[0].AsEnumerable().FirstOrDefault();
+                        if (header != null)
+                        {
+                            txtSetNo.Value = Convert.IsDBNull(header["adjust_no"]) ? string.Empty : Convert.ToString(header["adjust_no"]);
+                            cbbProductType.Value = Convert.IsDBNull(header["adjust_type"]) ? string.Empty : Convert.ToString(header["adjust_type"]);
+                            dtAdjustDate.Value = Convert.IsDBNull(header["adjust_date"]) ? string.Empty : Convert.ToDateTime(header["adjust_date"]).ToString("dd/MM/yyyy");
+                            txtStore.Value = Convert.IsDBNull(header["adjust_store"]) ? string.Empty : Convert.ToString(header["adjust_store"]);
+                            txtSubject.Value = Convert.IsDBNull(header["adjust_subject"]) ? string.Empty : Convert.ToString(header["adjust_subject"]);
+                            txtRemark2.Value = Convert.IsDBNull(header["adjust_remark"]) ? string.Empty : Convert.ToString(header["adjust_remark"]);
+
+                            var quotation_no = Convert.IsDBNull(header["quotation_no"]) ? string.Empty : Convert.ToString(header["quotation_no"]);
+                            var quotation_id = Convert.IsDBNull(header["quotation_id"]) ? string.Empty : Convert.ToString(header["quotation_id"]);
+                            cbbQuotation.Items.Add(new ListEditItem(quotation_no, quotation_id));
+
+                            cbbQuotation.Text = quotation_no;
+                            cbbQuotation.Value = quotation_id;
+                            cbbCustomer.Text = Convert.IsDBNull(header["customer_name"]) ? string.Empty : Convert.ToString(header["customer_name"]);
+                            cbbCustomer.Value = Convert.IsDBNull(header["customer_id"]) ? string.Empty : Convert.ToString(header["customer_id"]);
+                            hdDocStatus.Value = Convert.IsDBNull(header["doc_status"]) ? string.Empty : Convert.ToString(header["doc_status"]);
+                            txtPO.Value = Convert.IsDBNull(header["po_no"]) ? string.Empty : Convert.ToString(header["po_no"]);
+                        }
+
+                        if (hdDocStatus.Value == "CF")
+                        {
+                            //btnDraft.Visible = false;
+                            //btnProduct.Visible = false;
+                            //btnSparePart.Visible = false;
+                            //btnSave.Visible = false;
+                            //Page.ClientScript.RegisterStartupScript(this.GetType(), "Disabled Input", "disableInput()", true);
+                        }
+                        else
+                        {
+
+                        }
+
+                        var detail = dsResult.Tables[1].AsEnumerable().ToList();
+                        if (detail != null)
+                        {
+                            adjustDetailList = new List<AdjustProductDetail>();
+                            foreach (var row in detail)
+                            {
+                                var obj = new AdjustProductDetail()
+                                {
+                                    adjust_type = Convert.IsDBNull(row["adjust_type"]) ? string.Empty : Convert.ToString(row["adjust_type"]),
+                                    id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                    is_delete = Convert.IsDBNull(row["is_delete"]) ? false : Convert.ToBoolean(row["is_delete"]),
+                                    item_name = Convert.IsDBNull(row["item_name"]) ? string.Empty : Convert.ToString(row["item_name"]),
+                                    item_id = Convert.IsDBNull(row["item_id"]) ? 0 : Convert.ToInt32(row["item_id"]),
+                                    item_no = Convert.IsDBNull(row["item_no"]) ? string.Empty : Convert.ToString(row["item_no"]),
+                                    item_type = Convert.IsDBNull(row["item_type"]) ? string.Empty : Convert.ToString(row["item_type"]),
+                                    quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                    max_quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                    remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                    sort_no = Convert.IsDBNull(row["sort_no"]) ? 0 : Convert.ToInt32(row["sort_no"]),
+                                    unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"])
+                                };
+                                obj.quantity_type = (obj.quantity >= 0 ? "0" : "1");
+                                obj.quantity = Math.Abs(obj.quantity);
+
+                                adjustDetailList.Add(obj);
+                            }
+                        }
+                    }
+                    gridView.DataSource = adjustDetailList;
+                    gridView.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void SaveData(string status)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                int newID = DataListUtil.emptyEntryID;
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        if (dataId == 0) // Insert Mode
+                        {
+
+                            #region  Header
+                            //Quotation Header
+                            using (SqlCommand cmd = new SqlCommand("sp_adjust_item_header_add", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                DateTime? adjust_date = null;
+                                if (!string.IsNullOrEmpty(dtAdjustDate.Value))
+                                {
+                                    adjust_date = DateTime.ParseExact(dtAdjustDate.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture); ;
+                                }
+                                cmd.Parameters.Add("@doc_status", SqlDbType.VarChar, 20).Value = status;
+                                cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 2).Value = cbbProductType.Value;
+                                cmd.Parameters.Add("@adjust_date", SqlDbType.DateTime).Value = adjust_date;
+                                cmd.Parameters.Add("@adjust_no", SqlDbType.VarChar, 200).Value = txtSetNo.Value;
+                                cmd.Parameters.Add("@adjust_store", SqlDbType.VarChar, 10).Value = txtStore.Value;
+                                cmd.Parameters.Add("@adjust_subject", SqlDbType.VarChar, 200).Value = txtSubject.Value;
+                                cmd.Parameters.Add("@adjust_remark", SqlDbType.VarChar, 200).Value = txtRemark2.Value;
+                                cmd.Parameters.Add("@quotation_id", SqlDbType.Int).Value = cbbQuotation.Value;
+                                cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = cbbCustomer.Value;
+                                cmd.Parameters.Add("@po_no", SqlDbType.VarChar, 200).Value = txtPO.Value;
+                                cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                newID = Convert.ToInt32(cmd.ExecuteScalar());
+
+                            }
+                            #endregion  Header
+
+
+                            #region  Detail
+                            // Quotation Detail
+                            var oldDetailId = 0;
+                            var newDetailId = 0;
+                            if (adjustDetailList != null)
+                            {
+                                foreach (var row in adjustDetailList)
+                                {
+                                    oldDetailId = row.id;
+
+                                    using (SqlCommand cmd = new SqlCommand("sp_adjust_item_detail_add", conn, tran))
+                                    {
+                                        cmd.CommandType = CommandType.StoredProcedure;
+
+                                        cmd.Parameters.Add("@header_id", SqlDbType.Int).Value = newID;
+                                        cmd.Parameters.Add("@sort_no", SqlDbType.Int).Value = row.sort_no;
+                                        cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = (row.quantity_type == "0" ? row.quantity : row.quantity * -1);
+                                        cmd.Parameters.Add("@item_id", SqlDbType.Int).Value = row.item_id;
+                                        cmd.Parameters.Add("@item_no", SqlDbType.VarChar, 20).Value = row.item_no;
+                                        cmd.Parameters.Add("@item_name", SqlDbType.VarChar, 200).Value = row.item_name;
+                                        cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
+                                        cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
+                                        cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 5).Value = row.adjust_type;
+                                        cmd.Parameters.Add("@remark", SqlDbType.VarChar, 200).Value = row.remark;
+                                        cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                        newDetailId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                                    }
+
+                                }
+                            }
+                            else
+                            {
+                                Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage('Error','E')", true);
+                            }
+                            #endregion  Detail                           
+                        }
+                        else // Edit Mode
+                        {
+                            newID = dataId;
+
+                            #region Header
+                            //Quotation Header
+                            DateTime? adjust_date = null;
+                            if (!string.IsNullOrEmpty(dtAdjustDate.Value))
+                            {
+                                adjust_date = DateTime.ParseExact(dtAdjustDate.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture); ;
+                            }
+                            using (SqlCommand cmd = new SqlCommand("sp_adjust_item_header_edit", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = dataId;
+                                cmd.Parameters.Add("@doc_status", SqlDbType.VarChar, 20).Value = status;
+                                cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 2).Value = cbbProductType.Value;
+                                cmd.Parameters.Add("@adjust_date", SqlDbType.DateTime).Value = adjust_date;
+                                cmd.Parameters.Add("@adjust_no", SqlDbType.VarChar, 200).Value = txtSetNo.Value;
+                                cmd.Parameters.Add("@adjust_store", SqlDbType.VarChar, 10).Value = txtStore.Value;
+                                cmd.Parameters.Add("@adjust_subject", SqlDbType.VarChar, 200).Value = txtSubject.Value;
+                                cmd.Parameters.Add("@adjust_remark", SqlDbType.VarChar, 200).Value = txtRemark2.Value;
+                                cmd.Parameters.Add("@quotation_id", SqlDbType.Int).Value = cbbQuotation.Value;
+                                cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = cbbCustomer.Value;
+                                cmd.Parameters.Add("@po_no", SqlDbType.VarChar, 200).Value = txtPO.Value;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+                            #endregion  Header
+
+
+                            #region  Detail
+                            // Quotation Detail
+                            var oldDetailId = 0;
+                            var newDetailId = 0;
+                            if (adjustDetailList != null)
+                            {
+                                foreach (var row in adjustDetailList)
+                                {
+                                    oldDetailId = row.id;
+                                    if (row.id < 0)
+                                    {
+                                        using (SqlCommand cmd = new SqlCommand("sp_adjust_item_detail_add", conn, tran))
+                                        {
+                                            cmd.CommandType = CommandType.StoredProcedure;
+
+                                            cmd.Parameters.Add("@header_id", SqlDbType.Int).Value = newID;
+                                            cmd.Parameters.Add("@sort_no", SqlDbType.Int).Value = row.sort_no;
+                                            cmd.Parameters.Add("@item_id", SqlDbType.Int).Value = row.item_id;
+                                            cmd.Parameters.Add("@item_no", SqlDbType.VarChar, 20).Value = row.item_no;
+                                            cmd.Parameters.Add("@item_name", SqlDbType.VarChar, 200).Value = row.item_name;
+                                            cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = (row.quantity_type == "0" ? row.quantity : row.quantity * -1);
+                                            cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
+                                            cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
+                                            cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 5).Value = row.adjust_type;
+                                            cmd.Parameters.Add("@remark", SqlDbType.VarChar, 200).Value = row.remark;
+                                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                            newDetailId = Convert.ToInt32(cmd.ExecuteScalar());
+
+                                        }
+                                    }
+                                    else if (row.id > 0 && !row.is_delete)
+                                    {
+                                        using (SqlCommand cmd = new SqlCommand("sp_adjust_item_detail_edit", conn, tran))
+                                        {
+                                            cmd.CommandType = CommandType.StoredProcedure;
+
+                                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = row.id;
+                                            cmd.Parameters.Add("@sort_no", SqlDbType.Int).Value = row.sort_no;
+                                            // cmd.Parameters.Add("@item_id", SqlDbType.Int, 20).Value = row.item_id;
+                                            // cmd.Parameters.Add("@item_name", SqlDbType.VarChar, 200).Value = row.item_name;
+                                            // cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
+                                            cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = (row.quantity_type == "0" ? row.quantity : row.quantity * -1);
+                                            //cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
+                                            cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 5).Value = row.adjust_type;
+                                            cmd.Parameters.Add("@remark", SqlDbType.VarChar, 200).Value = row.remark;
+                                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = row.is_delete;
+                                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                            cmd.ExecuteNonQuery();
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (SqlCommand cmd = new SqlCommand("sp_adjust_item_detail_edit", conn, tran))
+                                        {
+                                            cmd.CommandType = CommandType.StoredProcedure;
+
+                                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = row.id;
+                                            cmd.Parameters.Add("@sort_no", SqlDbType.Int).Value = row.sort_no;
+                                            // cmd.Parameters.Add("@item_id", SqlDbType.Int, 20).Value = row.item_id;
+                                            // cmd.Parameters.Add("@item_name", SqlDbType.VarChar, 200).Value = row.item_name;
+                                            // cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
+                                            cmd.Parameters.Add("@quantity", SqlDbType.Int).Value = (row.quantity_type == "0" ? row.quantity : row.quantity * -1);
+                                            //cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
+                                            cmd.Parameters.Add("@adjust_type", SqlDbType.VarChar, 5).Value = row.adjust_type;
+                                            cmd.Parameters.Add("@remark", SqlDbType.VarChar, 200).Value = row.remark;
+                                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = row.is_delete;
+                                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                            cmd.ExecuteNonQuery();
+
+                                        }
+                                    }
+
+                                }
+                            }
+
+                            //  Start adjust product
+                            if (status == "CF")
+                            {
+                                var transNo = string.Empty;
+                                using (SqlCommand cmd = new SqlCommand("sp_gen_transection_no", conn, tran))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    transNo = Convert.ToString(cmd.ExecuteScalar());
+                                }
+                                foreach (var row in adjustDetailList)//.Where(t => t.receive_qty_balance != 0))
+                                {
+                                    if (!row.is_delete)
+                                    {
+                                        using (SqlCommand cmd = new SqlCommand("sp_stock_movement_add", conn, tran))
+                                        {
+                                            cmd.CommandType = CommandType.StoredProcedure;
+                                            cmd.Parameters.Add("@transection_no", SqlDbType.VarChar, 20).Value = transNo;
+
+                                            cmd.Parameters.Add("@product_type", SqlDbType.VarChar, 1).Value = row.item_type;
+                                            cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.item_id;
+
+                                            cmd.Parameters.Add("@transection_type", SqlDbType.VarChar, 50).Value = "ADJ";
+                                            cmd.Parameters.Add("@movement_type", SqlDbType.VarChar, 3).Value = (row.quantity > 0 ? "IN" : "OUT");
+                                            cmd.Parameters.Add("@checking_type", SqlDbType.NVarChar, 1).Value = "W";
+                                            cmd.Parameters.Add("@qty", SqlDbType.Int).Value = Math.Abs(row.quantity);
+                                            cmd.Parameters.Add("@stock_balance", SqlDbType.Int).Value = 0; // คำนวนจาก Store
+                                            cmd.Parameters.Add("@remark", SqlDbType.VarChar, 500).Value = "Adjust product";
+                                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                            cmd.Parameters.Add("@ref_doc_id", SqlDbType.Int).Value = newID; // คำนวนจาก Store
+                                            cmd.Parameters.Add("@ref_doc_no", SqlDbType.VarChar, 20).Value = txtSetNo.Value;// txtPRNo.Value;
+                                            cmd.Parameters.Add("@supplier_id", SqlDbType.Int).Value = 0;
+                                            cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = 0;
+                                            cmd.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
+                            }
+                            #endregion
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage('" + ex.Message + "','E')", true);
+                        //throw ex;
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+
+                            Response.Redirect("AdjustProduct.aspx?dataId=" + newID);
+                        }
+                    }
+                }
+            }
+        }
+        private void ClearWorkingSession()
+        {
+            try
+            {
+                Session.Remove(guid + session_item);
+                Session.Remove(guid + session_detail);
+                Session.Remove(guid + session_selected_detail);
+                Session.Remove(guid + session_selected_item);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        private void BindGridView()
+        {
+            gridView.DataSource = adjustDetailList.Where(t => !t.is_delete).OrderBy(t => t.sort_no).ToList();
+            gridView.DataBind();
+        }
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = adjustDetailList.Where(t => !t.is_delete).OrderBy(t => t.sort_no).ToList();
+        }
+
+        protected void gridViewSelectedItem_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            if (e.Parameters.ToString().Contains("Search"))
+            {
+
+                var splitStr = e.Parameters.ToString().Split('|');
+                string searchText = string.Empty;
+                if (splitStr.Length > 0)
+                {
+                    searchText = splitStr[1];
+
+                    gridViewSelectedItem.DataSource = selectedItemDetailList.Where(t => t.item_name.ToUpper().Contains(searchText.ToUpper())
+                                                                                    || t.item_no.ToUpper().Contains(searchText.ToUpper())).ToList();
+                    gridViewSelectedItem.DataBind();
+                }
+            }
+            else
+            {
+                gridViewSelectedItem.DataSource = selectedItemDetailList;
+                gridViewSelectedItem.DataBind();
+            }
+        }
+
+        protected void gridViewSelectedItem_HtmlDataCellPrepared(object sender, ASPxGridViewTableDataCellEventArgs e)
+        {
+            ASPxCheckBox checkBox = gridViewSelectedItem.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "chkBox") as ASPxCheckBox;
+            if (checkBox != null)
+            {
+                if (e.DataColumn.FieldName == "is_selected")
+                {
+                    if (selectedItemDetailList != null)
+                    {
+                        var row = selectedItemDetailList.Where(t => t.item_no == e.KeyValue.ToString()).FirstOrDefault();
+                        if (row != null)
+                        {
+                            checkBox.Checked = row.is_selected;
+                        }
+                    }
+                }
+            }
+        }
+        private void BindGridSelectedItem()
+        {
+            gridViewSelectedItem.DataSource = selectedItemDetailList;
+            gridViewSelectedItem.DataBind();
+        }
+        [WebMethod]
+        public static string PopupItemDetail(string item_type)
+        {
+            try
+            {
+                DataSet dsResult = new DataSet();
+                var productList = new List<ProductSparePartDetail>();
+                if (item_type == "P")
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@product_no", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_list", arrParm.ToArray());
+                        conn.Close();
+                    }
+
+                    if (dsResult.Tables.Count > 0)
+                    {
+                        foreach (var row in dsResult.Tables[0].AsEnumerable())
+                        {
+                            productList.Add(new ProductSparePartDetail()
+                            {
+                                is_selected = false,
+                                item_id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                item_name = Convert.IsDBNull(row["product_name_tha"]) ? string.Empty : Convert.ToString(row["product_name_tha"]),
+                                item_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                item_type = "P",
+                                quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"]).ToString(),
+
+                            });
+                        }
+                    }
+                }
+                else if (item_type == "S")
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = string.Empty },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_spare_part_list", arrParm.ToArray());
+                        conn.Close();
+
+                        if (dsResult != null)
+                        {
+                            foreach (var row in dsResult.Tables[0].AsEnumerable())
+                            {
+                                productList.Add(new ProductSparePartDetail()
+                                {
+                                    is_selected = false,
+                                    item_id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                    item_no = Convert.IsDBNull(row["part_no"]) ? string.Empty : Convert.ToString(row["part_no"]),
+                                    item_name = Convert.IsDBNull(row["part_name_tha"]) ? string.Empty : Convert.ToString(row["part_name_tha"]),
+                                    unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"]),
+                                    quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                    item_type = "S"
+                                });
+
+                            }
+                        }
+                    }
+
+                }
+
+                HttpContext.Current.Session[guid + session_item] = productList;
+
+                return "ITEMDETAIL";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
+        [WebMethod]
+        public static string SelectedItem(int key, bool isSelected)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+            var selectedItemList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_selected_detail];
+            var productList = (List<ProductSparePartDetail>)HttpContext.Current.Session[guid + session_item];
+            if (productList != null)
+            {
+                var item = productList.Where(t => t.item_id == key).FirstOrDefault();
+                if (item != null)
+                {
+                    if (selectedItemList == null)
+                    {
+                        selectedItemList = new List<AdjustProductDetail>();
+                    }
+                    if (isSelected)
+                    {
+                        var count = 0;
+                        if (adjustDetailList != null)
+                        {
+                            count = adjustDetailList.Count;
+                        }
+
+                        selectedItemList.Add(new AdjustProductDetail()
+                        {
+                            adjust_type = null,
+                            id = (count + 1) * -1,
+                            is_delete = false,
+                            item_name = item.item_name,
+                            item_id = item.item_id,
+                            item_no = item.item_no,
+                            item_type = item.item_type,
+                            quantity = 0,//item.quantity,
+                            max_quantity = item.quantity,
+                            quantity_type = "0",
+                            unit_code = item.unit_code,
+                            remark = string.Empty,
+                            sort_no = (selectedItemList.Count + 1)
+
+                        });
+                        item.is_selected = true;
+                    }
+                    else
+                    {
+                        var checkExist = selectedItemList.Where(t => t.item_no == item.item_no).FirstOrDefault();
+                        if (checkExist != null)
+                        {
+                            selectedItemList.Remove(checkExist);
+                        }
+                        item.is_selected = false;
+                    }
+                }
+            }
+            HttpContext.Current.Session[guid + session_selected_detail] = selectedItemList;
+            HttpContext.Current.Session[guid + session_item] = productList;
+            return "SELECETD";
+        }
+
+        [WebMethod]
+        public static string SubmitSelectedItem()
+        {
+            var selectedItemList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_selected_detail];
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (selectedItemList != null)
+            {
+
+                if (adjustDetailList == null)
+                {
+                    adjustDetailList = new List<AdjustProductDetail>();
+                }
+                foreach (var row in selectedItemList)
+                {
+                    var checkExist = adjustDetailList.Where(t => t.item_no == row.item_no && !t.is_delete).FirstOrDefault();
+                    if (checkExist != null)
+                    {
+                        //checkExist.quantity += 1;
+                    }
+                    else
+                    {
+                        adjustDetailList.Add(row);
+                    }
+                }
+                /*var deletedItem = new List<AdjustProductDetail>();
+                deletedItem.AddRange(adjustDetailList);
+                foreach (var row in deletedItem)
+                {
+                    var checkDeleted = selectedItemList.Where(t => t.item_no == row.item_no).FirstOrDefault();
+                    if (checkDeleted == null)
+                    {
+                        var itemDeleted = adjustDetailList.Where(t => t.id == row.id).FirstOrDefault();
+                        if (itemDeleted.id < 0)
+                        {
+                            adjustDetailList.Remove(itemDeleted);
+                        }
+                        else
+                        {
+                            itemDeleted.is_delete = true;
+                        }
+                    }
+                }*/
+
+            }
+            HttpContext.Current.Session[guid + session_selected_detail] = null;
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "SUBMIT";
+        }
+
+        [WebMethod]
+        public static string CheckedAdjust(int key, string value)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == key).FirstOrDefault();
+                if (row != null)
+                {
+                    row.adjust_type = value;
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "CHECKEDADJUST";
+        }
+        [WebMethod]
+        public static string ChangeRemark(int key, string value)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == key).FirstOrDefault();
+                if (row != null)
+                {
+                    row.remark = value;
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "CHECKEDADJUST";
+        }
+        [WebMethod]
+        public static string ChangeQuantity(int key, int value)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == key).FirstOrDefault();
+                if (row != null)
+                {
+                    row.quantity = value;
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "QUANTITY";
+        }
+        [WebMethod]
+        public static string ChangeQuantityType(int key, string value)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == key).FirstOrDefault();
+                if (row != null)
+                {
+                    row.quantity_type = value;
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "QUANTITY";
+        }
+        [WebMethod]
+        public static string ChangeSortno(int key, int value)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == key).FirstOrDefault();
+                if (row != null)
+                {
+                    row.sort_no = value;
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "QUANTITY";
+        }
+
+        protected void gridView_HtmlDataCellPrepared(object sender, ASPxGridViewTableDataCellEventArgs e)
+        {
+            try
+            {
+                ASPxRadioButtonList rdoAdjust = gridView.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "rdoAdjust") as ASPxRadioButtonList;
+                ASPxSpinEdit txtQuantity = gridView.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "txtQuantity") as ASPxSpinEdit;
+                ASPxSpinEdit txtSortNo = gridView.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "txtSortNo") as ASPxSpinEdit;
+                ASPxTextBox txtRemark = gridView.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "txtRemark") as ASPxTextBox;
+                if (rdoAdjust != null)
+                {
+                    if (e.DataColumn.FieldName == "quantity")
+                    {
+                        if (adjustDetailList != null)
+                        {
+                            var row = adjustDetailList.Where(t => t.id == Convert.ToInt32(e.KeyValue)).FirstOrDefault();
+                            if (row != null)
+                            {
+                                rdoAdjust.SelectedIndex = (row.quantity_type == "0" ? 0 : 1);
+                            }
+                            if (hdDocStatus.Value == "CF")
+                            {
+                                rdoAdjust.Enabled = false;
+                            }
+                        }
+                    }
+                }
+                if (txtQuantity != null)
+                {
+                    if (e.DataColumn.FieldName == "quantity")
+                    {
+                        if (adjustDetailList != null)
+                        {
+                            var row = adjustDetailList.Where(t => t.id == Convert.ToInt32(e.KeyValue)).FirstOrDefault();
+                            if (row != null)
+                            {
+                                txtQuantity.Value = row.quantity;
+                                txtQuantity.MaxValue = row.max_quantity;
+                            }
+                        }
+                    }
+                }
+                if (txtSortNo != null)
+                {
+                    if (e.DataColumn.FieldName == "sort_no")
+                    {
+                        if (adjustDetailList != null)
+                        {
+                            var row = adjustDetailList.Where(t => t.id == Convert.ToInt32(e.KeyValue)).FirstOrDefault();
+                            if (row != null)
+                            {
+                                txtSortNo.Value = row.sort_no;
+                            }
+                        }
+                    }
+                }
+                if (txtRemark != null)
+                {
+                    if (e.DataColumn.FieldName == "remark")
+                    {
+                        if (adjustDetailList != null)
+                        {
+                            var row = adjustDetailList.Where(t => t.id == Convert.ToInt32(e.KeyValue)).FirstOrDefault();
+                            if (row != null)
+                            {
+                                txtRemark.Value = row.remark;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static string DeleteAdjustItem(int id)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            if (adjustDetailList != null)
+            {
+                var row = adjustDetailList.Where(t => t.id == id).FirstOrDefault();
+                if (row != null)
+                {
+                    if (row.id < 0)
+                    {
+                        adjustDetailList.Remove(row);
+                    }
+                    else
+                    {
+                        row.is_delete = true;
+                    }
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = adjustDetailList;
+            return "QUANTITY";
+        }
+
+        [WebMethod]
+        public static string CheckProduct()
+        {
+            string msgError = "";
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+            //  Check product
+            var productNos = "";
+            var partNos = "";
+            foreach (var row in adjustDetailList)
+            {
+                if (row.item_type == "P")
+                {
+                    if (productNos != "")
+                    {
+                        productNos += ",";
+                    }
+                    productNos += row.item_no;
+                }
+                else
+                {
+                    if (partNos != "")
+                    {
+                        partNos += ",";
+                    }
+                    partNos += row.item_no;
+                }
+            }
+            try
+            {
+                //  For product
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@item_type", SqlDbType.VarChar, 1) { Value = "P"},
+                            new SqlParameter("@item_no", SqlDbType.VarChar, 100) { Value = productNos },
+                        };
+                    conn.Open();
+                    var dsQuataionData = SqlHelper.ExecuteDataset(conn, "sp_adjust_product_check_qty", arrParm.ToArray());
+                    conn.Close();
+
+                    if (dsQuataionData.Tables.Count > 0)
+                    {
+                        if (dsQuataionData.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsQuataionData.Tables[0].AsEnumerable())
+                            {
+                                var qty = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]);
+                                var item_no = Convert.IsDBNull(row["item_no"]) ? string.Empty : Convert.ToString(row["item_no"]);
+
+                                var obj = adjustDetailList.Where(t => t.item_no == item_no).FirstOrDefault();
+                                if (obj != null)
+                                {
+                                    if (obj.quantity < 0 && Math.Abs(obj.quantity) > qty)
+                                    {
+                                        if (msgError != "")
+                                        {
+                                            msgError += "\n";
+                                        }
+                                        msgError += (item_no + " จำนวนไม่เพียงพอ");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //  For part
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@item_type", SqlDbType.VarChar, 1) { Value = "S"},
+                            new SqlParameter("@item_no", SqlDbType.VarChar, 100) { Value = partNos },
+                        };
+                    conn.Open();
+                    var dsQuataionData = SqlHelper.ExecuteDataset(conn, "sp_adjust_product_check_qty", arrParm.ToArray());
+                    conn.Close();
+
+                    if (dsQuataionData.Tables.Count > 0)
+                    {
+                        if (dsQuataionData.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsQuataionData.Tables[0].AsEnumerable())
+                            {
+                                var qty = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]);
+                                var item_no = Convert.IsDBNull(row["item_no"]) ? string.Empty : Convert.ToString(row["item_no"]);
+
+                                var obj = adjustDetailList.Where(t => t.item_no == item_no).FirstOrDefault();
+                                if (obj != null)
+                                {
+                                    if (obj.quantity < 0 && Math.Abs(obj.quantity) > qty)
+                                    {
+                                        if (msgError != "")
+                                        {
+                                            msgError += "\n";
+                                        }
+                                        msgError += (item_no + " จำนวนไม่เพียงพอ");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return msgError;
+        }
+
+        [WebMethod]
+        public static string StartAdjustProduct(int id)
+        {
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+
+            return "QUANTITY " + id;
+        }
+
+        protected void btnSaveDraft_Click(object sender, EventArgs e)
+        {
+            SaveData("DR");
+        }
+
+        protected void btnConfirm_Click(object sender, EventArgs e)
+        {
+            SaveData("CF");
+        }
+        [WebMethod]
+        public static string ValidateData()
+        {
+            var msgError = string.Empty;
+            var adjustDetailList = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+            if (adjustDetailList != null)
+            {
+                int countRows = adjustDetailList.Where(t => !t.is_delete).Count();
+                if (countRows == 0)
+                {
+                    msgError = "กรุณาทำรายการอย่างน้อย 1 รายการ";
+                }
+                /*else
+                {
+                    foreach (var row in adjustDetailList)
+                    {
+                        if (row.quantity == 0)
+                        {
+                            msgError += "กรุณาใส่จำนวน สินค้า " + row.item_name + "\n";
+                        }
+                    }
+                }*/
+            }
+            return msgError;
+        }
+        [WebMethod]
+        public static ProductName GetProductName(string id)
+        {
+            var data = new ProductName();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = ""},
+                            new SqlParameter("@product_no", SqlDbType.VarChar,50) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+                        };
+                    conn.Open();
+                    var dsQuataionData = SqlHelper.ExecuteDataset(conn, "sp_product_list", arrParm.ToArray());
+                    conn.Close();
+
+                    if (dsQuataionData.Tables.Count > 0)
+                    {
+                        if (dsQuataionData.Tables[0].Rows.Count > 0)
+                        {
+                            var row = (from t in dsQuataionData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                            if (row != null)
+                            {
+                                data.name_eng = Convert.IsDBNull(row["product_name_eng"]) ? string.Empty : Convert.ToString(row["product_name_eng"]);
+                                data.name_tha = Convert.IsDBNull(row["product_name_tha"]) ? string.Empty : Convert.ToString(row["product_name_tha"]);
+                                data.quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]);
+                                data.quantity_reserve = Convert.IsDBNull(row["quantity_reserve"]) ? 0 : Convert.ToInt32(row["quantity_reserve"]);
+                                data.quantity_balance = Convert.IsDBNull(row["quantity_balance"]) ? 0 : Convert.ToInt32(row["quantity_balance"]);
+
+
+                            }
+                        }
+                    }
+                }
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static QuotationData GetQuotationData(string id)
+        {
+            var headerData = new QuotationData();
+            try
+            {
+                var dsResult = new DataSet();
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_quotation_list_data", arrParm.ToArray());
+                    conn.Close();
+                }
+                if (dsResult.Tables.Count > 0)
+                {
+                    // Quotation Header
+                    var data = dsResult.Tables[0].AsEnumerable().FirstOrDefault();
+                    if (data != null)
+                    {
+                        headerData.customer_id = Convert.IsDBNull(data["customer_id"]) ? 0 : Convert.ToInt32(data["customer_id"]);
+                        headerData.quotation_subject = Convert.IsDBNull(data["quotation_subject"]) ? string.Empty : Convert.ToString(data["quotation_subject"]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return headerData;
+        }
+
+        [WebMethod]
+        public static void MoveUpListModel(string id)
+        {
+            List<AdjustProductDetail> data = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+            if (data != null)
+            {
+                var row = (from t in data where t.id == Convert.ToInt32(id) select t).FirstOrDefault();
+                if (row != null)
+                {
+                    if (row.sort_no != 1)
+                    {
+                        row.sort_no = row.sort_no - 1;
+                    }
+                    else
+                    {
+                        row.sort_no = 1;
+                    }
+                    var sortNoLower = (from t in data where t.sort_no == row.sort_no && t.id != Convert.ToInt32(id) select t).FirstOrDefault();
+                    if (sortNoLower != null)
+                    {
+                        sortNoLower.sort_no = sortNoLower.sort_no + 1;
+                    }
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = data;
+        }
+        [WebMethod]
+        public static void MoveDownListModel(string id)
+        {
+            List<AdjustProductDetail> data = (List<AdjustProductDetail>)HttpContext.Current.Session[guid + session_detail];
+            if (data != null)
+            {
+                var row = (from t in data where t.id == Convert.ToInt32(id) select t).FirstOrDefault();
+                if (row != null)
+                {
+                    if (row.sort_no != data.Count)
+                    {
+                        row.sort_no = row.sort_no + 1;
+                    }
+                    else
+                    {
+                        row.sort_no = data.Count;
+                    }
+                    var sortNoLower = (from t in data where t.sort_no == row.sort_no && t.id != Convert.ToInt32(id) select t).FirstOrDefault();
+                    if (sortNoLower != null)
+                    {
+                        sortNoLower.sort_no = sortNoLower.sort_no - 1;
+                    }
+                }
+            }
+            HttpContext.Current.Session[guid + session_detail] = data;
+        }
+
+    }
+}

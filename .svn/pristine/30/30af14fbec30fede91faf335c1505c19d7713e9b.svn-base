@@ -1,0 +1,152 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class StockCard : MasterDetailPage
+    {
+        public class StockCardData
+        {
+            public string datepickerFrom { get; set; }
+            public string datepickerTo { get; set; }
+            public int product_id { get; set; }
+            public string product_type { get; set; }
+
+            public string no_ { get; set; }
+            public string name_ { get; set; }
+            public string remark { get; set; }
+            public int in_ { get; set; }
+            public int out_ { get; set; }
+            public int stock_balance { get; set; }
+        }
+        List<StockCardData> stockCardData
+        {
+            get
+            {
+                if (Session["SESSION_STOCK_CARD"] == null)
+                    Session["SESSION_STOCK_CARD"] = new List<StockCardData>();
+                return (List<StockCardData>)Session["SESSION_STOCK_CARD"];
+            }
+            set
+            {
+                Session["SESSION_STOCK_CARD"] = value;
+            }
+        }
+        public override string PageName { get { return "Stock Card"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            if (!Page.IsPostBack)
+            {
+                PrepareData();
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+
+                var dtSource = new DataTable();
+                dtSource.Columns.Add("data_value", typeof(string));
+                dtSource.Columns.Add("data_text", typeof(string));
+                dtSource.Rows.Add("PP", "Product");
+                dtSource.Rows.Add("SP", "SparePart");
+                cbbProductType.DataSource = dtSource;
+                cbbProductType.DataBind();
+
+                SPlanetUtil.BindASPxComboBox(ref cbbProduct, DataListUtil.DropdownStoreProcedureName.Product);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        public override void OnFilterChanged()
+        {
+            //BindGrid();
+        }
+        [WebMethod]
+        public static string ChangedData()
+        {
+            string returnData = string.Empty;
+            HttpContext.Current.Session.Remove("SESSION_STOCK_CARD");
+            return returnData;
+        }
+        [WebMethod]
+        public static void GetViewGrid(StockCardData[] dataStockCard)
+        {
+            var dsDatastockCard = new DataSet();
+            var stockCardData = new List<StockCardData> ();
+            var data = (from t in dataStockCard select t).FirstOrDefault();
+            if (data != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@product_id", SqlDbType.Int) { Value = data.product_id },
+                             new SqlParameter("@date_from", SqlDbType.VarChar,20) { Value = data.datepickerFrom },
+                             new SqlParameter("@date_to", SqlDbType.VarChar,20) { Value = data.datepickerTo },
+                             new SqlParameter("@product_type", SqlDbType.VarChar,1) { Value = data.product_type },
+                        };
+                        conn.Open();
+                        dsDatastockCard = SqlHelper.ExecuteDataset(conn, "sp_stock_card_report", arrParm.ToArray());
+
+                        if (dsDatastockCard.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsDatastockCard.Tables[0].AsEnumerable())
+                            {
+                                stockCardData.Add(new StockCardData()
+                                {
+                                    no_ = Convert.IsDBNull(row["no_"]) ? string.Empty : Convert.ToString(row["no_"]),
+                                    name_ = Convert.IsDBNull(row["name_"]) ? string.Empty : Convert.ToString(row["name_"]),
+                                    remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                    in_ = Convert.IsDBNull(row["in_"]) ? 0 : Convert.ToInt32(row["in_"]),
+                                    out_ = Convert.IsDBNull(row["out_"]) ? 0 : Convert.ToInt32(row["out_"]),
+                                    stock_balance = Convert.IsDBNull(row["stock_balance"]) ? 0 : Convert.ToInt32(row["stock_balance"]),
+                                });
+                            }
+                        }
+                    }
+                    HttpContext.Current.Session["SESSION_STOCK_CARD"] = stockCardData;
+                }
+                
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+
+            }
+        protected void gridStockCard_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = (from t in stockCardData select t).ToList();
+            gridView.DataBind();
+        }
+    }
+
+        }
+    

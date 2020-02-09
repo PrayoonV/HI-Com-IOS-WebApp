@@ -1,0 +1,392 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="AdjustProductSparePart.aspx.cs" Inherits="HicomIOS.Master.AdjustProductSparePart" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style type="text/css">
+        fieldset {
+            border: 1px solid #4b4b57;
+            display: block;
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+
+        legend {
+            width: auto;
+            display: block;
+            -webkit-padding-start: 2px;
+            -webkit-padding-end: 2px;
+            border-width: initial;
+            border-style: none;
+            border-color: initial;
+            border-image: initial;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: inherit;
+            font-weight: bold;
+        }
+
+        #Splitter_0 {
+            display: none;
+        }
+
+        #div-content {
+            padding: 10px 30px;
+            background-color: #ffffff;
+            margin: 20px 0;
+        }
+
+            #div-content .row.form-group {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        .no-padding-right {
+            padding-right: 0px;
+        }
+
+        .no-margin {
+            margin: 0px;
+        }
+
+        .label-rigth {
+            padding: 4px 8px 0 0;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+            .form-group label {
+                font-weight: normal;
+            }
+
+        .form-control {
+            border-radius: 0;
+            padding: 0 3px;
+            font-size: 11px;
+            height: 22px;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            margin: 1px 0 0;
+        }
+
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+            border: 1px solid #4b4b57;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid #4b4b57;
+        }
+
+            .nav-tabs > li > a {
+                border-radius: 0;
+            }
+
+                .nav-tabs > li > a:hover {
+                    border-color: #eee #eee #4b4b57;
+                }
+
+        .nav > li > a:focus, .nav > li > a:hover {
+            background-color: #faedb6;
+        }
+
+        a {
+            color: inherit;
+        }
+
+            a:focus, a:hover {
+                color: inherit;
+            }
+
+        #div-content .tab-content .tab-pane {
+            padding-top: 10px;
+        }
+
+        .btn-addItem {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+            .btn-addItem:hover {
+                background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+                border: 1px solid #eecc53;
+            }
+
+            .btn-addItem i {
+                font-size: 12px;
+            }
+
+        .btn-app {
+            width: 65px;
+        }
+
+        .modal-open {
+            opacity: 0.7;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: white;
+            /*border: 1px solid #909aa6;*/
+            border-collapse: separate;
+        }
+
+            .modal-content .modal-header {
+                background: #bbcee6 url(/DXR.axd?r=0_4062-wP3qf) repeat-x left top;
+                border-bottom: 1px solid #909aa6;
+                padding: 8px 0 6px 12px;
+                color: #1e395b;
+                font: 11px Verdana, Geneva, sans-serif;
+                height: 29px;
+            }
+
+        .modal-backdrop {
+            opacity: 0.5 !important;
+        }
+
+        .hr-line {
+            border-top: 1px solid #000;
+        }
+
+        .shipping-step {
+            float: left;
+            padding: 0 15px;
+        }
+
+        .dv {
+            margin-left: 0.1px;
+        }
+
+        .swal-modal {
+            width: 420px !important;
+            height: 250px !important;
+        }
+
+        .swal-title {
+            font-size: 15px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+    </style>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var h = window.innerHeight;
+            gridView.SetHeight(h - 155);
+        });
+        ASPxClientControl.GetControlCollection().BrowserWindowResized.AddHandler(function (s, e) {
+            console.log(s);
+            var dimensions = {
+                height: (event.srcElement || event.currentTarget).innerHeight,
+                width: (event.srcElement || event.currentTarget).innerWidth
+            };
+            //console.log(dimensions);
+            //var a = $('#gridView').length;
+            var height = dimensions.height - 152;
+            //document.getElementById('gridCell').setAttribute("style", "height:" + height + "px");
+            console.log(height);
+            gridView.SetHeight(height);
+        });
+        function addItemDetail(item_type) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $.ajax({
+                type: "POST",
+                url: "AdjustProductSparePart.aspx/PopupItemDetail",
+                data: "{item_type : '" + item_type + "'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridViewSelectedItem.PerformCallback();
+                    $('#popupSelectedItem').modal("show");
+                    $.LoadingOverlay("hide");
+                },
+                failure: function (response) {
+
+                }
+            });
+
+        }
+        function searchProductGrid(e) {
+            if (e == 13) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+
+                var txtSearch = $("#txtSearchBoxData").val();
+                gridViewSelectedItem.PerformCallback("Search|" + txtSearch.toString());
+
+                $.LoadingOverlay("hide");
+            }
+        }
+        function getCheckBoxValue() {
+
+        }
+    </script>
+    <div class="div-content">
+        <div class="row">
+            <button type="button" runat="server" id="btnBack" onclick="backPage()" class="btn-addItem">
+                <i class="fa fa-list-ol" aria-hidden="true"></i>&nbsp;List PurchaseRequest
+            </button>
+        </div>
+        <div class="row">
+            <fieldset>
+                <legend>Header</legend>
+                <div class="col-xs-5 no-padding">
+                    <div class="row">
+                        <div class="col-md-6">
+                            ลูกค้า :
+                        <dx:ASPxComboBox ID="cbbCustomer" CssClass="form-control" runat="server" ClientInstanceName="cbbCustomer" TextField="data_text"
+                            EnableCallbackMode="true"
+                            ValueField="data_value">
+                        </dx:ASPxComboBox>
+                        </div>
+                        <div class="col-md-6">
+                            เลขที่ใบเสนอราคา :
+                               <input type="text" class="form-control" id="txtQuotationNo" runat="server" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            เลขที่ใบสั่งซื้อ :
+                     <input type="text" class="form-control" id="txtPO" runat="server" />
+                        </div>
+                        <div class="col-md-6">
+                            วัตถุประสงค์ในการปรับปรุง :
+                     <input type="text" class="form-control" id="txtObjective" runat="server" />
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="row">
+            <div class="row form-group">
+                <button type="button" runat="server" id="btnProduct" onclick="addItemDetail('P')" class="btn-addItem">เพิ่มสินค้า</button>
+                <button type="button" runat="server" id="btnSparePart" onclick="addItemDetail('S')" class="btn-addItem">เพิ่มสินค้าอะไหล่</button>
+            </div>
+
+            <div class="col-xs-12">
+                <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridView"
+                    Width="100%" KeyFieldName="id" EnableCallBacks="true" OnCustomCallback="gridView_CustomCallback">
+                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                    <Paddings Padding="0px" />
+                    <Border BorderWidth="0px" />
+                    <BorderBottom BorderWidth="1px" />
+                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                        PageSizeItemSettings-Visible="true">
+                        <PageSizeItemSettings Items="10, 20, 50" />
+                    </SettingsPager>
+                    <Columns>
+                        <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
+                            <DataItemTemplate>
+                                <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editNotice(<%# Eval("id")%>)" title="Edit">
+                                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                                </a>
+                                |
+                        <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteNotice(<%# Eval("id")%>)" title="Delete">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            </DataItemTemplate>
+                        </dx:GridViewDataTextColumn>
+                        <dx:GridViewDataTextColumn FieldName="quotation_status_display" Caption="Status" Width="50px" />
+                        <dx:GridViewDataTextColumn FieldName="company_name_tha" Caption="Customer Name" Width="200px" />
+                        <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false"
+                            FieldName="grand_total" Caption="Grand Total(THB)" Width="60px">
+                            <PropertiesSpinEdit DisplayFormatString="n" DisplayFormatInEditMode="true" MinValue="0" MaxValue="99999999">
+                                <ValidationSettings Display="Dynamic" RequiredField-IsRequired="true" />
+                            </PropertiesSpinEdit>
+                        </dx:GridViewDataSpinEditColumn>
+                        <dx:GridViewDataTextColumn FieldName="sales_name" Caption="Sales Name" Width="90px" />
+                    </Columns>
+                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
+                    <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+                    <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                        CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                </dx:ASPxGridView>
+            </div>
+
+            <div class="modal fade" id="popupSelectedItem" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            Add Product/Spare Part
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div style="float: right; margin-bottom: 5px;">
+                                        <input type="text" id="txtSearchBoxData" class="form-control searchBoxData"
+                                            placeholder="กรอกคำค้นหา..." runat="server" onkeypress="searchProductGrid(event.keyCode)" />
+                                        <button type="button" class="btn-addItem" id="btnSubmitSearch" onclick="searchProductGrid(13);">
+                                            <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+                                        </button>
+                                    </div>
+                                    <dx:ASPxGridView ID="gridViewSelectedItem" SettingsBehavior-AllowSort="false"
+                                        ClientInstanceName="gridViewSelectedItem" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                        Settings-VerticalScrollableHeight="0" EnableCallBacks="true"
+                                        OnCustomCallback="gridViewSelectedItem_CustomCallback" OnHtmlDataCellPrepared="gridViewSelectedItem_HtmlDataCellPrepared"
+                                        KeyFieldName="id" Width="100%">
+                                        <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                        <Paddings Padding="0px" />
+                                        <Border BorderWidth="0px" />
+                                        <BorderBottom BorderWidth="1px" />
+                                        <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                            PageSizeItemSettings-Visible="false">
+                                            <PageSizeItemSettings Items="10, 20, 50" />
+                                        </SettingsPager>
+                                        <Columns>
+                                            <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="50px">
+                                                <DataItemTemplate>
+                                                    <dx:ASPxCheckBox ID="chkBox" runat="server" ValueType="System.Boolean"
+                                                        TextField="Name" ValueField="is_selected" ClientInstanceName="chkBox"
+                                                        ProductId='<%# Eval("item_id")%>'>
+                                                        <ClientSideEvents ValueChanged="function(s, e) { 
+                                                                        getCheckBoxValue(s, e); 
+                                                                    }" />
+                                                    </dx:ASPxCheckBox>
+                                                </DataItemTemplate>
+                                            </dx:GridViewDataTextColumn>
+                                            <dx:GridViewDataColumn FieldName="item_no" Caption="Item No" Width="100px" VisibleIndex="1" />
+                                            <dx:GridViewDataColumn FieldName="item_name" Caption="Item Name" Width="200px" VisibleIndex="2" />
+                                            <dx:GridViewDataColumn FieldName="quantity" Caption="Quantity" Width="50px" VisibleIndex="3" />
+
+
+                                        </Columns>
+                                        <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="350" />
+                                    </dx:ASPxGridView>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <div class="col-xs-12 no-padding text-right" style="margin-top: 5px;">
+                                            <button type="button" runat="server" id="Button1" onclick="addQuotationDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                            <button type="button" runat="server" id="Button2" class="btn-app btn-addItem noDisabled" data-dismiss="modal">ยกเลิก</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</asp:Content>

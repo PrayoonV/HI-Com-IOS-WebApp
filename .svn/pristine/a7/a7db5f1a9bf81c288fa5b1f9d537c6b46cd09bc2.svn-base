@@ -1,0 +1,305 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Shelf.aspx.cs" Inherits="HicomIOS.Master.Shelf" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <style>
+        .btn-app {
+            width: 80px;
+        }
+
+        .btn-left {
+            float: left !important;
+        }
+
+        .btn-back {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+        .btn-back:hover {
+            background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+            border: 1px solid #eecc53;
+        }
+
+        .btn-back i {
+            font-size: 12px;
+        }
+         .swal-modal {
+            width: 420px !important;
+            height: 250px !important;
+        }
+
+        .swal-title {
+            font-size: 18px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+    </style>
+     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+        $('#gridCell').css({
+            'height': '550px;'
+        });
+    </script>
+    <button id="add_NewItem" type="button" onclick="addNewItem()" class="btn-addItem btn-new btn-new1 <%= ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_create) ? "" : "hidden" %>">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        &nbsp;New Shelf
+    </button>
+    <div class="div-search-box">
+        <input type="text" id="txtSearchBoxData" class="form-control" placeholder="กรอกคำค้นหา..." runat="server" onkeypress="searchDataGrid(event.keyCode)" />
+        <button type="button" class="btn-addItem" id="btnSubmitSearch" onclick="searchDataGrid(13);">
+            <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+        </button>
+    </div>
+    <div id="gridCell">
+        <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="notificationGrid"
+            Width="100%" KeyFieldName="id" EnableCallBacks="true" OnCustomCallback="gridView_CustomCallback" OnPageIndexChanged="gridView_PageIndexChanged" OnBeforeColumnSortingGrouping="gridView_BeforeColumnSortingGrouping">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <SettingsLoadingPanel ShowImage="False"></SettingsLoadingPanel>
+            <%-- DXCOMMENT: Configure ASPxGridView's columns in accordance with datasource fields --%>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption=" " FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px"  Settings-AllowSort="False">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editItem(<%# Eval("id")%>, <%# Container.VisibleIndex %>)" title="Edit">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>|
+                        <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>)" title="Delete">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+
+                <dx:GridViewDataTextColumn FieldName="shelf_name" Caption="Name" Width="350px" Settings-AllowSort="True" SortOrder="Ascending" />
+                 <dx:GridViewDataTextColumn Caption="Status" FieldName="is_enable" CellStyle-HorizontalAlign="Center" Width="45px">
+                    <DataItemTemplate>
+                        <button type="button" id="item_<%# Eval("id")%>" class="<%# (bool)Eval("is_enable") == true ? "btn btn-left btn-toggle active " : "btn btn-left btn-toggle" %>"
+                             data-toggle="button" aria-pressed="true"  onclick="changeStatusItem(<%# Eval("id")%>, '<%# Eval("is_enable")%>')"  <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled=\"disabled\"" %> >
+                             <div class="handle"></div>
+                        </button>
+                        </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
+            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+            <SettingsPopup>
+                <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+            </SettingsPopup>
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
+     
+        <%-- modal Edit/add--%>
+        <div class="modal fade" id="modal_shelf" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="modal-title" id="modal-title">ข้อมูล</div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Shelf Name :</label>
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control" id="shelf_name" runat="server" data-rule-required="true" data-msg-required="กรุณากรอกข้อมูล" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="id">
+                        <button type="button"
+                            class="btn-app btn-addItem"
+                            id="_btn_save" onclick="confirm_btn()">
+                            <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                        </button>
+                        <button type="button "
+                            class="btn-app btn-addItem"
+                            data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+           
+            var h = window.innerHeight;
+            notificationGrid.SetHeight(h - 155);
+        });
+        ASPxClientControl.GetControlCollection().ControlsInitialized.AddHandler(function (s, e) {
+
+            $("[name='is_enable']").bootstrapToggle();
+        });
+        ASPxClientControl.GetControlCollection().BrowserWindowResized.AddHandler(function (s, e) {
+            console.log(s);
+            var dimensions = {
+                height: (event.srcElement || event.currentTarget).innerHeight,
+                width: (event.srcElement || event.currentTarget).innerWidth
+            };
+
+            var height = dimensions.height - 152;
+
+            console.log(height);
+            notificationGrid.SetHeight(height);
+        });
+
+
+        function confirm_btn() {
+            var isValid = false;
+            $("#modal_form input[type=text]").each(function () {
+                if ($(this).val() == "") {
+                    $(this).parent().parent().addClass("has-error");
+                    isValid = true;
+                } else {
+                    $(this).parent().parent().removeClass("has-error");
+                }
+            });
+
+            if (!isValid) {
+                var id = $('#id').val();
+                if (id == "" || id == null) {
+                    console.log("add");
+                    $.ajax({
+                        type: "POST",
+                        url: "Shelf.aspx/ShelfConfirmAdd",
+                        data: '{shelf_name:"' + $('#shelf_name').val() + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            location.reload();
+                        }
+                    });
+
+                } else if (id != "" || id != null) {
+                    console.log("edit");
+                    $.ajax({
+                        type: "POST",
+                        url: "Shelf.aspx/ShelfConfirmEdit",
+                        data: '{shelf_name:"' + $('#shelf_name').val() + '",id:"' + $('#id').val() + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            location.reload();
+                        }
+                    });
+                }
+            }
+        }
+
+        function searchDataGrid(e) {
+            if (e == 13) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+
+                var txtSearch = $("#txtSearchBoxData").val();
+                notificationGrid.PerformCallback(txtSearch.toString());
+
+                $.LoadingOverlay("hide");
+            }
+        }
+
+        function editItem(id, index) {
+            gridView.FocusedRowIndex = index;
+
+            $.ajax({
+                type: "POST",
+                url: "Shelf.aspx/ShelfEdit",
+                data: '{id: "' + id + '", index: ' + index + '}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $('#id').val(data.d.id)
+                    $('#shelf_name').val(data.d.shelf_name);
+                    $('#modal_shelf').modal("show");
+                    $('#modal-title').text("แก้ไขข้อมูล");
+
+                }
+            });
+        }
+
+        function addNewItem() {
+            $('#shelf_name').val("");
+            $('#modal_shelf').modal("show");
+            $('#modal-title').text("เพิ่มข้อมูล");
+        }
+
+
+        function deleteItem(e) {
+            var id = e;
+            swal({
+                title: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "Shelf.aspx/DeleteShelf",
+                            data: '{id:"' + id + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                    swal("ลบข้อมูลสำเร็จ!", {
+                                        icon: "success"
+                                    })
+                                    .then((value) => {
+                                        location.reload()
+                                    });
+                            }
+                        });
+                    }
+                });
+        }
+        function changeStatusItem(id, e) {
+            var enable = e;
+            var is_enable = 0;
+            if (enable == "False") {
+                is_enable = 1;
+            }
+            console.log("changestatus==" + e);
+            console.log("changestatus==" + is_enable);
+            $.ajax({
+                type: 'POST',
+                url: "Config.aspx/ChangeStatus",
+                data: '{id: "' + id + '", is_enable: "' + is_enable + '", table_name: "tb_shelf"}',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (result) {
+                    var txtSearch = $("#txtSearchBoxData").val();
+                    notificationGrid.PerformCallback(txtSearch.toString());
+                       
+
+                    
+                }
+            });
+        }
+    </script>
+</asp:Content>

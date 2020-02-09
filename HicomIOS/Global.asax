@@ -1,0 +1,1 @@
+<%@ Application Codebehind="Global.asax.cs" Inherits="HicomIOS.Global_asax" Language="C#" %>

@@ -1,0 +1,153 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Approve.aspx.cs" Inherits="HicomIOS.Master.Approve" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style>
+        .modal .control-label {
+            margin: 5px 0 0 0;
+            padding: 0;
+            text-align: right;
+        }
+    </style>
+    <div id="gridCell">
+        <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="configGrid"
+            Width="100%" KeyFieldName="id">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="50px">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn btn-mini" onclick="editItem(<%# Eval("id")%>)" title="Edit">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="approve_doc" Caption="Document" Width="50px" />
+                <dx:GridViewDataTextColumn FieldName="approve_type" Caption="Type" Width="100px" />
+                <dx:GridViewDataTextColumn FieldName="name_app1" Caption="Approve Name1" Width="200px" />
+                <dx:GridViewDataTextColumn FieldName="name_app2" Caption="Approve Name2" Width="200px" />
+                <dx:GridViewDataTextColumn FieldName="name_app3" Caption="Approve Name3" Width="200px" />
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+            <SettingsPopup>
+                <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+            </SettingsPopup>
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
+
+        <div class="modal fade" id="modal_formEdit" role="dialog" data-backdrop="static" data-keyboard="true" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="modal-title">Add Customer Group</div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <input type="hidden" id="approve_id" />
+                        <div class="row">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Approve Name1:</label>
+                                <div class="col-xs-7">
+                                    <dx:ASPxComboBox ID="cboApprove1" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cboApprove1" TextField="data_text"
+                                        EnableCallbackMode="true"
+                                        ValueField="data_value">
+                                    </dx:ASPxComboBox>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Approve Name2:</label>
+                                <div class="col-xs-7">
+                                    <dx:ASPxComboBox ID="cboApprove2" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cboApprove2" TextField="data_text"
+                                        EnableCallbackMode="true"
+                                        ValueField="data_value">
+                                    </dx:ASPxComboBox>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Approve Name3:</label>
+                                <div class="col-xs-7">
+                                    <dx:ASPxComboBox ID="cboApprove3" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cboApprove3" TextField="data_text"
+                                        EnableCallbackMode="true"
+                                        ValueField="data_value">
+                                    </dx:ASPxComboBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-addItem" onclick="submitFrom()">
+                            <i class="fa fa-save" aria-hidden="true"></i>&nbsp;บันทึก
+                        </button>
+                        <button type="button" class="btn-addItem" data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="text/javascript">
+
+        function editItem(id) {
+            $.ajax({
+                type: 'POST',
+                url: "Approve.aspx/EditApprove",
+                data: '{ id:"' + id + '"}',
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (result) {
+                    $('#approve_id').val(result.d.id);
+                    cboApprove1.SetText(result.d.name_app1);
+                    cboApprove2.SetText(result.d.name_app2);
+                    cboApprove3.SetText(result.d.name_app3);
+                    $("#modal_formEdit .modal-title").html("Edit Approve");
+                    $("#modal_formEdit").modal("show");
+
+
+                }
+            });
+        }
+
+        function submitFrom(id) {
+            var parametersEdit = {
+                approveData: [
+                    {
+                        id: $('#approve_id').val(),
+                        approve_id1: cboApprove1.GetValue(),
+                        approve_id2: cboApprove2.GetValue(),
+                        approve_id3: cboApprove3.GetValue(),
+                    }
+                ]
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: "Approve.aspx/SubmitApprove",
+                data: JSON.stringify(parametersEdit),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (result) {
+                        location.reload();
+                }
+            });
+        }
+
+    </script>
+</asp:Content>
+

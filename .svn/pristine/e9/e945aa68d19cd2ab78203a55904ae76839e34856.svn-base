@@ -1,0 +1,64 @@
+﻿using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace HicomIOS.Master
+{
+    public partial class StockCheckingList : MasterDetailPage
+    {
+        private DataSet dsResult = new DataSet();
+        public override string PageName { get { return "StockCheckingList"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override void OnFilterChanged()
+        {
+
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                PrepareData();
+            }
+            else {
+                dsResult = (DataSet)ViewState["VIEWSTATE_STOCKCHECKING_LIST"];
+                BindDataGrid();
+            }
+        }
+        protected void PrepareData()
+        {
+
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                conn.Open();
+                dsResult = SqlHelper.ExecuteDataset(conn, "sp_stock_movement_list");
+                conn.Close();
+                ViewState["VIEWSTATE_STOCKCHECKING_LIST"] = dsResult;
+            }
+            BindDataGrid();
+        }
+        private void BindDataGrid()
+        {
+            gridView.DataSource = dsResult;
+            gridView.DataBind();
+        }
+    }
+}

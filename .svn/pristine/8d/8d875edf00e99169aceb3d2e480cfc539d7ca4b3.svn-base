@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  For more information on how to configure your ASP.NET application, please visit
+  http://go.microsoft.com/fwlink/?LinkId=169433
+  -->
+<configuration>
+  <configSections>
+    <sectionGroup name="devExpress">
+      <section name="themes" type="DevExpress.Web.ThemesConfigurationSection, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" requirePermission="false" />
+      <section name="compression" type="DevExpress.Web.CompressionConfigurationSection, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" requirePermission="false" />
+      <section name="settings" type="DevExpress.Web.SettingsConfigurationSection, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" requirePermission="false" />
+      <section name="errors" type="DevExpress.Web.ErrorsConfigurationSection, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" requirePermission="false" />
+      <section name="resources" type="DevExpress.Web.ResourcesConfigurationSection, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" requirePermission="false" />
+    </sectionGroup>
+  </configSections>
+  <connectionStrings>
+    <add name="ApplicationServices" connectionString="data source=(localdb)\mssqllocaldb;integrated security=SSPI;attachdbfilename=|DataDirectory|\aspnetdb.mdf" providerName="System.Data.SqlClient" />
+    <add name="HicomDBConnectionString" connectionString="Data Source=192.168.9.12\SQLExpress,12345;Initial Catalog=Hicom;User ID=sa;Password=P@ssw0rd1234" providerName="System.Data.SqlClient" />
+  </connectionStrings>  
+  <system.web>
+    <!--<trust level="Full" legacyCasModel="true"/>-->
+    <sessionState timeout="60"></sessionState>
+    <compilation debug="true" targetFramework="4.5.2">
+      <assemblies>
+        <add assembly="DevExpress.Data.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add assembly="DevExpress.Web.ASPxThemes.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add assembly="DevExpress.RichEdit.v17.1.Core, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add assembly="DevExpress.Printing.v17.1.Core, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add assembly="DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add assembly="DevExpress.Xpo.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=B88D1754D700E49A" />
+        <add assembly="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089" />
+        <add assembly="DevExpress.Web.Bootstrap.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=B88D1754D700E49A" />
+        <add assembly="DevExpress.Web.ASPxScheduler.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=B88D1754D700E49A" />
+        <add assembly="DevExpress.XtraScheduler.v17.1.Core, Version=17.1.6.0, Culture=neutral, PublicKeyToken=B88D1754D700E49A" />
+        <add assembly="System.Web.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089" />
+        <add assembly="System.Data.Entity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=B77A5C561934E089" />
+      </assemblies>
+    </compilation>
+    <authentication mode="None" />
+    <profile>
+      <providers>
+        <clear />
+        <add name="AspNetSqlProfileProvider" type="System.Web.Profile.SqlProfileProvider" connectionStringName="ApplicationServices" applicationName="/" />
+      </providers>
+    </profile>
+    <roleManager enabled="false">
+      <providers>
+        <clear />
+        <add name="AspNetSqlRoleProvider" type="System.Web.Security.SqlRoleProvider" connectionStringName="ApplicationServices" applicationName="/" />
+        <add name="AspNetWindowsTokenRoleProvider" type="System.Web.Security.WindowsTokenRoleProvider" applicationName="/" />
+      </providers>
+    </roleManager>
+    <httpHandlers>
+      <add type="DevExpress.Web.ASPxUploadProgressHttpHandler, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" verb="GET,POST" path="ASPxUploadProgressHandlerPage.ashx" validate="false" />
+      <add type="DevExpress.Web.ASPxHttpHandlerModule, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" verb="GET" path="DX.ashx" validate="false" />
+    </httpHandlers>
+    <httpModules>
+      <add type="DevExpress.Web.ASPxHttpHandlerModule, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" name="ASPxHttpHandlerModule" />
+    </httpModules>
+    <globalization culture="en-US" uiCulture="en-US" />
+    <httpRuntime maxRequestLength="4096" requestValidationMode="4.0" executionTimeout="110" targetFramework="4.5.2" />
+    <pages validateRequest="false" clientIDMode="Static">
+      <controls>
+        <add tagPrefix="dx" namespace="DevExpress.Web" assembly="DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.Data.Linq" assembly="DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.Web.ASPxPivotGrid" assembly="DevExpress.Web.ASPxPivotGrid.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.Web.ASPxSpreadsheet" assembly="DevExpress.Web.ASPxSpreadsheet.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.XtraReports.Web" assembly="DevExpress.XtraReports.v17.1.Web, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.XtraCharts.Web" assembly="DevExpress.XtraCharts.v17.1.Web, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add tagPrefix="dx" namespace="DevExpress.XtraCharts" assembly="DevExpress.XtraCharts.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+        <add src="~/UserControls/EditForms/EmployeeEditForm.ascx" tagName="EmployeeEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/CustomerEditForm.ascx" tagName="CustomerEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/ProductsEditForm.ascx" tagName="ProductsEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/CustomerGroupEditForm.ascx" tagName="CustomerGroupEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/EmployeeDepartmentEditForm.ascx" tagName="EmployeeDepartmentEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/SupplierEditForm.ascx" tagName="SupplierEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/SupplierGroupEditForm.ascx" tagName="SupplierGroupEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/DepartmentEditForm.ascx" tagName="DepartmentEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/EmployeePositionEditForm.ascx" tagName="EmployeePositionEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/NotificationEditForm.ascx" tagName="NotificationEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/CustomerBranchEditForm.ascx" tagName="CustomerBranchEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/CustomerIndustryTypeEditForm.ascx" tagName="CustomerIndustryTypeEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/SupplierBrandEditForm.ascx" tagName="SupplierBrandEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/SupplierBranchEditForm.ascx" tagName="SupplierBranchEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/ProductUnitEditForm.ascx" tagName="ProductUnitEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/ProductBrandEditForm.ascx" tagName="ProductBrandEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/ProductCategoryEditForm.ascx" tagName="ProductCategoryEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/ProductSetEditForm.ascx" tagName="ProductSetEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/UserGroupEditForm.ascx" tagName="UserGroupEditForm" tagPrefix="dx" />
+        <add src="~/UserControls/EditForms/UserGroupMappingEditForm.ascx" tagName="UserGroupMappingEditForm" tagPrefix="dx" />
+        
+      </controls>
+    </pages>
+  </system.web>
+  <system.webServer>
+    <defaultDocument>
+      <files>
+        <clear />
+        <add value="Login.aspx" />
+      </files>
+    </defaultDocument>
+    <modules runAllManagedModulesForAllRequests="true">
+      <remove name="FormsAuthentication" />
+      <add type="DevExpress.Web.ASPxHttpHandlerModule, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" name="ASPxHttpHandlerModule" />
+    </modules>
+    <handlers>
+      <add type="DevExpress.Web.ASPxUploadProgressHttpHandler, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" verb="GET,POST" path="ASPxUploadProgressHandlerPage.ashx" name="ASPxUploadProgressHandler" preCondition="integratedMode" />
+      <add type="DevExpress.Web.ASPxHttpHandlerModule, DevExpress.Web.v17.1, Version=17.1.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" verb="GET" path="DX.ashx" name="ASPxHttpHandlerModule" preCondition="integratedMode" />
+    </handlers>
+    <validation validateIntegratedModeConfiguration="false" />
+    <security>
+      <requestFiltering>
+        <requestLimits maxAllowedContentLength="30000000" />
+      </requestFiltering>
+    </security>
+  </system.webServer>
+  <runtime>
+    <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+      </dependentAssembly>
+      <dependentAssembly>
+        <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+        <bindingRedirect oldVersion="0.0.0.0-3.0.1.0" newVersion="3.0.1.0" />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
+  <devExpress>
+    <resources>
+      <add type="ThirdParty" />
+      <add type="DevExtreme" />
+    </resources>
+    <themes enableThemesAssembly="true" styleSheetTheme="" theme="Office2010Blue" customThemeAssemblies="" baseColor="" font="" />
+    <compression enableHtmlCompression="false" enableCallbackCompression="true" enableResourceCompression="true" enableResourceMerging="true" />
+    <settings accessibilityCompliant="false" bootstrapMode="Bootstrap3" doctypeMode="Html5" rightToLeft="false" checkReferencesToExternalScripts="true" protectControlState="true" ieCompatibilityVersion="edge" />
+    <errors callbackErrorRedirectUrl="" />
+  </devExpress>
+  <appSettings>
+    <add key="vs:EnableBrowserLink" value="false" />
+    <add key="GridViewPageSize" value="20" />
+    <add key="GridViewHeight" value="440" />
+    <add key="ValidationSettings:UnobtrusiveValidationMode" value="None" />
+    <add key="SecurityKey" value="Hi-Com IOS" />
+  </appSettings>
+</configuration>

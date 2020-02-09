@@ -1,0 +1,359 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class Shelf : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public override string PageName { get { return "Shelf Spare Part"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+
+        public class ShelfDetail
+        {
+            public int id { get; set; }
+            public string shelf_name { get; set; }
+            public int is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+        }
+
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            gridView.SettingsBehavior.AllowFocusedRow = true;
+
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                dsResult = null;
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_SHELF_MASTER"];
+                BindGrid(false);
+            }
+        }
+        #region "Initial Property and Event"
+        protected void PopupMenu_Load(object sender, EventArgs e)
+        {
+            (sender as ASPxPopupMenu).PopupElementID = gridView.ID;
+        }
+        #endregion
+        
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    string search = "";
+                    if (Session["SEARCH"] != null)
+                    {
+                        search = Session["SEARCH"].ToString();
+                        txtSearchBoxData.Value = search;
+                    }
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = search },
+
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_shelf_list", arrParm.ToArray());
+                        conn.Close();
+
+                        /*int i = 0;
+                        int rowId = 0;
+                        if (Session["ROW_ID"] != null)
+                        {
+                            rowId = Convert.ToInt32(Session["ROW_ID"].ToString());
+                            //  If -1, Find the most value
+                            if (rowId == -1)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    int id = Convert.ToInt32(row["id"]);
+                                    if (rowId < id)
+                                    {
+                                        rowId = id;
+                                    }
+                                }
+                            }
+                        }
+                        foreach (var row in dsResult.Tables[0].AsEnumerable())
+                        {
+                            if (rowId == Convert.ToInt32(row["id"]))
+                            {
+                                int selectedRow = i;
+                                int prevRow = Convert.ToInt32(Session["ROW"]);
+                                int pageSize = gridView.SettingsPager.PageSize;
+                                int pageIndex = (int)(selectedRow / pageSize);
+                                int prevPageIndex = Convert.ToInt32(Session["PAGE"]);
+                                if (prevRow == selectedRow)
+                                {
+                                    Session["PAGE"] = prevPageIndex;
+                                    Session["ROW"] = prevPageIndex * pageSize;
+                                }
+                                else
+                                {
+                                    Session["PAGE"] = pageIndex;
+                                    Session["ROW"] = selectedRow;
+                                }
+                            }
+                            i++;
+                        }*/
+
+                        Session["SESSION_SHELF_MASTER"] = dsResult;
+                    }
+                }
+
+                gridView.DataSource = dsResult;
+                gridView.DataBind();
+
+                //  Check page from session
+                if (Session["ROW_ID"] != null)
+                {
+                    int row = Convert.ToInt32(Session["ROW"]);
+                    gridView.FocusedRowIndex = row;
+                }
+                if (Session["PAGE"] != null)
+                {
+                    int page = Convert.ToInt32(Session["PAGE"]);
+                    gridView.PageIndex = page;
+                }
+                if (!Page.IsPostBack && !string.IsNullOrEmpty(Session["COLUMN"].ToString()) && !string.IsNullOrEmpty(Session["ORDER"].ToString()))
+                {
+                    int order = Convert.ToInt32(Session["ORDER"]);
+                    if (order == 1)
+                    {
+                        ((GridViewDataColumn)gridView.Columns[Session["COLUMN"].ToString()]).SortAscending();
+                    }
+                    else
+                    {
+                        ((GridViewDataColumn)gridView.Columns[Session["COLUMN"].ToString()]).SortDescending();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        [WebMethod]
+        public static void ShelfConfirmAdd(string shelf_name)
+        {
+            var newID = DataListUtil.emptyEntryID;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_shelf_add", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@shelf_name", SqlDbType.VarChar, 50).Value = shelf_name;
+                        cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        newID = Convert.ToInt32(cmd.ExecuteScalar());
+                        conn.Close();
+
+                    }
+
+                }
+
+                //  Set new id
+                HttpContext.Current.Session["ROW_ID"] = "-1";
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static ShelfDetail ShelfEdit(string id, int index)
+        {
+            //  Set active row
+            HttpContext.Current.Session["ROW_ID"] = id;
+            HttpContext.Current.Session["ROW"] = index;
+
+            var dataShelf = new ShelfDetail();
+            var dsShelf = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                       new SqlParameter ("@id",SqlDbType.Int){ Value = Convert.ToInt32(id) },
+                       new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                    };
+                    conn.Open();
+                    dsShelf = SqlHelper.ExecuteDataset(conn, "sp_shelf_list", arrParm.ToArray());
+                    conn.Close();
+                }
+                if (dsShelf.Tables.Count > 0)
+                {
+                    var row = dsShelf.Tables[0].Rows[0];
+                    dataShelf.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    dataShelf.shelf_name = Convert.IsDBNull(row["shelf_name"]) ? null : Convert.ToString(row["shelf_name"]);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return dataShelf;
+        }
+
+        [WebMethod]
+        public static void ShelfConfirmEdit(string shelf_name, string id)
+        {
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_shelf_edit", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@shelf_name", SqlDbType.VarChar, 50).Value = shelf_name;
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+
+                //  Set new id
+                HttpContext.Current.Session["ROW_ID"] = Convert.ToString(id);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static void DeleteShelf(string id)
+        {
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_shelf_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = e.Parameters.ToString() },
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_shelf_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_SHELF_MASTER"] = dsResult;
+
+                    Session["SEARCH"] = e.Parameters.ToString();
+                }
+
+                gridView.DataSource = dsResult;
+                gridView.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        protected void gridView_PageIndexChanged(object sender, EventArgs e)
+        {
+            int pageIndex = (sender as ASPxGridView).PageIndex;
+            Session["PAGE"] = pageIndex;
+        }
+
+        protected void gridView_BeforeColumnSortingGrouping(object sender, ASPxGridViewBeforeColumnGroupingSortingEventArgs e)
+        {
+            string column = e.Column.FieldName;
+            int order = Convert.ToInt32(e.Column.SortOrder);
+
+            Session["COLUMN"] = column;
+            Session["ORDER"] = order;
+        }
+    }
+}

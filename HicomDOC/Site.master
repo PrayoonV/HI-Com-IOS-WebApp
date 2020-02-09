@@ -1,0 +1,15 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="Site" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Documents Demo | ASP.NET Controls by DevExpress</title>
+    <meta name="viewport" content="user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <link type="text/css" rel="Stylesheet" href="Content/styles.css" />
+    <script type="text/javascript" src="Scripts/Site.js"></script>
+</head>
+<body>
+    <asp:ContentPlaceHolder id="ContentPlaceHolder" runat="server">
+    </asp:ContentPlaceHolder>
+</body>
+</html>

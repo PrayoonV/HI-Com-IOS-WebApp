@@ -1,0 +1,341 @@
+﻿<%@ Master Language="C#" MasterPageFile="~/Root.master" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="HicomIOS.MainMaster" %>
+
+<%-- DXCOMMENT: Page Main.master is a master page that contains central area layout --%>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="Content" runat="server">
+    <script src="/Content/Custom.js"></script>
+    <script src="/Lib/js/artDialog.js?skin=blue"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            //window.onresize = function (event) {
+            //    var dimensions = {
+            //        height: (event.srcElement || event.currentTarget).innerHeight,
+            //        width: (event.srcElement || event.currentTarget).innerWidth
+            //    };
+            //    //console.log(dimensions);
+            //    //var a = $('#gridView').length;
+            //    var height = dimensions.height + 5;
+            //    //document.getElementById('gridCell').setAttribute("style", "height:" + height + "px");
+            //    console.log(height);
+            //};
+            $(".numberic").keydown(function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        function alertMessage(msg, type) {
+
+            if (type == "E") {
+                console.log("Error !");
+                $("#main_modal_message_alert").modal("show");
+                $("#lbMessageAlert").html(msg);
+
+            }
+        }
+        function confirmMessage(msg, btn) {
+            $('#hdConfirmBtnID').val(btn);
+            $("#main_modal_message_confirm").modal("show");
+            $("#lbMessageConfirm").html("ยืนยันการบันทึกข้อมูลเอกสาร " + msg + " ใช่หรือไม่ ?");
+        }
+
+        function sendApproveMessage(msg, btn, doc) {
+            $('#hdApproveBtnID').val(btn);
+            $("#main_modal_message_approve").modal("show");
+            $("#lbMessageSendApprove").html("ยืนยัน " + doc + " " + msg + " ใช่หรือไม่ ?");
+        }
+
+        function setCheckboxSwitch() {
+            console.log("is_enable");
+            $("[name='is_enable']").bootstrapSwitch();
+        }
+        function onConfirmClick() {
+             $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var hdBtn = $('#hdConfirmBtnID').val();
+            var btnConfirm = $('#' + hdBtn);
+            if (btnConfirm != null) {
+                btnConfirm.click();
+            }
+             $.LoadingOverlay("hide");
+        }
+        function onSendApproveClick() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var hdBtn = $('#hdApproveBtnID').val();
+            console.log(hdBtn);
+            var btnConfirm = $('#' + hdBtn);
+            if (btnConfirm != null) {
+                btnConfirm.click();
+            }
+            $.LoadingOverlay("hide");
+        }
+        function testMain() {
+            alert("x");
+        }
+
+        function number_format(number, decimals, decPoint, thousandsSep) {
+            decimals = Math.abs(decimals) || 0;
+            number = parseFloat(number);
+
+            if (!decPoint || !thousandsSep) {
+                decPoint = '.';
+                thousandsSep = ',';
+            }
+
+            var roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
+            var numbersString = decimals ? (roundedNumber.slice(0, decimals * -1) || 0) : roundedNumber;
+            var decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
+            var formattedNumber = "";
+
+            while (numbersString.length > 3) {
+                formattedNumber += thousandsSep + numbersString.slice(-3)
+                numbersString = numbersString.slice(0, -3);
+            }
+
+            if (decimals && decimalsString.length === 1) {
+                while (decimalsString.length < decimals) {
+                    decimalsString = decimalsString + decimalsString;
+                }
+            }
+
+            return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? (decPoint + decimalsString) : '');
+        }
+
+        //  For alert
+        function alertSuccess(content) {
+            art.dialog({
+                icon: 'succeed'
+                , title: 'ข้อความ'
+                , content: content
+                , okVal: 'ตกลง'
+                , ok: function () {
+                    return true;
+                }
+            });
+        }
+
+        function alertError(content) {
+            art.dialog({
+                icon: 'error'
+                , title: 'ข้อความเตือน'
+                , content: content
+                , okVal: 'ตกลง'
+                , ok: function () {
+                    return true;
+                }
+            });
+        }
+
+        function alertWarning(content) {
+            art.dialog({
+                icon: 'warning'
+                , title: 'ข้อความเตือน'
+                , content: content
+                , okVal: 'ตกลง'
+                , ok: function () {
+                    return true;
+                }
+            });
+        }
+    </script>
+    <dx:ASPxPanel ID="LeftPane" runat="server" FixedPosition="WindowLeft" ClientInstanceName="leftPane" CssClass="leftPane" Collapsible="true">
+        <SettingsAdaptivity CollapseAtWindowInnerWidth="1023" />
+        <Styles>
+            <Panel CssClass="panel"></Panel>
+        </Styles>
+        <PanelCollection>
+            <dx:PanelContent runat="server" SupportsDisabledAttribute="True">
+                <div class="leftPanel">
+                    <%-- DXCOMMENT: Configure the left panel's ASPxNavBar --%>
+                    <%--  <dx:ASPxNavBar ID="ASPxNavBar1" runat="server" AutoCollapse="True" EnableAnimation="True" Width="100%" DataSourceID="XmlDataSourceLeft">
+                        <Border BorderWidth="0px" />
+                        <Paddings Padding="0px" />
+                    </dx:ASPxNavBar>--%>
+
+                    <%-- <nav class="navbar-default navbar-static-side">
+                           <%=BasePage.SideMenu %>
+                        </nav>--%>
+                    <div class="nav-side-menu">
+                        <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+
+                        <div class="menu-list">
+
+                            <ul id="menu-content" class="menu-content collapse">
+                                <%--                                <li data-toggle="collapse" data-target="#products" class="collapsed active">
+                                    <a href="#"><i class="fa fa-gift fa-lg"></i>UI Elements <span class="arrow"></span></a>
+
+                                    <ul class="sub-menu collapse" id="products">
+                                        <li class="active"><a href="#">CSS3 Animation</a></li>
+                                        <li><a href="#">General</a></li>
+                                        <li><a href="#">Buttons</a></li>
+                                        <li><a href="#">Tabs & Accordions</a></li>
+                                        <li><a href="#">Typography</a></li>
+                                        <li><a href="#">FontAwesome</a></li>
+                                        <li><a href="#">Slider</a></li>
+                                        <li><a href="#">Panels</a></li>
+                                        <li><a href="#">Widgets</a></li>
+                                        <li><a href="#">Bootstrap Model</a></li>
+                                    </ul>
+                                </li>--%>
+                                <%=BasePage.SideMenu %>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </dx:PanelContent>
+        </PanelCollection>
+    </dx:ASPxPanel>
+
+    <div class="contentPane">
+        <dx:ASPxSplitter ID="Splitter" runat="server" FullscreenMode="True" Orientation="Vertical" Width="100%" AllowResize="False" EnableHierarchyRecreation="false"
+            SeparatorVisible="false" CssClass="mainSplitter" ClientInstanceName="splitter">
+            <Panes>
+                <dx:SplitterPane Size="40px" PaneStyle-CssClass="toolbarPane">
+                    <ContentCollection>
+                        <dx:SplitterContentControl runat="server">
+                            <%--<asp:XmlDataSource ID="ToolbarMenuDataSource" runat="server" DataFile="~/App_Data/Menu.xml" OnInit="ToolbarMenuDataSource_Init" />
+                            <dx:ASPxMenu ID="ToolbarMenu" runat="server" ClientInstanceName="toolbarMenu" ShowAsToolbar="True" AutoPostBack="false"
+                                DataSourceID="ToolbarMenuDataSource" OnItemDataBound="ToolbarMenu_ItemDataBound" OnCustomJSProperties="ToolbarMenu_CustomJSProperties">
+                                <ClientSideEvents ItemClick="SPlanet.ToolbarMenu_ItemClick" />
+                            </dx:ASPxMenu>--%>
+                            <dx:ASPxButtonEdit ID="SearchBox" runat="server" NullText="Type to Search..." NullTextDisplayMode="UnfocusedAndFocused" CssClass="searchBox" ClientInstanceName="searchBox" Width="200">
+                                <Buttons>
+                                    <dx:EditButton>
+                                        <Image>
+                                            <SpriteProperties CssClass="sprite" HottrackedCssClass="hover" PressedCssClass="pressed" />
+                                        </Image>
+                                    </dx:EditButton>
+                                </Buttons>
+                                <ButtonStyle CssClass="button" />
+                                <NullTextStyle Font-Italic="true" />
+                            </dx:ASPxButtonEdit>
+                        </dx:SplitterContentControl>
+                    </ContentCollection>
+                </dx:SplitterPane>
+                <dx:SplitterPane>
+                    <ContentCollection>
+                        <dx:SplitterContentControl runat="server" Height="100%">
+                            <dx:ASPxCallbackPanel ID="MainCallbackPanel" runat="server" ClientInstanceName="mainCallbackPanel" OnCallback="MainCallbackPanel_Callback" CssClass="mainCallbackPanel">
+                                <PanelCollection>
+                                    <dx:PanelContent>
+                                        <dx:ASPxHiddenField ID="HiddenField" runat="server" ClientInstanceName="hiddenField" OnInit="HiddenField_Init" />
+                                        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+                                        <dx:ASPxPopupControl ID="FilterPopup" runat="server" ClientInstanceName="filterPopup" Width="450px" PopupHorizontalAlign="WindowCenter" PopupAnimationType="Fade"
+                                            PopupVerticalAlign="WindowCenter" AllowDragging="True" CssClass="filterPopup" ShowCloseButton="false" HeaderText="Create Custom Filter" CloseAction="None" CloseOnEscape="true" Modal="true">
+                                            <ContentCollection>
+                                                <dx:PopupControlContentControl runat="server">
+                                                    <dx:ASPxFilterControl ID="FilterControl" ClientInstanceName="filterControl" CssClass="filterControl" runat="server" Width="100%" Height="150px">
+                                                        <ClientSideEvents Applied="SPlanet.FilterControl_Applied" />
+                                                    </dx:ASPxFilterControl>
+
+                                                    <dx:ASPxCheckBox ID="SaveCustomFilterCheckBox" ClientInstanceName="saveCustomFilterCheckBox" runat="server" CheckState="Unchecked" Text="Save for future use">
+                                                        <ClientSideEvents CheckedChanged="SPlanet.SaveCustomFilterCheckBox_CheckedChanged" />
+                                                    </dx:ASPxCheckBox>
+                                                    <dx:ASPxTextBox ID="CustomFilterTextBox" ClientInstanceName="customFilterTextBox" runat="server" NullText="Enter a name for your custom filter..." NullTextDisplayMode="UnfocusedAndFocused" Width="100%" MaxLength="50" OnLoad="CustomFilterTextBox_Load">
+                                                        <ValidationSettings ErrorDisplayMode="None" />
+                                                        <ClientSideEvents Validation="SPlanet.CustomFilterTextBox_Validation" />
+                                                    </dx:ASPxTextBox>
+                                                    <dx:ASPxButton ID="CancelFilterButton" runat="server" AutoPostBack="False" UseSubmitBehavior="False" Text="Cancel">
+                                                        <ClientSideEvents Click="SPlanet.CancelFilterButton_Click" />
+                                                    </dx:ASPxButton>
+                                                    <dx:ASPxButton ID="SaveFilterButton" runat="server" AutoPostBack="False" UseSubmitBehavior="False" Text="OK" Width="82" OnClick="SaveFilterButton_Click">
+                                                        <ClientSideEvents Click="SPlanet.SaveFilterButton_Click" />
+                                                    </dx:ASPxButton>
+                                                </dx:PopupControlContentControl>
+                                            </ContentCollection>
+                                        </dx:ASPxPopupControl>
+                                    </dx:PanelContent>
+                                </PanelCollection>
+                                <ClientSideEvents EndCallback="SPlanet.MainCallbackPanel_EndCallback" />
+                            </dx:ASPxCallbackPanel>
+                        </dx:SplitterContentControl>
+                    </ContentCollection>
+                </dx:SplitterPane>
+            </Panes>
+        </dx:ASPxSplitter>
+    </div>
+
+    <!-- PageViewer for popup ReportViewer and Spreadsheet Viewer -->
+    <dx:ASPxPopupControl ID="PageViewerPopup" runat="server" ClientInstanceName="pageViewerPopup" Width="1000" Height="840" CssClass="pageViewerPopup"
+        PopupHorizontalAlign="WindowCenter" PopupVerticalAlign="WindowCenter"
+        AllowDragging="true" DragElement="Header" PopupAnimationType="Fade" Modal="true" CloseAction="CloseButton" CloseOnEscape="true" OnCustomJSProperties="PageViewerPopup_CustomJSProperties">
+        <ClientSideEvents Shown="SPlanet.PageViewerPopup_Shown" CloseUp="SPlanet.PageViewerPopup_CloseUp" />
+    </dx:ASPxPopupControl>
+    <dx:ASPxLoadingPanel ID="LoadingPanel" ClientInstanceName="loadingPanel" runat="server" Modal="true"></dx:ASPxLoadingPanel>
+
+
+    <div id="main_modal_message_alert" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header alert-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">เกิดข้อผิดพลาด</h4>
+                </div>
+                <div class="modal-body">
+                    <asp:Label runat="server" Font-Size="Large" ForeColor="Red" ID="lbMessageAlert"></asp:Label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default noDisabled" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="main_modal_message_confirm" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header alert-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">ยืนยันการบันทึกข้อมูล</h4>
+                </div>
+                <div class="modal-body">
+                    <asp:Label runat="server" Font-Size="Large" ForeColor="" ID="lbMessageConfirm"></asp:Label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary noDisabled" onclick="onConfirmClick()">Submit</button>
+                    <button type="button" class="btn btn-default noDisabled" data-dismiss="modal">Close</button>
+                    <asp:HiddenField runat="server" ID="hdConfirmBtnID" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="main_modal_message_approve" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header alert-danger">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">ยืนยันการส่งเอกสาร</h4>
+                </div>
+                <div class="modal-body">
+                    <asp:Label runat="server" Font-Size="Large" ForeColor="" ID="lbMessageSendApprove"></asp:Label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary noDisabled" onclick="onSendApproveClick()">Submit</button>
+                    <button type="button" class="btn btn-default noDisabled" data-dismiss="modal">Close</button>
+                    <asp:HiddenField runat="server" ID="hdApproveBtnID" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+</asp:Content>

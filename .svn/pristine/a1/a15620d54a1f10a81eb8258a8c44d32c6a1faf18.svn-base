@@ -1,0 +1,285 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
+using HicomIOS.ClassUtil;
+
+public enum ReportType
+{
+    Quotaion_Description_Report, Quotaion_Description_Discount_Item_Report, Quotaion_PartNo_Report, Quotaion_PartNo_Discount_Item_Report, Sale_Order_Product, Sale_Order_Spare_Part, Issue_Report, Delivery_Note,
+    Sale_Order_Product_Discount, Product_Set, Stock_Card, Part_List, Borrow_Report, Delivery_Note_Order, Stock_Inventory_Products, Purchase_Request, Return, SparePart_Set, Adjust_Product
+}
+
+public static class HicomReportUtil
+{
+
+    static Dictionary<ReportType, string> reportDisplayNames = new Dictionary<ReportType, string>();
+    static object reportDisplayNamesLockObject = new object();
+
+
+    #region " For Core Report Functions"
+    public static XtraReport CreateReport(string queryString)
+    {
+        var args = SPlanetUtil.DeserializeCallbackArgs(queryString);
+        if (args.Count == 0)
+            return null;
+        ReportType rType;
+        if (!Enum.TryParse(args[0], out rType))
+            return null;
+        //var itemID = !string.IsNullOrEmpty(args[1]) ? long.Parse(args[1]) : DataListUtil.emptyEntryID;
+        return CreateReport(rType, args);
+    }
+
+    static Dictionary<ReportType, string> ReportDisplayNames
+    {
+        get
+        {
+            lock (reportDisplayNamesLockObject)
+            {
+                if (reportDisplayNames.Count == 0)
+                    PopuplateReportNames(reportDisplayNames);
+                return reportDisplayNames;
+            }
+        }
+    }
+
+    public static string GetReportDisplayName(ReportType rType)
+    {
+        return ReportDisplayNames[rType];
+    }
+
+    #endregion
+
+    #region " For set datasource of each reports"
+
+    static void PopuplateReportNames(Dictionary<ReportType, string> names)
+    {
+        names[ReportType.Quotaion_Description_Report] = "Quotation Report";
+        names[ReportType.Quotaion_Description_Discount_Item_Report] = "Quotation Discount Item Report";
+        names[ReportType.Quotaion_PartNo_Report] = "Quotation Part No Report";
+        names[ReportType.Quotaion_PartNo_Discount_Item_Report] = "Quotaion Part No Discount Item Report";
+        names[ReportType.Sale_Order_Product] = "Sale Order Report";
+        names[ReportType.Sale_Order_Product_Discount] = "Sale Order Discount Item Report";
+        names[ReportType.Sale_Order_Spare_Part] = "Sale Order Report";
+        names[ReportType.Issue_Report] = "Issue Report";
+        names[ReportType.Delivery_Note] = "Delivery Note Report";
+        names[ReportType.Product_Set] = "Product Set Report";
+        names[ReportType.Stock_Card] = "Stock Card Report";
+        names[ReportType.Part_List] = "Part List Report";
+        names[ReportType.Borrow_Report] = "Borrow Report";
+        names[ReportType.Delivery_Note_Order] = "Delivery Note Order Report";
+        names[ReportType.Stock_Inventory_Products] = "Stock Inventory Report";
+        names[ReportType.Purchase_Request] = "Purchase Request Report";
+        names[ReportType.Return] = "Return Report";
+        names[ReportType.SparePart_Set] = "SparePart Set Report";
+        names[ReportType.SparePart_Set] = "SparePart Set Report";
+        names[ReportType.Adjust_Product] = "Adjust Product";
+    }
+
+
+    public static XtraReport CreateReport(ReportType reportType, List<string> args)
+    {
+        var itemID = args[1];
+
+        var dateFrom = args.Count > 2 ? args[2] : string.Empty;
+        var dateTo = args.Count > 3 ? args[3] : string.Empty;
+        var productType = args.Count > 4 ? args[4] : string.Empty;
+        var shelf = args.Count > 5 ? args[5] : "0";
+        var product_cat = args.Count > 6 ? args[6] :"0";
+        var product_no = args.Count > 7 ? args[7] : string.Empty;
+        switch (reportType)
+        {
+            case ReportType.SparePart_Set:
+                return Create_SparePartSetReport(itemID.ToString());
+            case ReportType.Quotaion_Description_Report:
+                return CreateQuotaion_Description_Report(itemID.ToString());
+            case ReportType.Return:
+                return Create_ReturnReport(itemID.ToString());
+            case ReportType.Product_Set:
+                return CreateProduct_SetReport(itemID.ToString());
+            case ReportType.Quotaion_Description_Discount_Item_Report:
+                return CreateQuotaion_Description_Discount_Item_Report(itemID.ToString());
+            case ReportType.Quotaion_PartNo_Report:
+                return CreateQuotaion_PartNo_Report(itemID.ToString());
+            case ReportType.Quotaion_PartNo_Discount_Item_Report:
+                return CreateQuotaion_PartNo_Discount_Item_Report(itemID.ToString());
+            case ReportType.Stock_Card:
+                return CreateStock_CardReport(itemID.ToString(), dateFrom.ToString(), dateTo.ToString(), productType.ToString(), shelf.ToString(), product_cat.ToString(), product_no.ToString());
+            case ReportType.Sale_Order_Product:
+                return CreateSale_Order_ProductReport(itemID.ToString(), Convert.ToInt32(dateFrom));
+            case ReportType.Part_List:
+                return CreatePart_ListReport(itemID.ToString());
+            case ReportType.Borrow_Report:
+                return CreateBorrow_ReportReport(itemID.ToString());
+            case ReportType.Sale_Order_Spare_Part:
+                return CreateSale_Order_Spare_PartReport(itemID.ToString());
+            case ReportType.Sale_Order_Product_Discount:
+                return CreateSale_Order_Product_Discount(itemID.ToString(), Convert.ToInt32(dateFrom));
+            case ReportType.Delivery_Note_Order:
+                return CreateDelivery_Note_Order(itemID.ToString());
+            case ReportType.Stock_Inventory_Products:
+                return CreateStock_Inventory_Products(itemID.ToString(), dateFrom.ToString(), dateTo.ToString(), productType.ToString(), shelf.ToString(), product_cat.ToString(), product_no.ToString());
+            case ReportType.Issue_Report:
+                return CreateIssueReport(itemID.ToString());
+            case ReportType.Purchase_Request:
+                return CreatePurchase_RequestReport(itemID.ToString());
+            case ReportType.Delivery_Note:
+                return CreateDelivery_NoteReport(itemID.ToString());
+            case ReportType.Adjust_Product:
+                return CreateAdjustProductReport(itemID.ToString());
+        }
+        return null;
+    }
+    static XtraReport CreateStock_Inventory_Products(string product_name, string datepickerFrom, string datepickerTo, string product_type, string shelf, string product_cat, string product_no)
+    {
+        var report = new HicomIOS.Report.Stock_Inventory_Products();
+        report.RequestParameters = false;
+        report.Parameters["product_name"].Value = Convert.ToString(product_name);
+        report.Parameters["date_from"].Value = Convert.ToString(datepickerFrom);
+        report.Parameters["date_to"].Value = Convert.ToString(datepickerTo);
+        report.Parameters["product_type"].Value = Convert.ToString(product_type);
+        report.Parameters["shelf"].Value = Convert.ToInt32(shelf);
+        report.Parameters["product_cat"].Value = Convert.ToInt32(product_cat);
+        report.Parameters["product_no"].Value = Convert.ToString(product_no);
+        return report;
+    }
+    
+    static XtraReport Create_SparePartSetReport(string SparePartSetId)
+    {
+        var report = new HicomIOS.Report.SparePart_Set();
+        report.RequestParameters = false;
+        report.Parameters["sparepartset_param"].Value = SparePartSetId;
+        return report;
+    }
+    static XtraReport Create_ReturnReport(string return_no)
+    {
+        var report = new HicomIOS.Report.Return();
+        report.RequestParameters = false;
+        report.Parameters["parameter_return"].Value = return_no;
+        return report;
+    }
+    static XtraReport CreateDelivery_Note_Order(string delivery_order_no)
+    {
+        var report = new HicomIOS.Report.Delivery_Note_Order();
+        report.RequestParameters = false;
+        report.Parameters["parameter_delivery_order"].Value = delivery_order_no;
+        return report;
+    }
+    static XtraReport CreatePurchase_RequestReport(string purchase_request_no)
+    {
+        var report = new HicomIOS.Report.Purchase_Request();
+        report.RequestParameters = false;
+        report.Parameters["parameter_purchase"].Value = Convert.ToString(purchase_request_no);
+        return report;
+    }
+    static XtraReport CreateBorrow_ReportReport(string borrow_no)
+    {
+        var report = new HicomIOS.Report.Borrow_Report();
+        report.RequestParameters = false;
+        report.Parameters["borrow_no"].Value = borrow_no;
+        return report;
+    }
+    static XtraReport CreatePart_ListReport(string id)
+    {
+        var report = new HicomIOS.Report.Part_List();
+        report.RequestParameters = false;
+        report.Parameters["parameter_part_list_package"].Value = Convert.ToInt32(id);
+        report.Parameters["parameter1"].Value = "";
+        return report;
+    }
+    static XtraReport CreateStock_CardReport(string product_name, string datepickerFrom, string datepickerTo, string product_type, string shelf, string product_cat, string product_no)
+    {
+        var report = new HicomIOS.Report.Stock_Card();
+        report.RequestParameters = false;
+        report.Parameters["product_name"].Value = Convert.ToString(product_name);
+        report.Parameters["date_from"].Value = Convert.ToString(datepickerFrom);
+        report.Parameters["date_to"].Value = Convert.ToString(datepickerTo);
+        report.Parameters["product_type"].Value = Convert.ToString(product_type);
+        report.Parameters["shelf"].Value = Convert.ToInt32(shelf);
+        report.Parameters["product_cat"].Value = Convert.ToInt32(product_cat);
+        report.Parameters["product_no"].Value = Convert.ToString(product_no);
+        return report;
+    }
+    static XtraReport CreateProduct_SetReport(string product_set_id)
+    {
+        var report = new HicomIOS.Report.Product_Set();
+        report.RequestParameters = false;
+        report.Parameters["parameter_product_set"].Value = Convert.ToInt32(product_set_id);
+        return report;
+    }
+    static XtraReport CreateQuotaion_Description_Report(string quotationNo)
+    {
+        var report = new HicomIOS.Report.Quotaion_Description_Report();
+        report.RequestParameters = false;
+        report.Parameters["param_quotation_no"].Value = quotationNo;
+        return report;
+    }
+    static XtraReport CreateQuotaion_Description_Discount_Item_Report(string quotationNo)
+    {
+        var report = new HicomIOS.Report.Quotaion_Description_Discount_Item_Report();
+        report.RequestParameters = false;
+        report.Parameters["parameter_des_report"].Value = quotationNo;
+        return report;
+    }
+    static XtraReport CreateQuotaion_PartNo_Report(string quotationNo)
+    {
+        var report = new HicomIOS.Report.Quotation();
+        report.RequestParameters = false;
+        report.Parameters["param_quotation_no"].Value = quotationNo;
+        return report;
+    }
+    static XtraReport CreateQuotaion_PartNo_Discount_Item_Report(string quotationNo)
+    {
+        var report = new HicomIOS.Report.Quotaion_PartNo_Discount_Item_Report();
+        report.RequestParameters = false;
+        report.Parameters["parameterQuotation"].Value = quotationNo;
+        return report;
+    }
+    static XtraReport CreateSale_Order_ProductReport(string sales_order_no, int period_count)
+    {
+        var report = new HicomIOS.Report.Sale_Order_Product();
+        report.RequestParameters = false;
+        report.Parameters["parameter_sale"].Value = sales_order_no;
+        report.Parameters["parameter_period"].Value = period_count;
+        return report;
+    }
+    static XtraReport CreateSale_Order_Spare_PartReport(string sales_order_no)
+    {
+        var report = new HicomIOS.Report.Sale_Order_Spare_Part();
+        report.RequestParameters = false;
+        report.Parameters["parameter_sale"].Value = sales_order_no;
+        return report;
+    }
+    static XtraReport CreateSale_Order_Product_Discount(string sales_order_no, int period_count)
+    {
+        var report = new HicomIOS.Report.Sale_Order_Product_Discount();
+        report.RequestParameters = false;
+        report.Parameters["parameter_sale"].Value = sales_order_no;
+        report.Parameters["parameter_period"].Value = period_count;
+        return report;
+    }
+    static XtraReport CreateIssueReport(string issue_no)
+    {
+        var report = new HicomIOS.Report.Issue_Report();
+        report.RequestParameters = false;
+        report.Parameters["issue_no"].Value = issue_no;
+        return report;
+    }
+    static XtraReport CreateDelivery_NoteReport(string delivery_note_no)
+    {
+        var report = new HicomIOS.Report.Delivery_Note();
+        report.RequestParameters = false;
+        report.Parameters["parameter_Delivery_Note"].Value = delivery_note_no;
+        return report;
+    }
+    static XtraReport CreateAdjustProductReport(string id)
+    {
+        var report = new HicomIOS.Report.AdjustProduct();
+        report.RequestParameters = false;
+        report.Parameters["id"].Value = id;
+        return report;
+    }
+    #endregion
+}

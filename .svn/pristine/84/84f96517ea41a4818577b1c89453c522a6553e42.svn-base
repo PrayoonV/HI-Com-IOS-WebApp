@@ -1,0 +1,373 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class BorrowList : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public override string PageName { get { return "Borrow List"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+
+        public class BorrowListData
+        {
+            public string borrow_no { get; set; }
+        }
+        public class BorrowDetail
+        {
+            public int id { get; set; }
+            public int sort_no { get; set; }
+            public int item_id { get; set; }
+            public string item_no { get; set; }
+            public string item_name { get; set; }
+            public string item_type { get; set; }
+            public string unit_code { get; set; }
+            public int qty { get; set; }
+            public int old_qty { get; set; }
+            public decimal unit_price { get; set; }
+            public decimal total_price { get; set; }
+            public bool is_delete { get; set; }
+        }
+
+        public class BorrowDetailMFG
+        {
+            public int id { get; set; }
+            public string borrow_no { get; set; }
+            public int borrow_detail_id { get; set; }
+            public int item_id { get; set; }
+            public string mfg_no { get; set; }
+            public string old_mfg_no { get; set; }
+            public bool is_deleted { get; set; }
+
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_BORROW_LIST"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override void RefreshEntry()     //Popup Menu Select Refresh Data
+        {
+            BindGrid(true);
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" }
+                        };
+
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_borrow_header_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_BORROW_LIST"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string DeleteBorrow(string id)
+        {
+            string returnData = "success";
+            List<BorrowDetail> borrowDetailList = new List<BorrowDetail>();
+            List<BorrowDetailMFG> borrowDetailMFGList = new List<BorrowDetailMFG>();
+            DataSet dsBorrow = new DataSet();
+            var borrowNo = string.Empty;
+            var customer_id = 0;
+            var supplier_id = 0;
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        #region Load for Delete
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+                        };
+                       
+                        dsBorrow = SqlHelper.ExecuteDataset(tran, "sp_borrow_list_data", arrParm.ToArray());
+                     
+
+                        if (dsBorrow.Tables.Count > 0)
+                        {
+                            var header = (from t in dsBorrow.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                            if (header != null)
+                            {
+
+                                borrowNo = Convert.IsDBNull(header["borrow_no"]) ? string.Empty : Convert.ToString(header["borrow_no"]);
+                                customer_id = Convert.IsDBNull(header["customer_id"]) ? 0 : Convert.ToInt32(header["customer_id"]);
+                                supplier_id = Convert.IsDBNull(header["supplier_id"]) ? 0 : Convert.ToInt32(header["supplier_id"]);
+                            }
+
+                            var detail = (from t in dsBorrow.Tables[1].AsEnumerable() select t).ToList();
+                            if (detail != null)
+                            {
+                                borrowDetailList = new List<BorrowDetail>();
+                                foreach (var row in detail)
+                                {
+                                    borrowDetailList.Add(new BorrowDetail()
+                                    {
+                                        id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                        is_delete = Convert.IsDBNull(row["is_delete"]) ? false : Convert.ToBoolean(row["is_delete"]),
+                                        item_name = Convert.IsDBNull(row["item_name"]) ? string.Empty : Convert.ToString(row["item_name"]),
+                                        item_id = Convert.IsDBNull(row["item_id"]) ? 0 : Convert.ToInt32(row["item_id"]),
+                                        item_no = Convert.IsDBNull(row["item_no"]) ? string.Empty : Convert.ToString(row["item_no"]),
+                                        item_type = Convert.IsDBNull(row["item_type"]) ? string.Empty : Convert.ToString(row["item_type"]),
+                                        unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"]),
+                                        qty = Convert.IsDBNull(row["qty"]) ? 0 : Convert.ToInt32(row["qty"]),
+                                        old_qty = Convert.IsDBNull(row["old_qty"]) ? 0 : Convert.ToInt32(row["old_qty"]),
+                                        sort_no = Convert.IsDBNull(row["sort_no"]) ? 0 : Convert.ToInt32(row["sort_no"]),
+                                        total_price = Convert.IsDBNull(row["total_price"]) ? 0 : Convert.ToDecimal(row["total_price"]),
+                                        unit_price = Convert.IsDBNull(row["unit_price"]) ? 0 : Convert.ToDecimal(row["unit_price"]),
+                                    });
+                                }
+                            }
+                            var mfgDetail = (from t in dsBorrow.Tables[2].AsEnumerable() select t).ToList();
+                            if (mfgDetail != null)
+                            {
+                                borrowDetailMFGList = new List<BorrowDetailMFG>();
+                                foreach (var row in mfgDetail)
+                                {
+                                    borrowDetailMFGList.Add(new BorrowDetailMFG()
+                                    {
+                                        id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                        is_deleted = Convert.IsDBNull(row["is_delete"]) ? false : Convert.ToBoolean(row["is_delete"]),
+                                        mfg_no = Convert.IsDBNull(row["mfg_no"]) ? string.Empty : Convert.ToString(row["mfg_no"]),
+                                        old_mfg_no = Convert.IsDBNull(row["old_mfg_no"]) ? string.Empty : Convert.ToString(row["old_mfg_no"]),
+                                        borrow_detail_id = Convert.IsDBNull(row["borrow_detail_id"]) ? 0 : Convert.ToInt32(row["borrow_detail_id"]),
+                                        borrow_no = Convert.IsDBNull(row["borrow_no"]) ? string.Empty : Convert.ToString(row["borrow_no"]),
+                                        item_id = Convert.IsDBNull(row["item_id"]) ? 0 : Convert.ToInt32(row["item_id"]),
+
+                                    });
+                                }
+                            }
+                        }
+                        #endregion
+
+                        using (SqlCommand cmd = new SqlCommand("sp_borrow_header_delete", conn,tran))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+   
+                            cmd.ExecuteNonQuery();
+ 
+                        }
+
+                        #region Transection
+                        var transNo = string.Empty;
+                        using (SqlCommand cmd = new SqlCommand("sp_gen_transection_no", conn, tran))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            transNo = Convert.ToString(cmd.ExecuteScalar());
+
+                        }
+                        string stock_type = string.Empty;
+
+                        foreach (var row in borrowDetailList)
+                        {
+
+                            using (SqlCommand cmd = new SqlCommand("sp_stock_movement_add", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@transection_no", SqlDbType.VarChar, 20).Value = transNo;
+
+                                cmd.Parameters.Add("@product_type", SqlDbType.VarChar, 1).Value = row.item_type;
+                                cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.item_id;
+
+                                cmd.Parameters.Add("@transection_type", SqlDbType.VarChar, 50).Value = "BORROW";
+                                cmd.Parameters.Add("@movement_type", SqlDbType.VarChar, 3).Value = "OUT";
+                                cmd.Parameters.Add("@checking_type", SqlDbType.NVarChar, 1).Value = "W";
+                                cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty * -1;// คืนค่า
+                                cmd.Parameters.Add("@stock_balance", SqlDbType.Int).Value = 0; // คำนวนจาก Store
+                                cmd.Parameters.Add("@remark", SqlDbType.VarChar, 500).Value = "คืนค่าจาก BORROW";//row.remark;
+                                cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.Parameters.Add("@ref_doc_id", SqlDbType.Int).Value = id; // คำนวนจาก Store
+                                cmd.Parameters.Add("@ref_doc_no", SqlDbType.VarChar, 20).Value = borrowNo;
+                                cmd.Parameters.Add("@supplier_id", SqlDbType.Int).Value = supplier_id;
+                                cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = customer_id;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        #endregion
+
+                        foreach (var row in borrowDetailMFGList)
+                        {
+
+                            using (SqlCommand cmd = new SqlCommand("sp_borrow_detail_mfg_delete", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = row.id;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.ExecuteNonQuery();
+                            }
+                            // if (status != "FL")
+                            // {
+                            using (SqlCommand cmd = new SqlCommand("sp_product_mfg_delete_by_mfg ", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+
+                                cmd.Parameters.Add("@mfg_no", SqlDbType.VarChar, 20).Value = row.mfg_no;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+
+                        }
+                    }
+
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        //throw ex;
+                        return ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+                        }
+                    }
+
+                    return returnData;
+                }
+            }
+        }
+
+        [WebMethod]
+        public static BorrowListData GetBorrowData(string id)
+        {
+            var data = new BorrowListData();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value =Convert.ToInt32(id) },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" }
+                        };
+                conn.Open();
+                var dsIssueData = SqlHelper.ExecuteDataset(conn, "sp_borrow_header_list", arrParm.ToArray());
+                conn.Close();
+
+                if (dsIssueData.Tables.Count > 0)
+                {
+                    if (dsIssueData.Tables[0].Rows.Count > 0)
+                    {
+                        var row = (from t in dsIssueData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                        if (row != null)
+                        {
+
+                            data.borrow_no = Convert.IsDBNull(row["borrow_no"]) ? string.Empty : Convert.ToString(row["borrow_no"]);
+
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = e.Parameters.ToString() }
+                        };
+
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_borrow_header_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_BORROW_LIST"] = dsResult;
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}

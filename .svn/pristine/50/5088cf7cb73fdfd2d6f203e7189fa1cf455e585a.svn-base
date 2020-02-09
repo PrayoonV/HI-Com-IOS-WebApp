@@ -1,0 +1,618 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="DeliveryOrder.aspx.cs" Inherits="HicomIOS.DeliveryOrder" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+   <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <style> 
+        fieldset {
+            border: 1px solid #4b4b57;
+            display: block;
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+
+        legend {
+            width: auto;
+            display: block;
+            -webkit-padding-start: 2px;
+            -webkit-padding-end: 2px;
+            border-width: initial;
+            border-style: none;
+            border-color: initial;
+            border-image: initial;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: inherit;
+            font-weight: bold;
+        }
+
+        #Splitter_0 {
+            display: none;
+        }
+         .txt-no {
+            background-color: #e4effa !important;
+        }
+        #div-content {
+            padding: 10px 30px;
+            background-color: #ffffff;
+            margin: 20px 0;
+        }
+
+            #div-content .row.form-group {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        .no-padding-right {
+            padding-right: 0px;
+        }
+
+        .no-margin {
+            margin: 0px;
+        }
+
+        .label-rigth {
+            padding: 4px 8px 0 0;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+            .form-group label {
+                font-weight: normal;
+            }
+
+        .form-control {
+            border-radius: 0;
+            padding: 0 3px;
+            font-size: 11px;
+            height: 22px;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            margin: 1px 0 0;
+        }
+
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+            border: 1px solid #4b4b57;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid #4b4b57;
+        }
+
+            .nav-tabs > li > a {
+                border-radius: 0;
+            }
+
+                .nav-tabs > li > a:hover {
+                    border-color: #eee #eee #4b4b57;
+                }
+
+        .nav > li > a:focus, .nav > li > a:hover {
+            background-color: #faedb6;
+        }
+
+        a {
+            color: inherit;
+        }
+
+            a:focus, a:hover {
+                color: inherit;
+            }
+
+        #div-content .tab-content .tab-pane {
+            padding-top: 10px;
+        }
+
+        .btn-addItem {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+            .btn-addItem:hover {
+                background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+                border: 1px solid #eecc53;
+            }
+
+            .btn-addItem i {
+                font-size: 12px;
+            }
+
+        .btn-app {
+            width: 65px;
+        }
+
+        .modal-open {
+            opacity: 0.7;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: white;
+            /*border: 1px solid #909aa6;*/
+            border-collapse: separate;
+        }
+
+            .modal-content .modal-header {
+                background: #bbcee6 url(/DXR.axd?r=0_4062-wP3qf) repeat-x left top;
+                border-bottom: 1px solid #909aa6;
+                padding: 8px 0 6px 12px;
+                color: #1e395b;
+                font: 11px Verdana, Geneva, sans-serif;
+                height: 29px;
+            }
+
+        .modal-backdrop {
+            opacity: 0.5 !important;
+        }
+
+        .hr-line {
+            border-top: 1px solid #000;
+        }
+
+        .shipping-step {
+            float: left;
+            padding: 0 15px;
+        }
+            
+        .swal-modal {
+            width: 420px !important;
+            height: 230px !important;
+        }
+
+        .swal-title {
+            font-size: 18px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#Splitter_0").parent().hide();
+            $("#txtIssueDate").prop("readonly", "readonly");
+
+            $("#txtDeadline").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+
+            $("#txtIssueDate").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+
+            //$('#txtAgreementOther').hide();
+
+        });
+        function changedIssueType() {
+            var key = cbbIssue.GetValue();
+            $.ajax({
+                type: "POST",
+                url: "DeliveryOrder.aspx/GetIssueData",
+                data: '{id:"' + key + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#lbProject').val(data.project_name);
+                    $('#lbAddresss').val(data.address);
+                    $('#lbAttention').val(data.attention_name);
+                    $('#lbTelephoneNumber').val(data.tel);
+                    //$('#lbSaleName').val(data.sale_name);
+                    $('#lbQuotationNo').val(data.quotation_no);
+                    $('#txtIssueDate').val(data.display_delivery_date);
+                    $('#lbCustomerFirstName').val(data.customer_name);
+                    $('#hdCustomerId').val(data.customer_id);
+                    gridViewIssue.PerformCallback();
+                    
+                }
+            });
+        }
+
+        function callReport() {
+            window.open("../Report/DocumentViewer.aspx?ReportArgs=Delivery_Note_Order|" + $("#txtDeliveryOrderNo").val(), "_blank");
+        }
+
+        function popupMFGDetail(productId, issueDetailId) {
+            //var input = s.GetMainElement();
+
+            $('#hdSelectedIssueDetailId').val(issueDetailId);
+
+            $.ajax({
+                type: "POST",
+                url: "DeliveryOrder.aspx/GetMFGDetail",
+                data: '{id:"' + issueDetailId + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#txtMFGProductDescription').val(data.product_name_tha);
+                    $('#hdSelectedProductId').val(data.product_id);
+                    gridViewIssueMFG.PerformCallback();
+                    $('#modal_issue_mfg').modal('show');
+                }
+            });
+
+        }
+
+        function checkedOtherAgreement() {
+            if ($('#chkOther').is(':checked')) {
+                $('#txtAgreementOther').show();
+            }
+            else {
+                $('#txtAgreementOther').hide();
+                $('#txtAgreementOther').val("");
+            }
+        }
+        function confirmSave() {
+            if (cbbIssue.GetValue() == null) {
+                alert("กรุณาเลือกเอกสาร Issue");
+                return;
+            }
+            //else if ($('#formcheckbox input[type="checkbox"]:checked').length <= 0) {
+            //    console.log($('#formcheckbox input[type="checkbox"]:checked').length);
+            //    var cbTypeSendTax = $('#formcheckbox');
+            //    var cbTypeSendTax_txt = '*กรุณาเลือกวิธีจัดส่งเอกสารใบกำกับภาษี';
+            //    var error_msg = '<span id="' + (cbTypeSendTax.attr('id')) + '-error" class="help-block" style="margin-left:1%">' + cbTypeSendTax_txt + '</span>';
+            //    cbTypeSendTax.parent().addClass('has-error');
+            //    if ($('#' + cbTypeSendTax.attr('id') + '-error').hasClass('help-block') === false) {
+            //        cbTypeSendTax.after(error_msg);
+            //    }
+            //    return false;
+            //}
+            //var type = $('#hdQuotationType').val();
+            //$.ajax({
+            //    type: "POST",
+            //    url: "SaleOrder.aspx/ValidateData",
+            //    data: '{type : "' + type + '"}',
+            //    contentType: "application/json; charset=utf-8",
+            //    dataType: "json",
+            //    success: function (response) {
+            //        if (response.d == "") {
+            //            $('#btnConfirm').click();
+            //        }
+            //        else {
+            //            alert(response.d);
+            //        }
+            //    },
+            //    failure: function (response) {
+            //        //alert(response.d);
+            //    }
+            //});
+            console.log("testconfirm");
+            swal("ลบข้อมูลสำเร็จ!", {
+                icon: "success"
+            })
+            .then((value) => {
+                $('#btnConfirm').click();
+            });
+        
+       
+            var txtDeliveryOrderNo = $('#txtDeliveryOrderNo').val();
+            //var confirm_true = confirm("ต้องการยืนยันเอกสาร " + txtDeliveryOrderNo + "ใช่หรือไม่?", 'btnConfirm');
+            //if (confirm_true) {
+            //    $('#btnConfirm').click();
+            //}
+          
+          
+        }
+
+        function saveDraft() {
+            if (cbbIssue.GetValue() == null) {
+                alert("กรุณาเลือกเอกสาร Issue");
+                return;
+            }
+            if ($('#txtDeadline').val() == "") {
+                alert("กรุณากำหนดวันส่ง");
+                return;
+            }
+            $('#btnSaveDraft').click();
+        }
+        function backPage() {
+            window.location = "DeliveryOrderList.aspx";
+        }
+    </script>
+    <div id="div-content">
+        <div class="row">
+            <button type="button" runat="server" id="btnDraft" onclick="saveDraft()" class="btn-addItem">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Save
+            </button>
+            <button type="button" runat="server" id="btnSave" onclick="confirmSave()" class="btn-addItem">
+                <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Confirm
+            </button>
+            <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem">
+                <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;Report
+            </button>
+            <button type="button" runat="server" id="btnBack" onclick="backPage()" class="btn-addItem">
+                <i class="fa fa-list-ol" aria-hidden="true"></i>&nbsp;List DeliveryOrder
+            </button>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnSaveDraft" Style="visibility: hidden" Text="Save" OnClick="btnSaveDraft_Click"></dx:ASPxButton>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnConfirm" Style="visibility: hidden" Text="Confirm" OnClick="btnConfirm_Click"></dx:ASPxButton>
+        </div>
+        <div class="row">
+
+            <fieldset>
+                <legend>Header</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">เลขที่ใบเบิก :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbIssue" CssClass="form-control" runat="server"
+                                    ClientInstanceName="cbbIssue" TextField="data_text"
+                                    ClientSideEvents-ValueChanged="changedIssueType" ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">ชื่อลูกค้า :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbCustomerFirstName" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">เลขที่ใบจัดส่ง :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input type="text" class="form-control txt-no" id="txtDeliveryOrderNo" readonly="" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">เลขที่ใบเสนอราคา :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbQuotationNo" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">ที่อยู่ลูกค้า :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbAddresss" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">โครงการ :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbProject" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">วันที่ส่งของ :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input type="text" class="form-control" id="txtIssueDate" readonly="" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">เบอร์โทรศัพท์ :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbTelephoneNumber" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">ผู้ติดต่อ :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input readonly="" class="form-control" id="lbAttention" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+
+                <legend>รายละเอียดการขนส่ง</legend>
+                <div class="col-xs-4 no-padding">
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">ชื่อขนส่ง :</label>
+                        <div class="col-xs-9 no-padding">
+                            <input type="text" class="form-control" id="txtDeliveryName" runat="server" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">ค่าขนส่ง :</label>
+                        <div class="col-xs-9 no-padding">
+                            <input type="text" class="form-control numberic" id="txtDeliveryPrice" runat="server" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">คำอธิบายหน้างาน :</label>
+                        <div class="col-xs-9 no-padding">
+                            <input type="text" class="form-control" id="txtOrderDescription" runat="server" />
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-xs-4 no-padding">
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">Forklift ขนาด :</label>
+                        <div class="col-xs-8 no-padding">
+                            <input type="text" class="form-control numberic" id="txtEquipment" runat="server" />
+                        </div>
+                        <label class="col-xs-1 text-left">Ton</label>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">กำหนดวันส่ง :</label>
+                        <div class="col-xs-8 no-padding">
+                            <input type="text" class="form-control" readonly="" id="txtDeadline" runat="server" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">อ้างอิงอื่น :</label>
+                        <div class="col-xs-8 no-padding">
+                            <input type="text" class="form-control" id="txtOtherRef" runat="server" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-4 no-padding">
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth">ข้อตกลงกับลูกค้า :</label>
+                        <div class="col-xs-9" id="formcheckbox">
+                            <div class="row" style="padding: 2px 0;">
+                                <div class="form-inline shipping-step">
+                                    <label class="checkbox">
+                                        <input type="checkbox" enableviewstate="false" id="chkFondation" value="On Foundation" runat="server">
+                                        On Foundation
+                                    </label>
+                                </div>
+                                <div class="form-inline shipping-step">
+                                    <label class="checkbox">
+                                        <input type="checkbox" enableviewstate="false" id="chkNoUnloading" value="On site without unloading" runat="server">
+                                        On site without unloading
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row" style="padding: 2px 0;">
+                                <div class="form-inline shipping-step">
+                                    <label class="checkbox">
+                                        <input type="checkbox" enableviewstate="false" id="chkInstallation" value="Hi-COM Installation" runat="server">
+                                        Hi-COM Installation
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row" style="padding: 2px 0;">
+                                <div class="form-inline shipping-step">
+                                    <label class="checkbox">
+                                        <input type="checkbox" enableviewstate="false" onchange="checkedOtherAgreement()" id="chkOther" value="Other" runat="server">
+                                        Other
+                                    </label>
+                                    &nbsp;
+                                    <input type="text" class="form-control" id="txtAgreementOther" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="col-xs-12">
+                    <dx:ASPxGridView ID="gridViewIssue" ClientInstanceName="gridViewIssue" runat="server" Settings-VerticalScrollBarMode="Visible"
+                        Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                        OnCustomCallback="gridViewIssue_CustomCallback"
+                        KeyFieldName="id" Width="100%">
+                        <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                        <Paddings Padding="0px" />
+                        <Border BorderWidth="0px" />
+                        <BorderBottom BorderWidth="1px" />
+                        <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                            PageSizeItemSettings-Visible="false">
+                            <PageSizeItemSettings Items="10, 20, 50" />
+                        </SettingsPager>
+                        <Columns>
+                            <dx:GridViewDataTextColumn Caption="MFG Detail" FieldName="id" CellStyle-HorizontalAlign="Center" Width="50px">
+                                <DataItemTemplate>
+                                    <a id="btnMFG" class="btn btn-mini" onclick="popupMFGDetail(<%# Eval("product_id")%>,<%# Eval("issue_stock_detail_id")%>)" title="MFG">
+                                        <i class="fa fa-list" aria-hidden="true"></i>
+                                    </a>
+                                </DataItemTemplate>
+                            </dx:GridViewDataTextColumn>
+                            <dx:GridViewDataColumn FieldName="product_no" Caption="Product No" Width="150px" />
+                            <dx:GridViewDataColumn FieldName="product_name_tha" Caption="Product Name" Width="200px" />
+                            <dx:GridViewDataColumn FieldName="qty" Caption="Quantity" Width="80px" />
+                            <dx:GridViewDataColumn FieldName="unit_tha" Caption="Unit" Width="100px" />
+                            <dx:GridViewDataColumn FieldName="remark" Caption="Remark" Width="150px" />
+                        </Columns>
+                    </dx:ASPxGridView>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+
+        <div class="modal fade" id="modal_issue_mfg" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        รายการ
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Product :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control" readonly="true" id="txtMFGProductDescription" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <dx:ASPxGridView ID="gridViewIssueMFG" ClientInstanceName="gridViewIssueMFG" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                    Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                                    OnCustomCallback="gridViewIssueMFG_CustomCallback"
+                                    KeyFieldName="mfg_no" Width="100%">
+                                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                    <Paddings Padding="0px" />
+                                    <Border BorderWidth="0px" />
+                                    <BorderBottom BorderWidth="1px" />
+                                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                        PageSizeItemSettings-Visible="false">
+                                        <PageSizeItemSettings Items="10, 20, 50" />
+                                    </SettingsPager>
+                                    <Columns>
+                                        <dx:GridViewDataTextColumn FieldName="id" Visible="false" Caption="ID" VisibleIndex="3" />
+                                        <dx:GridViewDataTextColumn FieldName="mfg_no" Caption="MFG No" VisibleIndex="4" Width="550px" />
+                                    </Columns>
+                                </dx:ASPxGridView>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth"></label>
+                                    <div class="col-xs-7 no-padding text-right">
+                                        <%--<button type="button" runat="server" id="Button3" onclick="submitMFGProduct()" class="btn-app btn-addItem">ยืนยัน</button>--%>
+                                        <button type="button" runat="server" id="Button4" class="btn-app btn-addItem" data-dismiss="modal">ปิด</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden">
+            <asp:HiddenField runat="server" ID="hdQuotationType" />
+            <asp:HiddenField runat="server" ID="hdQuotationNo" />
+            <asp:HiddenField runat="server" ID="hdCustomerId" />
+            <asp:HiddenField runat="server" ID="hdSelectedIssueDetailId" />
+            <asp:HiddenField runat="server" ID="hdSelectedProductId" />
+        </div>
+    </div>
+</asp:Content>

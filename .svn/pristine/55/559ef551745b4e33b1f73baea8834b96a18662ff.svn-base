@@ -1,0 +1,539 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Configuration;
+using System.Diagnostics;
+using System.Web.SessionState;
+using System.Web;
+using DevExpress.Web;
+using DevExpress.Data.Filtering;
+using System.Collections;
+using System.Linq;
+using DevExpress.XtraPrinting;
+using DevExpress.XtraReports.UI;
+using HicomIOS.ClassUtil;
+using System.Web.UI;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Text;
+using System.Security.Cryptography;
+using System.IO;
+
+public class FilterItem
+{
+    public string Name { get; set; }
+    public string Expression { get; set; }
+    public bool IsCustom { get; set; }
+}
+
+public static class SPlanetUtil
+{
+    const char SerializedStringArraySeparator = '|';
+
+    static SPlanetUtil()
+    {
+        //ObjectFilter = new FilterBag("DataFilter", CreateStandardFilters(), "is_enable");
+        ObjectFilter = new FilterBag("DataFilter");
+    }
+
+    // ****************** Code about Filter Control ************************
+    #region " For Filter Functions"
+    const string
+    StateHiddenFieldContextKey = "216A8C03-7A8A-4735-8CBB-4C62E0D4D23C",
+    SearchExpressionsContextKey = "7063240E-83E6-415E-A399-5F6C917CA385";
+    public static HttpContext Context { get { return HttpContext.Current; } }
+    public static bool TryGetClientStateValue<T>(string key, out T result)
+    {
+        if (!IsStateHiddenFieldContainsKey(key))
+        {
+            result = default(T);
+            return false;
+        }
+        result = (T)StateHiddenField[key];
+        return true;
+    }
+    static bool IsStateHiddenFieldContainsKey(string key)
+    {
+        return StateHiddenField != null && StateHiddenField.Contains(key);
+    }
+    static ASPxHiddenField StateHiddenField
+    {
+        get { return Context.Items[StateHiddenFieldContextKey] as ASPxHiddenField; }
+        set { Context.Items[StateHiddenFieldContextKey] = value; }
+    }
+    public static bool TrySetClientStateValue<T>(string key, T value)
+    {
+        if (StateHiddenField == null)
+            return false;
+        StateHiddenField[key] = value;
+        return true;
+    }
+    public static void BindComboBoxToEnum(ASPxComboBox comboBox, Type enumType)
+    {
+        comboBox.ValueType = enumType;
+        PopulateComboBoxItems(comboBox.Items, enumType);
+    }
+    public static void BindComboBoxToEnum(ComboBoxProperties prop, Type enumType)
+    {
+        prop.ValueType = enumType;
+        PopulateComboBoxItems(prop.Items, enumType);
+    }
+    static void PopulateComboBoxItems(ListEditItemCollection items, Type enumType)
+    {
+        items.Clear();
+        foreach (var value in Enum.GetValues(enumType))
+            items.Add(DevExpress.Web.Internal.CommonUtils.SplitPascalCaseString(value.ToString()), value);
+    }
+    public static void RegisterStateHiddenField(ASPxHiddenField hf)
+    {
+        StateHiddenField = hf;
+    }
+    #endregion
+
+    // Filters
+    public static FilterBag ObjectFilter { get; private set; }
+
+    static Dictionary<string, FilterItem> CreateStandardFilters()
+    {
+        var result = new Dictionary<string, FilterItem>();
+        var status = new OperandProperty("is_enable");
+        result.CreateItem("is_enable", (CriteriaOperator)(status == new OperandValue(DataListUtil.EnumStatus.Disabled)));
+        return result;
+    }
+
+    // ****************** End of Code about Filter Control ************************
+
+    public static List<string> DeserializeCallbackArgs(string data)
+    {
+        var items = new List<string>();
+        try
+        {
+            if (!string.IsNullOrEmpty(data))
+            {
+                int currentPos = 0;
+                int dataLength = data.Length;
+                while (currentPos < dataLength)
+                {
+                    string item = DeserializeStringArrayItem(data, ref currentPos);
+                    items.Add(item);
+                }
+            }
+        }
+        catch
+        {
+            items.Clear();
+        }
+        return items;
+    }
+    static string DeserializeStringArrayItem(string data, ref int currentPos)
+    {
+        int indexOfFirstSeparator = data.IndexOf(SerializedStringArraySeparator, currentPos);
+        string itemLengthString = "";
+        if (indexOfFirstSeparator == -1)
+            itemLengthString = data.Substring(currentPos);
+        else
+            itemLengthString = data.Substring(currentPos, indexOfFirstSeparator - currentPos);
+        //int itemLength = (int)(itemLengthString.Length);
+        currentPos += itemLengthString.Length + 1;
+        //string item = data.Substring(currentPos, itemLength);
+        //currentPos += itemLength;
+        //return item;
+        return itemLengthString;
+    }
+
+
+
+    // ****************** For Database Function ************************
+    #region "Database Function"
+    // Manage about Database
+    public static SqlConnection GetConnection_HicomDB()
+    {
+        string connStr = GetConnectionString();
+        SqlConnection connection = new SqlConnection(connStr);
+        connection.Open();
+        return connection;
+    }
+    public static string GetConnectionString()
+    {
+        string connStr = ConfigurationManager.ConnectionStrings["HicomDBConnectionString"].ConnectionString;
+        return connStr;
+    }
+
+    public static void BindASPxComboBox(ref ASPxComboBox control_name, string storeprocedure_name)
+    {
+        using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+        {
+            conn.Open();
+            using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, storeprocedure_name))
+            {
+                control_name.DataSource = dsResult;
+                control_name.TextField = "data_text";
+                control_name.ValueField = "data_value";
+                control_name.DataBind();
+            }
+        }
+    }
+    public static void BindASPxComboBox(ref ASPxComboBox control_name, string storeprocedure_name, List<SqlParameter> arrParm)
+    {
+
+        using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+        {
+            DataSet dsResult = new DataSet();
+            conn.Open();
+            dsResult = SqlHelper.ExecuteDataset(conn, storeprocedure_name , arrParm.ToArray());
+
+            control_name.DataSource = dsResult;
+            control_name.TextField = "data_text";
+            control_name.ValueField = "data_value";
+            control_name.DataBind();
+
+            conn.Close();
+        }
+        //using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, storeprocedure_name))
+        //{
+        //    control_name.DataSource = dsResult;
+        //    control_name.TextField = "data_text";
+        //    control_name.ValueField = "data_value";
+        //    control_name.DataBind();
+        //}
+
+    }
+
+    // Manage about Log Exception
+    public static string LogErrorCollect(Exception ex)
+    {
+
+        try
+        {
+            // Debug Info
+            StackFrame stackFrame = new StackFrame(1, true);
+            string strComputerName = Environment.MachineName;
+            string strFilename = stackFrame.GetFileName().ToString();
+            string strMethod = stackFrame.GetMethod().ToString();
+            int intLine = stackFrame.GetFileLineNumber();
+
+            // Summary Message Error
+            string strErrorMessage = strFilename + "\r\n" + strFilename + " : " + intLine.ToString() + "\r\n" + strMethod + "\r\n" + ex.Message;
+            Console.WriteLine(strErrorMessage);
+            return strErrorMessage;
+        }
+        catch (Exception errorEx)
+        {
+            return "ERROR Function LogErrorCollect in SPlanetUtil Class \r\n" + errorEx.Message;
+        }
+
+    }
+    #endregion
+    // ****************** End Database Function ************************
+
+    #region Encrypt and Decrypt Function
+    //public static string Encrypt(string toEncrypt, bool useHashing)
+    //{
+    //    byte[] keyArray;
+    //    byte[] toEncryptArray = UTF8Encoding.UTF8.GetBytes(toEncrypt);
+
+    //    System.Configuration.AppSettingsReader settingsReader =
+    //                                        new AppSettingsReader();
+    //    // Get the key from config file
+
+    //    string key = (string)settingsReader.GetValue("SecurityKey",
+    //                                                     typeof(String));
+    //    //System.Windows.Forms.MessageBox.Show(key);
+    //    //If hashing use get hashcode regards to your key
+    //    if (useHashing)
+    //    {
+    //        MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
+    //        keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+    //        //Always release the resources and flush data
+    //        // of the Cryptographic service provide. Best Practice
+
+    //        hashmd5.Clear();
+    //    }
+    //    else
+    //        keyArray = UTF8Encoding.UTF8.GetBytes(key);
+
+    //    TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
+    //    //set the secret key for the tripleDES algorithm
+    //    tdes.Key = keyArray;
+    //    //mode of operation. there are other 4 modes.
+    //    //We choose ECB(Electronic code Book)
+    //    tdes.Mode = CipherMode.ECB;
+    //    //padding mode(if any extra byte added)
+
+    //    tdes.Padding = PaddingMode.PKCS7;
+
+    //    ICryptoTransform cTransform = tdes.CreateEncryptor();
+    //    //transform the specified region of bytes array to resultArray
+    //    byte[] resultArray =
+    //      cTransform.TransformFinalBlock(toEncryptArray, 0,
+    //      toEncryptArray.Length);
+    //    //Release resources held by TripleDes Encryptor
+    //    tdes.Clear();
+    //    //Return the encrypted data into unreadable string format
+    //    return Convert.ToBase64String(resultArray, 0, resultArray.Length);
+    //}
+
+    //public static string Decrypt(string cipherString, bool useHashing)
+    //{
+    //    byte[] keyArray;
+    //    //get the byte code of the string
+
+    //    byte[] toEncryptArray = Convert.FromBase64String(cipherString);
+
+    //    System.Configuration.AppSettingsReader settingsReader =
+    //                                        new AppSettingsReader();
+    //    //Get your key from config file to open the lock!
+    //    string key = (string)settingsReader.GetValue("SecurityKey",
+    //                                                 typeof(String));
+
+    //    if (useHashing)
+    //    {
+    //        //if hashing was used get the hash code with regards to your key
+    //        MD5CryptoServiceProvider hashmd5 = new MD5CryptoServiceProvider();
+    //        keyArray = hashmd5.ComputeHash(UTF8Encoding.UTF8.GetBytes(key));
+    //        //release any resource held by the MD5CryptoServiceProvider
+
+    //        hashmd5.Clear();
+    //    }
+    //    else
+    //    {
+    //        //if hashing was not implemented get the byte code of the key
+    //        keyArray = UTF8Encoding.UTF8.GetBytes(key);
+    //    }
+
+    //    TripleDESCryptoServiceProvider tdes = new TripleDESCryptoServiceProvider();
+    //    //set the secret key for the tripleDES algorithm
+    //    tdes.Key = keyArray;
+    //    //mode of operation. there are other 4 modes. 
+    //    //We choose ECB(Electronic code Book)
+
+    //    tdes.Mode = CipherMode.ECB;
+    //    //padding mode(if any extra byte added)
+    //    tdes.Padding = PaddingMode.PKCS7;
+
+    //    ICryptoTransform cTransform = tdes.CreateDecryptor();
+    //    byte[] resultArray = cTransform.TransformFinalBlock(
+    //                         toEncryptArray, 0, toEncryptArray.Length);
+    //    //Release resources held by TripleDes Encryptor                
+    //    tdes.Clear();
+    //    //return the Clear decrypted TEXT
+    //    return UTF8Encoding.UTF8.GetString(resultArray);
+    //}
+
+
+    #endregion
+
+    #region Encrytp
+    public static string Encrypt(string plainText)
+    {
+        MD5 md5Hash = MD5.Create();
+        //string testhash = DecryptString(plainText, 100, plainText);
+        // string sss = DecryptString("e10adc3949ba59abbe56e057f20f883e");
+        string hash = GetMd5Hash(md5Hash, plainText);
+        return hash;
+    }
+
+    static string GetMd5Hash(MD5 md5Hash, string input)
+    {
+        // Convert the input string to a byte array and compute the hash.
+        byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+        // Create a new Stringbuilder to collect the bytes
+        // and create a string.
+        StringBuilder sBuilder = new StringBuilder();
+        // Loop through each byte of the hashed data 
+        // and format each one as a hexadecimal string.
+        for (int i = 0; i < data.Length; i++)
+        {
+            sBuilder.Append(data[i].ToString("x2"));
+        }
+        // Return the hexadecimal string.
+        return sBuilder.ToString();
+    }
+
+    private static readonly byte[] IV =
+          new byte[8] { 240, 3, 45, 29, 0, 76, 173, 59 };
+
+    public static string DecryptString(string message)
+    {
+        if (message == null || message.Length == 0) return string.Empty;
+
+        string result = string.Empty;
+
+        try
+        {
+            byte[] buffer = Convert.FromBase64String(message);
+
+            TripleDESCryptoServiceProvider des =
+                new TripleDESCryptoServiceProvider();
+
+            MD5CryptoServiceProvider MD5 =
+                new MD5CryptoServiceProvider();
+
+            des.Key =
+                MD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes("cryptoKey"));
+
+            des.IV = IV;
+
+            result = Encoding.ASCII.GetString(
+                des.CreateDecryptor().TransformFinalBlock(
+                buffer, 0, buffer.Length));
+        }
+        catch
+        {
+            throw;
+        }
+
+        return result;
+    }
+
+
+    #endregion
+
+    public static string GetBaseURL(HttpRequest objRequest)
+    {
+        string baseUrl = objRequest.Url.Scheme + "://" + objRequest.Url.Authority + objRequest.ApplicationPath.TrimEnd('/') + "/";
+        return baseUrl;
+    }
+
+    public static string Convert_ddmmyyyy_to_yyyymmdd(string input,string seperator="/")
+    {
+        string[] tempsplit = input.Split('/');
+        string newdate = "";
+        if (tempsplit.Count() > 1)
+            newdate = tempsplit[2] + seperator + tempsplit[1] + seperator + tempsplit[0];
+        return newdate;
+    }
+}
+
+
+public class FilterBag
+{
+    const string
+        SearchTextHiddenFieldKey = "SearchText",
+        FilterControlExpressionHiddenFieldKey = "FilterControlExpression",
+        CustomFilterItemsSessionKey = "5485495F-0268-48DB-A531-7D86F7A97905";
+
+    public FilterBag(string name)
+    {
+        Name = name;
+    }
+    public FilterBag(string name, Dictionary<string, FilterItem> defaultFilters, params string[] searchFieldNames)
+    {
+        Name = name;
+        DefaultFilterItems = defaultFilters;
+        SearchFieldNames = new HashSet<string>(searchFieldNames);
+    }
+
+    protected HttpSessionState Session { get { return SPlanetUtil.Context.Session; } }
+
+    public string Name { get; private set; }
+
+    // not modified
+    protected Dictionary<string, FilterItem> DefaultFilterItems { get; private set; }
+    public HashSet<string> SearchFieldNames { get; private set; }
+
+    // depend on client state
+    public string SearchText
+    {
+        get
+        {
+            string value;
+            SPlanetUtil.TryGetClientStateValue<string>(SearchTextHiddenFieldKey, out value);
+            return !string.IsNullOrEmpty(value) ? value : string.Empty;
+        }
+    }
+    public string FilterControlExpression
+    {
+        get
+        {
+            string value;
+            SPlanetUtil.TryGetClientStateValue<string>(FilterControlExpressionHiddenFieldKey, out value);
+            return !string.IsNullOrEmpty(value) ? value : string.Empty;
+        }
+        set { SPlanetUtil.TrySetClientStateValue<string>(FilterControlExpressionHiddenFieldKey, value); }
+    }
+    protected Dictionary<string, FilterItem> CustomFilterItems
+    {
+        get
+        {
+            var key = CustomFilterItemsSessionKey + Name;
+            if (Session[key] == null)
+                Session[key] = new Dictionary<string, FilterItem>();
+            return (Dictionary<string, FilterItem>)Session[key];
+        }
+    }
+
+    protected CriteriaOperator SearchCriteria
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(SearchText) || SearchFieldNames.Count == 0)
+                return null;
+            var operators = SearchFieldNames.Select(f => new FunctionOperator(FunctionOperatorType.Contains, new OperandProperty(f), SearchText)).OfType<CriteriaOperator>().ToList();
+            return operators.Count > 1 ? new GroupOperator(GroupOperatorType.Or, operators) : operators[0];
+        }
+    }
+    public string GetExpression(bool useSearch)
+    {
+        var search = useSearch ? SearchCriteria : null;
+        var filterControl = CriteriaOperator.Parse(FilterControlExpression);
+        var criteria = GroupOperator.And(filterControl, search);
+        return !object.ReferenceEquals(criteria, null) ? criteria.ToString() : string.Empty;
+    }
+
+    public Dictionary<string, FilterItem> GetFilterItems()
+    {
+        return DefaultFilterItems.Union(CustomFilterItems).ToDictionary(p => p.Key, p => p.Value);
+    }
+    public FilterItem CreateCustomFilter(string name, string criteria)
+    {
+        return CustomFilterItems.CreateItem(name, criteria, true);
+    }
+
+    public string GetActiveFilterName()
+    {
+        var item = GetFilterItems().FirstOrDefault(p => GetIsActiveFilter(p.Value.Expression));
+        return !object.ReferenceEquals(item, null) ? item.Key : string.Empty;
+    }
+    public bool GetIsActiveFilter(string expression)
+    {
+        return expression == FilterControlExpression;
+    }
+}
+
+public static class ExtentionUtils
+{
+    public static FilterItem CreateItem(this Dictionary<string, FilterItem> self, string name, string criteria, bool custom = false)
+    {
+        return self.CreateItem(name, CriteriaOperator.Parse(criteria), custom);
+    }
+    public static FilterItem CreateItem(this Dictionary<string, FilterItem> self, string name, CriteriaOperator criteria, bool custom = false)
+    {
+        var key = string.Format("{0}_{1}", name, custom);
+        if (!self.ContainsKey(key) || custom)
+        {
+            var expression = !object.ReferenceEquals(criteria, null) ? criteria.ToString() : string.Empty;
+            self[key] = new FilterItem() { Name = name, Expression = expression, IsCustom = custom };
+        }
+        return self[key];
+    }
+    public static T Add<T>(this ArrayList self, T item)
+    {
+        self.Add(item);
+        return item;
+    }
+    public static FilterControlComboBoxColumn Add(this ArrayList self, FilterControlComboBoxColumn column, Type enumType)
+    {
+        self.Add(column);
+        SPlanetUtil.BindComboBoxToEnum(column.PropertiesComboBox, enumType);
+        return column;
+    }
+
+    public static TableRow Add(this TableRowCollection collection)
+    { // TODO check why it doesn't work
+        var row = new TableRow();
+        collection.Add(row);
+        return row;
+    }
+}
+

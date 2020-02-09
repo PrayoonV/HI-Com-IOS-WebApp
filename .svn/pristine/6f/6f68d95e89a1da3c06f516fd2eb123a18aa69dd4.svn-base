@@ -1,0 +1,58 @@
+﻿
+/* Edit Form of User Control */
+.EditFormPopup .dxpc-content {
+    padding: 0 0 25px 5px;
+}
+
+.EditFormPopup .fullWidthEditorContainer {
+    padding-right: 32px;
+}
+
+.EditFormPopup .addressGroup .fullWidthTable,
+.EditFormPopup .fullWidthCell {
+    width: 100%;
+}
+
+.EditFormPopup .buttonsContainer,
+.evalEditFormPopup .buttonsContainer {
+    padding-right: 32px;
+    float: right;
+}
+
+.EditFormPopup .group > tbody > tr > td,
+.EditFormPopup .group,
+.evalEditFormPopup .group > tbody > tr > td,
+.evalEditFormPopup .group {
+    padding-right: 0;
+}
+
+.EditFormPopup .addressGroup .dxeButtonEditSys {
+    margin: 0 3px;
+}
+
+/* -------------------- */
+
+#FooterPane {
+    margin-bottom: 0;
+}
+
+.alert-minimalist {
+	background-color: rgb(241, 242, 240);
+	border-color: rgba(149, 149, 149, 0.3);
+	border-radius: 3px;
+	color: rgb(149, 149, 149);
+	padding: 10px;
+}
+.alert-minimalist > [data-notify="icon"] {
+	height: 50px;
+	margin-right: 12px;
+}
+.alert-minimalist > [data-notify="title"] {
+	color: rgb(51, 51, 51);
+	display: block;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+.alert-minimalist > [data-notify="message"] {
+	font-size: 80%;
+}

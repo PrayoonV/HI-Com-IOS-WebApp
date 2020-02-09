@@ -1,0 +1,679 @@
+﻿using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace HicomIOS.Master
+{
+    public partial class Employee : MasterDetailPage
+    {
+        private DataSet dsResult;
+        private DataTable dtAmphur = new DataTable();
+        private DataTable dtDistrict = new DataTable();
+        public class EmployeeList
+        {
+            public int id { get; set; }
+            public int group_id { get; set; }
+            public string employee_code { get; set; }
+            public int prefix_id { get; set; }
+            public string first_name { get; set; }
+            public string last_name { get; set; }
+            public string username { get; set; }
+            public string password { get; set; }
+            public string gender { get; set; }
+            public string card_id { get; set; }
+            public int department_id { get; set; }
+            public int position_id { get; set; }
+            public string nick_name { get; set; }
+            public string mobile { get; set; }
+            public string email { get; set; }
+            public string line_id { get; set; }
+            public string birth_day { get; set; }
+            public string cover_image { get; set; }
+            public string sign_image { get; set; }
+            public string address { get; set; }
+            public int province_id { get; set; }
+            public int amphur_id { get; set; }
+            public int district_id { get; set; }
+            public string zipcode { get; set; }
+            public bool is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+            public List<AmphurClass> amphurList { get; set; }
+            public List<DistrictClass> districtList { get; set; }
+
+        }
+
+        public class AmphurClass
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public class DistrictClass
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public override string PageName { get { return "Employee List"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+        // ClientInstanceName that use in Script.js
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                Session.Remove("EMPLOYEE_FORM_IMGPATH");
+                Session.Remove("EMPLOYEE_FORM_SIGN_IMGPATH");
+                // Load Combobox Employee Department Data
+                SPlanetUtil.BindASPxComboBox(ref cboDepartment, DataListUtil.DropdownStoreProcedureName.Employee_Department);
+
+                // Load Combobox Employee Position Data
+                SPlanetUtil.BindASPxComboBox(ref cboPosition, DataListUtil.DropdownStoreProcedureName.Employee_Position);
+
+                // Load Combobox Province Data
+                SPlanetUtil.BindASPxComboBox(ref cboProvince, DataListUtil.DropdownStoreProcedureName.Thailand_Province);
+
+                SPlanetUtil.BindASPxComboBox(ref cboUserGroup, DataListUtil.DropdownStoreProcedureName.Security_User_Group);
+
+                cboPrefix.Items.Add("นาย", "0");
+                cboPrefix.Items.Add("นางสาว", "1");
+                cboPrefix.Items.Add("นาง", "2");
+                cboPrefix.Items.Add("ไม่ระบุ", "3");
+
+
+                // Setting height gridView
+                gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+                gridView.SettingsBehavior.AllowFocusedRow = true;
+                if (Session["ROW"] != null)
+                {
+                    gridView.FocusedRowIndex = Convert.ToInt32(Session["ROW"]);
+                }
+
+                dsResult = null;
+                BindGrid(true);
+            }
+            else
+            {
+                //Page.ClientScript.RegisterStartupScript(this.GetType(), "setCheckboxSwitch", "setTimeout(function() { setCheckboxSwitch() }, 150);", true);
+                dsResult = (DataSet)Session["SESSION_EMPLOYEE_MASTER"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+        public override void RefreshEntry() //Popup Menu Select Refresh Data
+        {
+            BindGrid(true);
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    string search = "";
+                    if (Session["SEARCH"] != null)
+                    {
+                        search = Session["SEARCH"].ToString();
+                        txtSearchBoxData.Value = search;
+                    }
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = search },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_employee_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_EMPLOYEE_MASTER"] = dsResult;
+                    }
+                }
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+
+                //  Check page from session
+                if (Session["PAGE"] != null)
+                {
+                    int page = Convert.ToInt32(Session["PAGE"]);
+                    gridView.PageIndex = page;
+                }
+                if (!Page.IsPostBack && Session["COLUMN"] != null && Session["ORDER"] != null)
+                {
+                    int order = Convert.ToInt32(Session["ORDER"]);
+                    if (order == 1)
+                    {
+                        ((GridViewDataColumn)gridView.Columns[Session["COLUMN"].ToString()]).SortAscending();
+                    }
+                    else
+                    {
+                        ((GridViewDataColumn)gridView.Columns[Session["COLUMN"].ToString()]).SortDescending();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        #region Upload Image
+
+        protected void UploadControl_FileUploadComplete(object sender, FileUploadCompleteEventArgs e)
+        {
+            if (e.UploadedFile.IsValid)
+            {
+                //e.CallbackData = SavePostedFile(e.UploadedFile);
+                Guid guid = Guid.NewGuid();
+                e.CallbackData = String.Format("{0}_" + guid + ".jpg", ConstantClass.SESSION_USER_ID);
+                string path = Page.MapPath("../Images/") + e.CallbackData;
+                string serverPath = e.CallbackData;
+                bool exists = System.IO.Directory.Exists(Server.MapPath("/Images"));
+
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath("/Images"));
+
+                e.UploadedFile.SaveAs(path);
+                Session["EMPLOYEE_FORM_IMGPATH"] = serverPath;
+                //string replacePath = path.Replace('\\', '/');
+                //string path2 = Path.Combine(Server.MapPath(UploadDirectory), e.CallbackData);
+                //uploadedImage.Src = replacePath;
+                //ScriptManager.RegisterStartupScript(this, GetType(), "previewImage", "previewImage('" + replacePath + "');", true);
+            }
+        }
+
+        protected void uploadSign_FileUploadComplete(object sender, FileUploadCompleteEventArgs e)
+        {
+            if (e.UploadedFile.IsValid)
+            {
+                //e.CallbackData = SavePostedFile(e.UploadedFile);
+                Guid guid = Guid.NewGuid();
+                e.CallbackData = String.Format("{0}_" + guid + ".jpg", ConstantClass.SESSION_USER_ID);
+                string path = Page.MapPath("../Images/Sign/") + e.CallbackData;
+                string serverPath = e.CallbackData;
+                bool exists = System.IO.Directory.Exists(Server.MapPath("/Images/Sign"));
+
+                if (!exists)
+                    System.IO.Directory.CreateDirectory(Server.MapPath("/Images/Sign"));
+
+                e.UploadedFile.SaveAs(path);
+                Session["EMPLOYEE_FORM_SIGN_IMGPATH"] = serverPath;
+            }
+        }
+        #endregion
+
+        protected void cboAmphur_Callback(object source, CallbackEventArgsBase e)
+        {
+            FillAmphurCombo(e.Parameter);
+        }
+        protected void cboDistrict_Callback(object source, CallbackEventArgsBase e)
+        {
+            FillDistrictCombo(e.Parameter);
+        }
+
+        protected void FillAmphurCombo(string provinceId)
+        {
+            try
+            {
+                dtAmphur = new DataTable();
+                dtAmphur.Columns.Add("data_text", typeof(string));
+                dtAmphur.Columns.Add("data_value", typeof(int));
+                dtAmphur.Columns.Add("province_id", typeof(int));
+
+                if (!string.IsNullOrEmpty(provinceId))
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(int));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        conn.Open();
+                        using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, DataListUtil.DropdownStoreProcedureName.Thailand_Amphur))
+                        {
+                            if (dsResult != null)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    if (Convert.ToString(row["province_id"]) == provinceId)
+                                    {
+                                        dtAmphur.Rows.Add(row[1], Convert.ToInt32(row[0]), Convert.ToInt32(row[2]));
+                                    }
+                                }
+                            }
+
+                        }
+                        conn.Close();
+                    }
+
+                    var amphurFilter = (from t in dtAmphur.AsEnumerable()
+                                        where t.Field<int>("province_id") == Convert.ToInt32(provinceId)
+                                        select t).ToList();
+                    foreach (var row in amphurFilter)
+                    {
+                        dtSource.Rows.Add(row[1], row[0]);
+                    }
+                    cboAmphur.DataSource = dtSource;
+                    cboAmphur.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        protected void FillDistrictCombo(string amphurId)
+        {
+            try
+            {
+                dtDistrict = new DataTable();
+                dtDistrict.Columns.Add("data_text", typeof(string));
+                dtDistrict.Columns.Add("data_value", typeof(int));
+                dtDistrict.Columns.Add("amphur_id", typeof(int));
+
+                if (!string.IsNullOrEmpty(amphurId))
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(int));
+                    dtSource.Columns.Add("data_text", typeof(string));
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        conn.Open();
+                        using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, DataListUtil.DropdownStoreProcedureName.Thailand_District))
+                        {
+                            if (dsResult != null)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    if (Convert.ToString(row["amphur_id"]) == amphurId)
+                                    {
+                                        dtDistrict.Rows.Add(row[1], Convert.ToInt32(row[0]), Convert.ToInt32(row[2]));
+                                    }
+                                }
+                            }
+
+                        }
+                        conn.Close();
+                    }
+
+                    var districtFilter = (from t in dtDistrict.AsEnumerable()
+                                          where t.Field<int>("amphur_id") == Convert.ToInt32(amphurId)
+                                          select t).ToList();
+                    foreach (var row in districtFilter)
+                    {
+                        dtSource.Rows.Add(row[1], row[0]);
+                    }
+                    cboDistrict.DataSource = dtSource;
+                    cboDistrict.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        [WebMethod]
+        public static string NewEmployeeData()
+        {
+            HttpContext.Current.Session.Remove("EMPLOYEE_FORM_IMGPATH"); // CLEAR รูป
+            HttpContext.Current.Session.Remove("EMPLOYEE_FORM_SIGN_IMGPATH"); // CLEAR รูป
+
+            return "SUCCESS";
+        }
+
+        [WebMethod]
+        public static string InsertEmployee(EmployeeList[] employeeAddData)
+        {
+            var row = (from t in employeeAddData select t).FirstOrDefault();
+            if (row != null)
+            {
+                DateTime? birth_day_date = null;
+                if (!string.IsNullOrEmpty(row.birth_day))
+                {
+                    birth_day_date = DateTime.ParseExact(row.birth_day, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                }
+                var uploadImage = (string)HttpContext.Current.Session["EMPLOYEE_FORM_IMGPATH"];
+                var signImage = (string)HttpContext.Current.Session["EMPLOYEE_FORM_SIGN_IMGPATH"];
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_employee_add", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@employee_code", SqlDbType.VarChar, 20).Value = row.employee_code;
+                            cmd.Parameters.Add("@prefix_id", SqlDbType.Int).Value = row.prefix_id;
+                            cmd.Parameters.Add("@first_name", SqlDbType.VarChar, 50).Value = row.first_name;
+                            cmd.Parameters.Add("@last_name", SqlDbType.VarChar, 50).Value = row.last_name;
+                            cmd.Parameters.Add("@gender", SqlDbType.VarChar, 10).Value = row.gender;
+                            cmd.Parameters.Add("@card_id", SqlDbType.VarChar, 50).Value = row.card_id;
+                            cmd.Parameters.Add("@department_id", SqlDbType.Int).Value = row.department_id;
+                            cmd.Parameters.Add("@position_id", SqlDbType.Int).Value = row.position_id;
+                            cmd.Parameters.Add("@nick_name", SqlDbType.VarChar, 50).Value = row.nick_name;
+                            cmd.Parameters.Add("@mobile", SqlDbType.VarChar, 50).Value = row.mobile;
+                            cmd.Parameters.Add("@email", SqlDbType.VarChar, 50).Value = row.email;
+                            cmd.Parameters.Add("@line_id", SqlDbType.VarChar, 50).Value = row.line_id;
+                            cmd.Parameters.Add("@birth_day", SqlDbType.Date).Value = birth_day_date;//DateTime.ParseExact(row.birth_day, "dd/MM/yyyy", CultureInfo.InvariantCulture); ;
+                            cmd.Parameters.Add("@cover_image", SqlDbType.VarChar, 200).Value = uploadImage;//row.cover_image;
+                            cmd.Parameters.Add("@address", SqlDbType.VarChar, 200).Value = row.address;
+                            cmd.Parameters.Add("@province_id", SqlDbType.Int).Value = row.province_id;
+                            cmd.Parameters.Add("@amphur_id", SqlDbType.Int).Value = row.amphur_id;
+                            cmd.Parameters.Add("@district_id", SqlDbType.Int).Value = row.district_id;
+                            cmd.Parameters.Add("@zipcode", SqlDbType.VarChar, 50).Value = row.zipcode;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@group_id", SqlDbType.Int).Value = row.group_id;
+                            cmd.Parameters.Add("@sign_image", SqlDbType.VarChar, 200).Value = signImage;
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+            return "success";
+        }
+
+        [WebMethod]
+        public static EmployeeList GetEditEmployeeData(string id, int index)
+        {
+            //  Set active row
+            HttpContext.Current.Session["ROW"] = index;
+
+            var employeeData = new EmployeeList();
+            var dsDataEmployee = new DataSet();
+            var dsDataAmphur = new DataSet();
+            var dsDataDistrict = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                        };
+                    conn.Open();
+                    dsDataEmployee = SqlHelper.ExecuteDataset(conn, "sp_employee_list", arrParm.ToArray());
+                    conn.Close();
+
+                    var province_id = Convert.IsDBNull(dsDataEmployee.Tables[0].Rows[0]["province_id"]) ? 0 : Convert.ToInt32(dsDataEmployee.Tables[0].Rows[0]["province_id"]);
+                    if (province_id > 0)
+                    {
+                        List<SqlParameter> arrAmphur = new List<SqlParameter>
+                        {
+                            new SqlParameter("@province_id", SqlDbType.Int) { Value = Convert.ToInt32(province_id) }
+                        };
+                        conn.Open();
+                        dsDataAmphur = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_3_amphur", arrAmphur.ToArray());
+                        conn.Close();
+                    }
+
+
+                    var amphur_id = Convert.IsDBNull(dsDataEmployee.Tables[0].Rows[0]["amphur_id"]) ? 0 : Convert.ToInt32(dsDataEmployee.Tables[0].Rows[0]["amphur_id"]);
+                    if (amphur_id > 0)
+                    {
+                        List<SqlParameter> arrDistrict = new List<SqlParameter>
+                        {
+                            new SqlParameter("@amphur_id", SqlDbType.Int) { Value = Convert.ToInt32(amphur_id) }
+                        };
+                        conn.Open();
+                        dsDataDistrict = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_4_district", arrDistrict.ToArray());
+                        conn.Close();
+                    }
+
+                    if (dsDataEmployee.Tables.Count > 0)
+                    {
+                        var row = dsDataEmployee.Tables[0].Rows[0];
+                        employeeData.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                        employeeData.employee_code = Convert.IsDBNull(row["employee_code"]) ? null : Convert.ToString(row["employee_code"]);
+                        employeeData.username = Convert.IsDBNull(row["username"]) ? null : Convert.ToString(row["username"]);
+                        employeeData.prefix_id = Convert.IsDBNull(row["prefix_id"]) ? 0 : Convert.ToInt32(row["prefix_id"]);
+                        employeeData.first_name = Convert.IsDBNull(row["first_name"]) ? null : Convert.ToString(row["first_name"]);
+                        employeeData.last_name = Convert.IsDBNull(row["last_name"]) ? null : Convert.ToString(row["last_name"]);
+                        employeeData.nick_name = Convert.IsDBNull(row["nick_name"]) ? null : Convert.ToString(row["nick_name"]);
+                        employeeData.card_id = Convert.IsDBNull(row["card_id"]) ? null : Convert.ToString(row["card_id"]);
+                        employeeData.department_id = Convert.IsDBNull(row["department_id"]) ? 0 : Convert.ToInt32(row["department_id"]);
+                        employeeData.position_id = Convert.IsDBNull(row["position_id"]) ? 0 : Convert.ToInt32(row["position_id"]); 
+                        employeeData.birth_day = Convert.IsDBNull(row["birth_day"]) ? null : Convert.ToString(row["birth_day"]);
+                        employeeData.line_id = Convert.IsDBNull(row["line_id"]) ? null : Convert.ToString(row["line_id"]);
+                        employeeData.email = Convert.IsDBNull(row["email"]) ? null : Convert.ToString(row["email"]);
+                        employeeData.mobile = Convert.IsDBNull(row["mobile"]) ? null : Convert.ToString(row["mobile"]);
+                        employeeData.cover_image = Convert.IsDBNull(row["cover_image"]) ? string.Empty : Convert.ToString(row["cover_image"]);
+                        employeeData.sign_image = Convert.IsDBNull(row["sign_image"]) ? string.Empty : Convert.ToString(row["sign_image"]);
+                        employeeData.gender = Convert.IsDBNull(row["gender"]) ? null : Convert.ToString(row["gender"]);
+                        employeeData.address = Convert.IsDBNull(row["address"]) ? null : Convert.ToString(row["address"]);
+                        employeeData.province_id = Convert.IsDBNull(row["province_id"]) ? 0 : Convert.ToInt32(row["province_id"]);
+                        employeeData.amphur_id = Convert.IsDBNull(row["amphur_id"]) ? 0 : Convert.ToInt32(row["amphur_id"]);
+                        employeeData.district_id = Convert.IsDBNull(row["district_id"]) ? 0 : Convert.ToInt32(row["district_id"]);
+                        employeeData.zipcode = Convert.IsDBNull(row["zipcode"]) ? null : Convert.ToString(row["zipcode"]);
+                        employeeData.group_id = Convert.IsDBNull(row["group_id"]) ? 0 : Convert.ToInt32(row["group_id"]);
+                        HttpContext.Current.Session["EMPLOYEE_FORM_IMGPATH"] = Convert.IsDBNull(row["cover_image"]) ? null : Convert.ToString(row["cover_image"]);
+                        HttpContext.Current.Session["EMPLOYEE_FORM_SIGN_IMGPATH"] = Convert.IsDBNull(row["sign_image"]) ? null : Convert.ToString(row["sign_image"]);
+                    }
+
+                    employeeData.amphurList = new List<AmphurClass>();
+                    if (dsDataAmphur.Tables.Count > 0)
+                    {
+                        foreach (var rowAmphur in dsDataAmphur.Tables[0].AsEnumerable())
+                        {
+                            employeeData.amphurList.Add(new AmphurClass()
+                            {
+                                id = Convert.IsDBNull(rowAmphur["data_value"]) ? 0 : Convert.ToInt32(rowAmphur["data_value"]),
+                                name = Convert.IsDBNull(rowAmphur["data_text"]) ? null : Convert.ToString(rowAmphur["data_text"])
+                            });
+                        }
+                    }
+
+                    employeeData.districtList = new List<DistrictClass>();
+                    if (dsDataDistrict.Tables.Count > 0)
+                    {
+                        foreach (var rowDistrict in dsDataDistrict.Tables[0].AsEnumerable())
+                        {
+                            employeeData.districtList.Add(new DistrictClass()
+                            {
+                                id = Convert.IsDBNull(rowDistrict["data_value"]) ? 0 : Convert.ToInt32(rowDistrict["data_value"]),
+                                name = Convert.IsDBNull(rowDistrict["data_text"]) ? null : Convert.ToString(rowDistrict["data_text"])
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return employeeData;
+        }
+
+        [WebMethod]
+        public static string UpdateEmployee(EmployeeList[] employeeUpdateData)
+        {
+            var row = (from t in employeeUpdateData select t).FirstOrDefault();
+            if (row != null)
+            {
+                DateTime? birth_day_date = null;
+                if (!string.IsNullOrEmpty(row.birth_day))
+                {
+                    birth_day_date = DateTime.ParseExact(row.birth_day, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                }
+                var uploadImage = (string)HttpContext.Current.Session["EMPLOYEE_FORM_IMGPATH"];
+                var signImage = (string)HttpContext.Current.Session["EMPLOYEE_FORM_SIGN_IMGPATH"];
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_employee_edit", conn))
+                        {
+
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                            cmd.Parameters.Add("@employee_code", SqlDbType.VarChar, 20).Value = row.employee_code;
+                            cmd.Parameters.Add("@username", SqlDbType.VarChar, 20).Value = row.username;
+                            cmd.Parameters.Add("@password", SqlDbType.VarChar, 20).Value = row.password;
+                            cmd.Parameters.Add("@prefix_id", SqlDbType.Int).Value = row.prefix_id;
+                            cmd.Parameters.Add("@first_name", SqlDbType.VarChar, 50).Value = row.first_name;
+                            cmd.Parameters.Add("@last_name", SqlDbType.VarChar, 50).Value = row.last_name;
+                            cmd.Parameters.Add("@gender", SqlDbType.VarChar, 10).Value = row.gender;
+                            cmd.Parameters.Add("@card_id", SqlDbType.VarChar, 50).Value = row.card_id;
+                            cmd.Parameters.Add("@department_id", SqlDbType.Int).Value = row.department_id;
+                            cmd.Parameters.Add("@position_id", SqlDbType.Int).Value = row.position_id;
+                            cmd.Parameters.Add("@nick_name", SqlDbType.VarChar, 50).Value = row.nick_name;
+                            cmd.Parameters.Add("@mobile", SqlDbType.VarChar, 50).Value = row.mobile;
+                            cmd.Parameters.Add("@email", SqlDbType.VarChar, 50).Value = row.email;
+                            cmd.Parameters.Add("@line_id", SqlDbType.VarChar, 50).Value = row.line_id;
+                            cmd.Parameters.Add("@birth_day", SqlDbType.Date).Value = birth_day_date;
+                            cmd.Parameters.Add("@cover_image", SqlDbType.VarChar, 200).Value = uploadImage;
+                            cmd.Parameters.Add("@address", SqlDbType.VarChar, 200).Value = row.address;
+                            cmd.Parameters.Add("@province_id", SqlDbType.Int).Value = row.province_id;
+                            cmd.Parameters.Add("@amphur_id", SqlDbType.Int).Value = row.amphur_id;
+                            cmd.Parameters.Add("@district_id", SqlDbType.Int).Value = row.district_id;
+                            cmd.Parameters.Add("@zipcode", SqlDbType.VarChar, 50).Value = row.zipcode;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@group_id", SqlDbType.Int).Value = row.group_id;
+                            cmd.Parameters.Add("@sign_image", SqlDbType.VarChar, 200).Value = signImage;
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string DeleteEmployee(string id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_employee_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = e.Parameters.ToString() },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_employee_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_EMPLOYEE_MASTER"] = dsResult;
+
+                    Session["SEARCH"] = e.Parameters.ToString();
+                }
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        protected void gridView_PageIndexChanged(object sender, EventArgs e)
+        {
+            int pageIndex = (sender as ASPxGridView).PageIndex;
+            Session["PAGE"] = pageIndex;
+        }
+
+        protected void gridView_BeforeColumnSortingGrouping(object sender, ASPxGridViewBeforeColumnGroupingSortingEventArgs e)
+        {
+            string column = e.Column.FieldName;
+            int order = Convert.ToInt32(e.Column.SortOrder);
+
+            Session["COLUMN"] = column;
+            Session["ORDER"] = order;
+        }
+    }
+}
+

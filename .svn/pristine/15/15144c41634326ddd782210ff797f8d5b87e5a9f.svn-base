@@ -1,0 +1,258 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="AnnualServiceList.aspx.cs" Inherits="HicomIOS.Master.AnnualServiceList" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <script type="text/javascript" src="../Content/Custom.js"></script>
+    <script type="text/javascript" src="../Content/Script.js"></script>
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+    <style>
+        .btnexport {
+            margin-bottom: 7px;
+            margin-left: 15px;
+        }
+
+        #SearchBox {
+            display: none;
+        }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        .btn-reportItem {
+            margin-bottom: 7px;
+            margin-left: 15px;
+        }
+
+        .btn-view {
+             width: 15%;
+       margin-left: 2%;
+        }
+
+        .has-error {
+            border-color: #e40703 !important;
+        }
+          .btn-labelEdit {
+            cursor: pointer;
+        }
+         a:link {
+            text-decoration: none !important;
+        }
+
+        a:active {
+            text-decoration: underline !important;
+        }
+
+        a:hover {
+            text-decoration: underline !important;
+            
+        }
+         .swal-modal {
+            width: 420px !important;
+            height: 250px !important;
+        }
+
+        .swal-title {
+            font-size: 18px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+           .btn-linkview {
+            cursor: pointer;
+            font-size: 15px;
+            color: #5bc0de !important;
+        }
+           
+    </style>
+    <div id="div-content">
+        <div class="row">
+            <fieldset>
+                <legend>Annual Service List</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-4 text-right ">Test Run Date From :</label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerFrom" />
+                            </div>
+                            <label class="col-xs-1 text-center">Test Run Date To</label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerTo" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-4 text-right ">Starting Date From :</label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="starttingdateFrom" />
+                            </div>
+                            <label class="col-xs-1 text-center">Starting Date To</label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="starttingdateTo" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-4 text-right ">Expire Date From :</label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="expiredateFrom" />
+                            </div>
+                            <label class="col-xs-1 text-center">Expire Date To </label>
+                            <div class="col-xs-2 no-padding">
+                                <input class="form-control picker" runat="server" type="text" id="expiredateTo" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding text-center">
+                    <div class="row form-group" >
+                        <div class="col-xs-6 no-padding">
+                            <button type="button"
+                                class="btn-info btn-view" style="height: 30px;float: right;"
+                                id="btnReportClient" onclick="view_Click()">
+                                <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
+                                    View
+                            </button>
+                        </div>
+                        <div class="col-xs-6 no-padding">
+                            <button type="button"
+                                class="btn-info btn-view" style="height: 30px;float: left;"
+                                id="btnClear" onclick="clear_Click()">
+                                <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
+                                    Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="row">
+            <button type="button"
+                class="btn-addItem btnexport"
+                id="btnExport" onclick="Export_Click()">
+                <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Export
+            </button>
+            <div class="col-xs-12" runat="server" id="dvAnnuualServiceList">
+                <dx:ASPxGridView ID="gridAnnualServiceList" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridAnnualServiceList"
+                    Width="100%" KeyFieldName="id" EnableCallBacks="true"
+                    EnableRowsCache="false"
+                    SettingsBehavior-AllowSort="false"
+                    OnCustomCallback="gridAnnualServiceList_CustomCallback">
+                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                    <Paddings Padding="0px" />
+                    <Border BorderWidth="0px" />
+                    <BorderBottom BorderWidth="1px" />
+                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                        PageSizeItemSettings-Visible="true">
+                        <PageSizeItemSettings Items="10, 20, 50" />
+                    </SettingsPager>
+                    <Columns>
+                         <dx:GridViewDataTextColumn FieldName="id" CellStyle-HorizontalAlign="Center"  Caption="#" >
+                            <DataItemTemplate>
+                                 <a id="btnEdit" class="btn-linkview " onclick="viewItem(<%# Eval("id")%>)" title="View" >
+                                     <i class="fas fa-search"></i>
+                                </a>
+                                
+                            </DataItemTemplate>
+                        </dx:GridViewDataTextColumn>
+                        <dx:GridViewDataTextColumn FieldName="customer" Caption="Customer" >
+                            <DataItemTemplate>
+                                <a id="btnEdit" class="btn-labelEdit " onclick="editItem(<%# Eval("id")%>)" title="Edit">
+                                    <%# Eval("customer")%>
+                                </a>
+                            </DataItemTemplate>
+                        </dx:GridViewDataTextColumn>
+                        <dx:GridViewDataTextColumn FieldName="mfg" Caption="MFG" />
+                        <dx:GridViewDataTextColumn FieldName="start_date" Caption="Test Run Date" />
+                        <dx:GridViewDataTextColumn FieldName="starting_date" Caption="Starting Up Date"  />
+                        <dx:GridViewDataTextColumn FieldName="expire_date" Caption="Expire Date" />
+                       
+                    </Columns>
+                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+                    <SettingsPopup>
+                        <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+                    </SettingsPopup>
+                    <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                        CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                </dx:ASPxGridView>
+            </div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnExport').hide();
+        });
+        $(function () {
+            $(".picker").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+        });
+        function editItem(e) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = e;
+            window.location.href = "AnnualService.aspx?dataId=" + key;
+            $.LoadingOverlay("hide");
+        }
+        function viewItem(e) {
+            editItem(e)
+        }
+        function clear_Click() {
+            $('#datepickerFrom').val("");
+            $('#datepickerTo').val("");
+            $('#starttingdateFrom').val("");
+            $('#starttingdateTo').val("");
+            $('#expiredateFrom').val("");
+            $('#expiredateTo').val("");
+        }
+
+        function view_Click() {
+            var datepickerFrom =      $('#datepickerFrom').val() == "" || $('#datepickerFrom').val() == null ? "" : $('#datepickerFrom').val();
+            var datepickerTo =       $('#datepickerTo').val() == "" || $('#datepickerTo').val() == null ? "" : $('#datepickerTo').val();
+            var starttingdateFrom = $('#starttingdateFrom').val() == "" || $('#starttingdateFrom').val() == null ? "" : $('#starttingdateFrom').val();
+            var starttingdateTo = $('#starttingdateTo').val() == "" || $('#starttingdateTo').val() == null ? "" : $('#starttingdateTo').val();
+            var expiredateFrom = $('#expiredateFrom').val() == "" || $('#expiredateFrom').val() == null ? "" : $('#expiredateFrom').val();
+            var expiredateTo = $('#expiredateTo').val() == "" || $('#expiredateTo').val() == null ? "" : $('#expiredateTo').val();
+         
+            var parametersAdd = {
+                masterData: [
+                    {
+                        datepickerFrom: datepickerFrom,
+                        datepickerTo: datepickerTo,
+                        starttingdateFrom: starttingdateFrom,
+                        starttingdateTo: starttingdateTo,
+                        expiredateFrom: expiredateFrom,
+                        expiredateTo: expiredateTo,
+                    }
+                ]
+            };
+            $.ajax({
+                type: 'POST',
+                url: "AnnualServiceList.aspx/GetViewGrid",
+                data: JSON.stringify(parametersAdd),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (result) {
+                    gridAnnualServiceList.PerformCallback();
+                    $('#btnExport').show();
+
+                }
+            });
+        }
+    </script>
+</asp:Content>

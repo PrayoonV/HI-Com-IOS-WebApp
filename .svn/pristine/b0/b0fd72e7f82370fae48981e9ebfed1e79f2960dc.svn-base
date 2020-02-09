@@ -1,0 +1,305 @@
+﻿using DevExpress.Web;
+using DevExpress.Web.Data;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace HicomIOS.Master
+{
+    public partial class AdjustProductSparePart : MasterDetailPage
+    {
+        public override string PageName { get { return "AdjustProductSparePart"; } }
+
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+
+        private static string guid = Guid.NewGuid().ToString();
+        private const string session_item = "_SESSION_ADJUST_ITEM";
+        private const string session_detail = "_SESSION_ADJUST_DETAIL";
+        private const string session_selected_detail = "_SESSION_ADJUST_SELECTED_DETAIL";
+        private const string session_selected_item = "_SESSION_ADJUST_SELECTED_ITEM";
+        #region Members
+        public class AdjustProductDetail
+        {
+            public int id { get; set; }
+            public string item_no { get; set; }
+            public string item_name { get; set; }
+            public string item_type { get; set; }
+            public string adjust_type { get; set; }
+            public int quantity { get; set; }
+            public string unit_code { get; set; }
+            public bool is_delete { get; set; }
+
+        }
+
+        public class ProductSparePartDetail
+        {
+            public bool is_selected { get; set; }
+            public int item_id { get; set; }
+            public string item_no { get; set; }
+            public string item_name { get; set; }
+            public string item_type { get; set; }
+            public int quantity { get; set; }
+            public string unit_code { get; set; }
+        }
+
+        List<ProductSparePartDetail> itemDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_item] == null)
+                    Session[guid + session_item] = new List<ProductSparePartDetail>();
+                return (List<ProductSparePartDetail>)Session[guid + session_item];
+            }
+            set
+            {
+                Session[guid + session_item] = value;
+            }
+        }
+        List<ProductSparePartDetail> selectedItemDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_item] == null)
+                    Session[guid + session_item] = new List<ProductSparePartDetail>();
+                return (List<ProductSparePartDetail>)Session[guid + session_item];
+            }
+            set
+            {
+                Session[guid + session_item] = value;
+            }
+        }
+        List<AdjustProductDetail> adjustDetailList
+        {
+            get
+            {
+
+                if (Session[guid + session_detail] == null)
+                    Session[guid + session_detail] = new List<AdjustProductDetail>();
+                return (List<AdjustProductDetail>)Session[guid + session_detail];
+            }
+            set
+            {
+                Session[guid + session_detail] = value;
+            }
+        }
+        List<AdjustProductDetail> selectedAdjustDetailList
+        {
+
+            get
+            {
+
+                if (Session[guid + session_selected_detail] == null)
+                    Session[guid + session_selected_detail] = new List<AdjustProductDetail>();
+                return (List<AdjustProductDetail>)Session[guid + session_selected_detail];
+            }
+            set
+            {
+                Session[guid + session_selected_detail] = value;
+            }
+        }
+        #endregion
+
+        #region Inherited Events
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+
+        }
+        #endregion
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        #endregion
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                PrepareData();
+                LoadData();
+            }
+            else
+            {
+                BindGridView();
+                BindGridSelectedItem();
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+                SPlanetUtil.BindASPxComboBox(ref cbbCustomer, DataListUtil.DropdownStoreProcedureName.Customer);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void LoadData()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void SaveData()
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        private void BindGridView()
+        {
+            gridView.DataSource = adjustDetailList.Where(t => !t.is_delete).ToList();
+            gridView.DataBind();
+        }
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = adjustDetailList.Where(t => !t.is_delete).ToList();
+            gridView.DataBind();
+        }
+
+        protected void gridViewSelectedItem_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            if (e.Parameters.ToString().Contains("Search"))
+            {
+
+                var splitStr = e.Parameters.ToString().Split('|');
+                string searchText = string.Empty;
+                if (splitStr.Length > 0)
+                {
+                    searchText = splitStr[1];
+
+                    gridViewSelectedItem.DataSource = selectedItemDetailList.Where(t => t.item_name.ToUpper().Contains(searchText.ToUpper())
+                                                                                    || t.item_no.ToUpper().Contains(searchText.ToUpper())).ToList();
+                    gridViewSelectedItem.DataBind();
+                }
+            }
+            else
+            {
+                gridViewSelectedItem.DataSource = selectedItemDetailList;
+                gridViewSelectedItem.DataBind();
+            }
+        }
+
+        protected void gridViewSelectedItem_HtmlDataCellPrepared(object sender, ASPxGridViewTableDataCellEventArgs e)
+        {
+
+        }
+        private void BindGridSelectedItem()
+        {
+            gridViewSelectedItem.DataSource = selectedItemDetailList;
+            gridViewSelectedItem.DataBind();
+        }
+        [WebMethod]
+        public static string PopupItemDetail(string item_type)
+        {
+            try
+            {
+                DataSet dsResult = new DataSet();
+                var productList = new List<ProductSparePartDetail>();
+                if (item_type == "P")
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@product_no", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_list", arrParm.ToArray());
+                        conn.Close();
+                    }
+
+                    if (dsResult.Tables.Count > 0)
+                    {
+                        foreach (var row in dsResult.Tables[0].AsEnumerable())
+                        {
+                            productList.Add(new ProductSparePartDetail()
+                            {
+                                is_selected = false,
+                                item_id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                item_name = Convert.IsDBNull(row["product_name_tha"]) ? string.Empty : Convert.ToString(row["product_name_tha"]),
+                                item_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                item_type = "P",
+                                quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"]).ToString(),
+
+                            });
+                        }
+                    }
+                }
+                else if (item_type == "S")
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = string.Empty },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_spare_part_list", arrParm.ToArray());
+                        conn.Close();
+
+                        if (dsResult != null)
+                        {
+                            foreach (var row in dsResult.Tables[0].AsEnumerable())
+                            {
+                                productList.Add(new ProductSparePartDetail()
+                                {
+                                    is_selected = false,
+                                    item_id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                    item_no = Convert.IsDBNull(row["part_no"]) ? string.Empty : Convert.ToString(row["part_no"]),
+                                    item_name = Convert.IsDBNull(row["part_name_tha"]) ? string.Empty : Convert.ToString(row["part_name_tha"]),
+                                    unit_code = Convert.IsDBNull(row["unit_code"]) ? string.Empty : Convert.ToString(row["unit_code"]),
+                                    quantity = Convert.IsDBNull(row["quantity"]) ? 0 : Convert.ToInt32(row["quantity"]),
+                                    item_type = "S"
+                                });
+
+                            }
+                        }
+                    }
+
+                }
+                HttpContext.Current.Session[guid + session_item] = productList;
+
+                return "ITEMDETAIL";
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+    }
+}

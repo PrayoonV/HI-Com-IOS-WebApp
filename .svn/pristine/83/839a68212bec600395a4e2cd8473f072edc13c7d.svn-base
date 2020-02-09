@@ -1,0 +1,270 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class QuotationList : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public class QuotationHeaderList
+        {
+            public int id { get; set; }
+            public string quotation_no { get; set; }
+            public string quotation_type { get; set; }
+            public string quotation_status { get; set; }
+            public string quotation_status_display { get; set; }
+            public bool is_discount_by_item { get; set; }
+            public string discount1_type { get; set; }
+            public string discount2_type { get; set; }
+            public bool is_net { get; set; }
+
+        }
+
+
+        public override string PageName { get { return "Quotation List"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Set Permission
+            Permission.GetPermission(Convert.ToInt32(ConstantClass.SESSION_USER_GROUP_ID), PageName);
+
+            // setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                BindGrid(true);
+
+
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_QUOTATION_LIST"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Initial Property and Event"
+        protected void PopupMenu_Load(object sender, EventArgs e)
+        {
+            (sender as ASPxPopupMenu).PopupElementID = gridView.ID;
+        }
+        #endregion
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+        public override void DeleteEntry(string id)
+        {
+            try
+            {//Execute Delete Data Store Procedure
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@id", SqlDbType.Int) { Value = int.Parse(id) },
+                        new SqlParameter("@update_by", SqlDbType.Int) { Value = Session[ConstantClass.SESSION_USER_ID] }
+                    };
+                    conn.Open();
+                    SqlHelper.ExecuteNonQuery(conn, "sp_notification_delete", arrParm.ToArray());
+                }
+                BindGrid(true);
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        public override void RefreshEntry()     //Popup Menu Select Refresh Data
+        {
+            BindGrid(true);
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@user_id", SqlDbType.Int) { Value = ConstantClass.SESSION_USER_ID },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" }
+                           // new SqlParameter("@customer_id", SqlDbType.Int) { Value = 0 },
+                        };
+
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_quotation_header_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_QUOTATION_LIST"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string DeleteQuatationList(string id)
+        {
+            string data = "success";
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_quotation_header_delete", conn, tran))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            cmd.ExecuteNonQuery();
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        //throw ex;
+                        return ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+                        }
+                    }
+                }
+
+                return data;
+            }
+        }
+
+        [WebMethod]
+        public static QuotationHeaderList GetQuotationData(string id)
+        {
+            var data = new QuotationHeaderList();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+                        };
+                conn.Open();
+                var dsQuataionData = SqlHelper.ExecuteDataset(conn, "sp_quotation_list_data", arrParm.ToArray());
+                conn.Close();
+
+                if (dsQuataionData.Tables.Count > 0)
+                {
+                    if (dsQuataionData.Tables[0].Rows.Count > 0)
+                    {
+                        var row = (from t in dsQuataionData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                        if (row != null)
+                        {
+                            data.id = Convert.ToInt32(id);
+                            data.quotation_no = Convert.IsDBNull(row["quotation_no"]) ? string.Empty : Convert.ToString(row["quotation_no"]);
+                            data.quotation_status = Convert.IsDBNull(row["quotation_status"]) ? string.Empty : Convert.ToString(row["quotation_status"]);
+                            data.quotation_type = Convert.IsDBNull(row["quotation_type"]) ? string.Empty : Convert.ToString(row["quotation_type"]);
+                            data.is_discount_by_item = Convert.IsDBNull(row["is_discount_by_item"]) ? false : Convert.ToBoolean(row["is_discount_by_item"]);
+                            data.discount1_type = Convert.IsDBNull(row["discount1_type"]) ? string.Empty : Convert.ToString(row["discount1_type"]);
+                            data.is_net = Convert.IsDBNull(row["is_net"]) ? false : Convert.ToBoolean(row["is_net"]);
+                            data.discount2_type = Convert.IsDBNull(row["discount2_type"]) ? string.Empty : Convert.ToString(row["discount2_type"]);
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@user_id", SqlDbType.Int) { Value = ConstantClass.SESSION_USER_ID },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = e.Parameters.ToString() }
+                           // new SqlParameter("@customer_id", SqlDbType.Int) { Value = 0 },
+                        };
+
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_quotation_header_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_QUOTATION_LIST"] = dsResult;
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}

@@ -1,0 +1,376 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using Excel = Microsoft.Office.Interop.Excel;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Web.Services;
+using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using System.Collections;
+namespace HicomIOS.Master
+{
+    public partial class ExportSummaryQuotationContract : MasterDetailPage
+    {
+        public class SummaryQuotationContractData
+        {
+            public int customer_id { get; set; }
+            public int customer_group { get; set; }
+            public string customer_code { get; set; }
+            public string quotation_status { get; set; }
+            public string quotation_no { get; set; }
+            public string customer_name { get; set; }
+            public string contract_type { get; set; }
+            public string contract_no { get; set; }
+            public int contract_id { get; set; }
+            public string expire_date_from { get; set; }
+            public string expire_date_to { get; set; }
+            public string quotation_date_from { get; set; }
+            public string quotation_date_to { get; set; }
+            public string Starting_date_from { get; set; }
+            public string Starting_date_to { get; set; }
+            public string po_date_from { get; set; }
+            public string po_date_to { get; set; }
+        }
+        List<SummaryQuotationContractData> summaryQuotationContractData
+        {
+            get
+            {
+                if (Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"] == null)
+                    Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"] = new List<SummaryQuotationContractData>();
+                return (List<SummaryQuotationContractData>)Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"];
+            }
+            set
+            {
+                Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"] = value;
+            }
+        }
+
+        private static Excel.Workbook MyBook = null;
+        private static Excel.Application MyApp = null;
+        private static Excel.Worksheet MySheet = null;
+        private static string baseUrl;
+
+        public override string PageName { get { return "SummaryQuotationContractData"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        public override void OnFilterChanged()
+        {
+            //BindGrid();
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            baseUrl = SPlanetUtil.GetBaseURL(Page.Request);
+            if (!Page.IsPostBack)
+            {
+                PrepareData();
+                ClearWoringSession();
+            }
+            else
+            {
+
+                //BindGrid(false);
+            }
+        }
+        protected void ClearWoringSession()
+        {
+            Session.Remove("SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT");
+        }
+
+        protected void PrepareData()
+        {
+            try
+            {
+                if (!Page.IsPostBack)
+                {
+                    SPlanetUtil.BindASPxComboBox(ref cbbCustomer, DataListUtil.DropdownStoreProcedureName.Customer);
+                    //SPlanetUtil.BindASPxComboBox(ref cbbEmployee, DataListUtil.DropdownStoreProcedureName.Employee_List);
+                    SPlanetUtil.BindASPxComboBox(ref cbbCustomerGroup, DataListUtil.DropdownStoreProcedureName.Customer_Group);
+
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@type", SqlDbType.VarChar,2) { Value = "A" },
+                        };
+                        conn.Open();
+                        var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_quotation_type", arrParm.ToArray());
+
+                        conn.Close();
+                        cbbQuotation.DataSource = dsResult;
+                        cbbQuotation.TextField = "data_text";
+                        cbbQuotation.ValueField = "data_value";
+                        cbbQuotation.DataBind();
+
+                    }
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                        };
+                        conn.Open();
+                        var dsResult = SqlHelper.ExecuteDataset(conn, "sp_customer_list", arrParm.ToArray());
+
+                        conn.Close();
+                        cbbCustomerCode.DataSource = dsResult;
+                        cbbCustomerCode.TextField = "customer_code";
+                        cbbCustomerCode.ValueField = "customer_code";
+                        cbbCustomerCode.DataBind();
+
+                    }
+
+
+
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(string));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    dtSource.Rows.Add("FL", "Follow");
+                    dtSource.Rows.Add("CF", "Confirm");
+                    dtSource.Rows.Add("PO", "PO");
+                    dtSource.Rows.Add("DL", "Delivery");
+                    dtSource.Rows.Add("CP", "Completed");
+                    dtSource.Rows.Add("LS", "Lose");
+                    cbbStatus.DataSource = dtSource;
+                    cbbStatus.DataBind();
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #region "QUOTATION SUMMARY PRODCUT REPORT"
+        private enum Column_QuotationSummary_Contract
+        {
+            NO = 1,
+            CONTRACT_NO = 2,
+            QUOTATION_No = 3,
+            ISSUE_DATE = 4,
+            ISSUE_DATE_MM = 5,
+            ISSUE_DATE_YY = 6,
+            CUSTOMER_CODE = 7,
+            CUSTOMER_NAME = 8,
+            PROJECT_NAME = 9,
+            PRODUCT_NAME = 10,
+            CONTACT = 11,
+            QTY = 12,
+            UNIT_PRICE = 13,
+            DISCOUNT = 14,
+            TOTAL_AMOUNT = 15,
+            TYPE_OF_CONTRACT = 16,
+            STARTIING_DATE = 17,
+            STARTIING_MM = 18,
+            STARTIING_YY = 19,
+            EXPIRE_DATE = 20,
+            EXPIRE_MM = 21,
+            EXPIRE_YY = 22,
+            DETAIL_STATUS = 23,
+            DETAIL_DATE = 24,
+            DETAIL_MM = 25,
+            DETAIL_YY = 26,
+            PO_NO = 27,
+            AMOUNT_PO = 28,
+            INVOICE_DATE = 29,
+            INVOICE_MM   = 30,
+            INVOICE_YY   = 31,
+            INVOICE_NO = 32,
+            SCHEDULE_MM_FROM = 33,
+            SCHEDULE_YY_FROM = 34,
+            SCHEDULE_MM_TO = 35,
+            SCHEDULE_YY_TO = 36, 
+            Contract_MM = 37,
+            Contract_YY = 38,
+            REMARK=39,
+        }
+
+        [WebMethod]
+        public static string Export_Quotation_Summary_Product(SummaryQuotationContractData[] dataSummaryQuotationContract)
+        {
+            var strDownloadUrl = "";
+            string strTemplateFile = "Template_QuotationSummaryReport-Product.xlsx";
+            int intStartRow = 5;
+            DataSet dsResult;
+
+            try
+            {
+                // Open Excel Application
+                MyApp = new Excel.Application();
+                MyApp.Visible = false;
+                var strTemplatePath = "/Report/Template/"; ;
+                var strExcelPath = HttpContext.Current.Server.MapPath(strTemplatePath);
+                MyBook = MyApp.Workbooks.Open(strExcelPath + strTemplateFile);
+                MySheet = (Excel.Worksheet)MyBook.Sheets[1];  // Explicit cast is not required here
+                                                              //int intStartRow = MySheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell).Row;
+                var data = (from t in dataSummaryQuotationContract select t).FirstOrDefault();
+                if (data != null)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@customer_id", SqlDbType.Int) { Value = data.customer_id },
+                        new SqlParameter("@customer_code", SqlDbType.VarChar, 50) { Value = data.customer_code },
+                        new SqlParameter("@customer_group", SqlDbType.Int) { Value = data.customer_group },
+                        new SqlParameter("@contract_no", SqlDbType.VarChar, 50) { Value = data.contract_no },
+                        new SqlParameter("@type_of_contract_id", SqlDbType.Int) { Value = data.contract_type },
+                        new SqlParameter("@quotation_no", SqlDbType.VarChar, 20) { Value = data.quotation_no },
+                        new SqlParameter("@quotation_status", SqlDbType.VarChar,2) { Value = data.quotation_status },
+                        new SqlParameter("@quotation_date_from", SqlDbType.VarChar,20) { Value = data.quotation_date_from },
+                        new SqlParameter("@quotation_date_to", SqlDbType.VarChar,20) { Value =data.quotation_date_to  },
+                        new SqlParameter("@po_date_from", SqlDbType.VarChar,20) { Value = data.po_date_from },
+                        new SqlParameter("@po_date_to", SqlDbType.VarChar,20) { Value =data.po_date_to  },
+                        new SqlParameter("@starting_date_from", SqlDbType.VarChar, 20) { Value = data.Starting_date_from },
+                        new SqlParameter("@starting_date_to", SqlDbType.VarChar, 20) { Value = data.Starting_date_to },
+                        new SqlParameter("@expire_date_from", SqlDbType.VarChar, 20) { Value = data.expire_date_from },
+                        new SqlParameter("@expire_date_to", SqlDbType.VarChar, 20) { Value = data.expire_date_to },
+
+                    };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_report_quotation_summary_product", arrParm.ToArray());
+                        foreach (DataRow row in dsResult.Tables[0].Rows)
+                        {
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.NO] = row["quotation_no"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.CONTRACT_NO] = row["quotation_date_dd"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.QUOTATION_No] = row["quotation_date_mm"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.ISSUE_DATE] = row["quotation_date_yy"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.ISSUE_DATE_MM] = row["customer_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.ISSUE_DATE_YY] = row["project_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.CUSTOMER_CODE] = row["province_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.CUSTOMER_NAME] = row["customer_address"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.PROJECT_NAME] = row["model_list_air_compressor"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.PRODUCT_NAME] = row["model_list_air_compressor_pressure"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.CONTACT] = row["model_list_air_compressor_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.QTY] = row["model_list_air_dryer"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.UNIT_PRICE] = row["model_list_air_dryer_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.DISCOUNT] = row["model_list_line_filter"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.TOTAL_AMOUNT] = row["model_list_line_filter_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.TYPE_OF_CONTRACT] = row["model_list_mist_filter"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.STARTIING_DATE] = row["model_list_mist_filter_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.STARTIING_MM] = row["model_list_air_tank"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.STARTIING_YY] = row["model_list_air_tank_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.EXPIRE_DATE] = row["model_list_other"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.EXPIRE_MM] = row["model_list_other_qty"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.EXPIRE_YY] = row["sales_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.DETAIL_STATUS] = row["total_amount"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.DETAIL_DATE] = row["total_discount"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.DETAIL_MM] = row["grand_total"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.DETAIL_YY] = row["contact_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.PO_NO] = row["status_name"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.AMOUNT_PO] = row["po_no"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.INVOICE_DATE] = row["amount_po"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.INVOICE_MM] = row["sent_by"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.INVOICE_YY] = row["customer_request_date"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.INVOICE_NO] = row["customer_request_month"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.SCHEDULE_MM_FROM] = row["customer_request_year"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.SCHEDULE_YY_FROM] = row["test_run_date"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.SCHEDULE_MM_TO] = row["test_run_month"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.SCHEDULE_YY_TO] = row["test_run_year"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.Contract_MM] = row["customer_tel"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.Contract_YY] = row["customer_fax"].ToString();
+                         //MySheet.Cells[intStartRow, Column_QuotationSummary_Contract.REMARK] = row["customer_email"].ToString();
+                          
+
+
+                            intStartRow++;
+                        }
+                    }
+                }
+                if (System.IO.File.Exists(strExcelPath + "Temp_quotation_summary_product.xlsx"))
+                    System.IO.File.Delete(strExcelPath + "Temp_quotation_summary_product.xlsx");
+                MyBook.SaveAs(strExcelPath + "Temp_quotation_summary_product.xlsx");
+                MyApp.Quit();
+                MyApp = null;
+
+                strDownloadUrl = baseUrl + strTemplatePath + "Temp_quotation_summary_product.xlsx";
+
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+            }
+            return strDownloadUrl;
+        }
+        #endregion
+
+        [WebMethod]
+        public static void GetViewGrid(SummaryQuotationContractData[] dataSummaryQuotationContract)
+        {
+            var dsData = new DataSet();
+            var summaryQuotationContractData = new List<SummaryQuotationContractData>();
+            var data = (from t in dataSummaryQuotationContract select t).FirstOrDefault();
+            if (data != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                        new SqlParameter("@customer_id", SqlDbType.Int) { Value = data.customer_id },
+                        new SqlParameter("@customer_code", SqlDbType.VarChar, 50) { Value = data.customer_code },
+                        new SqlParameter("@customer_group", SqlDbType.Int) { Value = data.customer_group },
+                        new SqlParameter("@contract_no", SqlDbType.VarChar, 50) { Value = data.contract_no },
+                        new SqlParameter("@type_of_contract_id", SqlDbType.Int) { Value = data.contract_type },
+                        new SqlParameter("@quotation_no", SqlDbType.VarChar, 20) { Value = data.quotation_no },
+                        new SqlParameter("@quotation_status", SqlDbType.VarChar,2) { Value = data.quotation_status },
+                        new SqlParameter("@quotation_date_from", SqlDbType.VarChar,20) { Value = data.quotation_date_from },
+                        new SqlParameter("@quotation_date_to", SqlDbType.VarChar,20) { Value =data.quotation_date_to  },
+                        new SqlParameter("@po_date_from", SqlDbType.VarChar,20) { Value = data.po_date_from },
+                        new SqlParameter("@po_date_to", SqlDbType.VarChar,20) { Value =data.po_date_to  },
+                        new SqlParameter("@starting_date_from", SqlDbType.VarChar, 20) { Value = data.Starting_date_from },
+                        new SqlParameter("@starting_date_to", SqlDbType.VarChar, 20) { Value = data.Starting_date_to },
+                        new SqlParameter("@expire_date_from", SqlDbType.VarChar, 20) { Value = data.expire_date_from },
+                        new SqlParameter("@expire_date_to", SqlDbType.VarChar, 20) { Value = data.expire_date_to },
+                        };
+                        conn.Open();
+                        dsData = SqlHelper.ExecuteDataset(conn, "sp_report_quotation_summary_product", arrParm.ToArray());
+
+                        if (dsData.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsData.Tables[0].AsEnumerable())
+                            {
+                                summaryQuotationContractData.Add(new SummaryQuotationContractData()
+                                {
+                                    quotation_no = Convert.IsDBNull(row["quotation_no"]) ? string.Empty : Convert.ToString(row["quotation_no"]),
+                                    customer_name = Convert.IsDBNull(row["customer_name"]) ? string.Empty : Convert.ToString(row["customer_name"]),
+                                });
+                            }
+                        }
+                    }
+                    HttpContext.Current.Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"] = summaryQuotationContractData;
+                }
+
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+
+        }
+        protected void gridExportSummaryQuotationContract_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = (from t in summaryQuotationContractData select t).ToList();
+            gridView.DataBind();
+        }
+    }
+}

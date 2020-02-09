@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System.Collections;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class AnnualServiceList : MasterDetailPage
+    {
+        public int dataId = 0;
+        public override string PageName { get { return "AnnualServiceList"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override void OnFilterChanged()
+        {
+
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        public class AnnualServiceListData
+        {
+            public string datepickerFrom { get; set; }
+            public string datepickerTo { get; set; }
+            public string starttingdateFrom { get; set; }
+            public string starttingdateTo { get; set; }
+            public string expiredateFrom { get; set; }
+            public string expiredateTo { get; set; }
+            public string customer { get; set; }
+            public int id { get; set; }
+            public string mfg { get; set; }
+            public string start_date { get; set; }
+            public string starting_date { get; set; }
+            public string expire_date { get; set; }
+        }
+        List<AnnualServiceListData> annualServiceListData
+        {
+            get
+            {
+                if (Session["SESSION_ANNUALSERVICELIST_DATA"] == null)
+                    Session["SESSION_ANNUALSERVICELIST_DATA"] = new List<AnnualServiceListData>();
+                return (List<AnnualServiceListData>)Session["SESSION_ANNUALSERVICELIST_DATA"];
+            }
+            set
+            {
+                Session["SESSION_ANNUALSERVICELIST_DATA"] = value;
+            }
+        }
+
+        [WebMethod]
+        public static void GetViewGrid(AnnualServiceListData[] masterData)
+        {
+            var dsData = new DataSet();
+            var AnnualServiceListData = new List<AnnualServiceListData>();
+            var datalist = (from t in masterData select t).FirstOrDefault();
+            if (datalist != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                        new SqlParameter("@start_up_date_from", SqlDbType.VarChar,200) { Value = datalist.datepickerFrom },
+                        new SqlParameter("@start_up_date_to", SqlDbType.VarChar,200) { Value = datalist.datepickerTo  },
+                        new SqlParameter("@starting_date_from", SqlDbType.VarChar,200) { Value = datalist.starttingdateFrom },
+                        new SqlParameter("@starting_date_to", SqlDbType.VarChar, 200) { Value = datalist.starttingdateTo },
+                        new SqlParameter("@expire_date_from", SqlDbType.VarChar,200) { Value = datalist.expiredateFrom },
+                        new SqlParameter("@expire_date_to", SqlDbType.VarChar, 200) { Value = datalist.expiredateTo },
+
+                        };
+                        conn.Open();
+                        dsData = SqlHelper.ExecuteDataset(conn, "sp_annual_service_list", arrParm.ToArray());
+
+                        if (dsData.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsData.Tables[0].AsEnumerable())
+                            {
+                                AnnualServiceListData.Add(new AnnualServiceListData()
+                                {
+  
+                                    id = Convert.ToInt32(row["customer_id"]),
+                                    mfg = Convert.IsDBNull(row["mfg"]) ? string.Empty : Convert.ToString(row["mfg"]),
+                                    start_date = Convert.IsDBNull(row["start_up_date"]) ? string.Empty : Convert.ToString(row["start_up_date"]),
+                                    starting_date = Convert.IsDBNull(row["starting_date"]) ? string.Empty : Convert.ToString(row["starting_date"]),
+                                    expire_date = Convert.IsDBNull(row["expire_date"]) ? string.Empty : Convert.ToString(row["expire_date"]),
+                                    customer = Convert.IsDBNull(row["cust_name"]) ? string.Empty : Convert.ToString(row["cust_name"]),
+
+                                });
+                            }
+                        }
+                    }
+                    HttpContext.Current.Session["SESSION_ANNUALSERVICELIST_DATA"] = AnnualServiceListData;
+                }
+
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+
+
+        }
+      
+        protected void gridAnnualServiceList_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridAnnualServiceList.DataSource = (from t in annualServiceListData select t).ToList();
+            gridAnnualServiceList.DataBind();
+        }
+    }
+}

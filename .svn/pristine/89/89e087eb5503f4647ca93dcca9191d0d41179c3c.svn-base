@@ -1,0 +1,216 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class Remark : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public override string PageName { get { return "Remark"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        
+        public class RemarkDetail
+        {
+            public int id { get; set; }
+            public string remark_type { get; set; }
+            public string remark_type_document { get; set; }
+            public string remark_description { get; set; }
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+                
+                ClearWoringSession();
+                BindGrid(true);
+            }
+            else
+            {
+                BindGrid(false);
+            }
+        }
+        List<RemarkDetail> remarkDetail
+        {
+            get
+            {
+                if (Session["SESSION_REMARK_LIST"] == null)
+                    Session["SESSION_REMARK_LIST"] = new List<RemarkDetail>();
+                return (List<RemarkDetail>)Session["SESSION_REMARK_LIST"];
+            }
+            set
+            {
+                Session["SESSION_REMARK_LIST"] = value;
+            }
+        }
+        protected void ClearWoringSession()
+        {
+            Session.Remove("SESSION_REMARK_LIST");
+        }
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@remark_type", SqlDbType.Int) { Value = ""},
+                             new SqlParameter("@remark_type_document", SqlDbType.Int) { Value = ""}
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_remark_list", arrParm.ToArray());
+
+                        if (dsResult != null)
+                        {
+                            var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
+                            foreach (var data in row)
+                            {
+                                remarkDetail.Add(new RemarkDetail()
+                                {
+
+                                    remark_type_document = Convert.IsDBNull(data["remark_type_document"]) ? null : Convert.ToString(data["remark_typedocument"]),
+                                    remark_type = Convert.IsDBNull(data["remark_type"]) ? null : Convert.ToString(data["remarktype"]),
+
+                                });
+                            }
+                        }
+
+                        HttpContext.Current.Session["SESSION_NOTIFICATION_LIST"] = remarkDetail;
+                    }
+                }
+
+                gridView.DataSource = dsResult;
+                gridView.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        [WebMethod]
+        public static List<RemarkDetail> RemarkEdit(string remark_type_document, string remark_type)
+        {
+            var remarkDetailData = new List<RemarkDetail>();
+            var dsDataRemark = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@remark_type", SqlDbType.Int) { Value =remark_type },
+                             new SqlParameter("@remark_type_document", SqlDbType.Int) { Value = remark_type_document}
+                    };
+                    conn.Open();
+                    dsDataRemark = SqlHelper.ExecuteDataset(conn, "sp_remark_list", arrParm.ToArray());
+                    conn.Close();
+                }
+                if (dsDataRemark.Tables.Count > 0)
+                {
+                    var row = (from t in dsDataRemark.Tables[0].AsEnumerable() select t).ToList();
+                    foreach (var data in row)
+                    {
+                        remarkDetailData.Add(new RemarkDetail()
+                        {
+
+                            id = Convert.IsDBNull(data["id"]) ? 0 : Convert.ToInt32(data["id"]),
+                            remark_type = Convert.IsDBNull(data["remark_type"]) ? null : Convert.ToString(data["remark_type"]),
+                            remark_type_document = Convert.IsDBNull(data["remark_type_document"]) ? null : Convert.ToString(data["remark_type_document"]),
+                            remark_description = Convert.IsDBNull(data["remark_description"]) ? null : Convert.ToString(data["remark_description"]),
+
+                        });
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return remarkDetailData;
+        }
+
+        [WebMethod]
+        public static string SubmitRemarkEdit(RemarkDetail[] parametersEdit)
+        {
+            var row = (from t in parametersEdit select t).ToList();
+            if (row != null)
+            {
+                foreach(var data in row)
+                {
+                    try
+                    {
+                        using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                        {
+                            using (SqlCommand cmd = new SqlCommand("sp_remark_edit", conn))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(data.id);
+                                cmd.Parameters.Add("@remark_description", SqlDbType.VarChar, 200).Value = data.remark_description;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                conn.Open();
+                                cmd.ExecuteNonQuery();
+                                conn.Close();
+                            }
+                        }
+                    }
+
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                
+
+            }
+            return "success";
+        }
+
+
+
+    }
+}

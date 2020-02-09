@@ -1,0 +1,1484 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="PurchaseRequest.aspx.cs" Inherits="HicomIOS.Master.PurchaseRequest" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <style>
+        /*a.disabled {
+            pointer-events: none;
+        }
+
+        span.disable-links {
+            pointer-events: none;
+        }*/
+
+        fieldset {
+            border: 1px solid #4b4b57;
+            display: block;
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+
+        legend {
+            width: auto;
+            display: block;
+            -webkit-padding-start: 2px;
+            -webkit-padding-end: 2px;
+            border-width: initial;
+            border-style: none;
+            border-color: initial;
+            border-image: initial;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: inherit;
+            font-weight: bold;
+        }
+
+        #Splitter_0 {
+            display: none;
+        }
+
+        #div-content {
+            padding: 10px 30px;
+            background-color: #ffffff;
+            margin: 20px 0;
+        }
+
+            #div-content .row.form-group {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        .no-padding-right {
+            padding-right: 0px;
+        }
+
+        .no-margin {
+            margin: 0px;
+        }
+
+        .label-rigth {
+            padding: 4px 8px 0 0;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+            .form-group label {
+                font-weight: normal;
+            }
+
+        .form-control {
+            border-radius: 0;
+            padding: 0 3px;
+            font-size: 11px;
+            height: 22px;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            margin: 1px 0 0;
+        }
+
+        .nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+            border: 1px solid #4b4b57;
+            border-bottom-color: transparent;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid #4b4b57;
+        }
+
+            .nav-tabs > li > a {
+                border-radius: 0;
+            }
+
+                .nav-tabs > li > a:hover {
+                    border-color: #eee #eee #4b4b57;
+                }
+
+        .nav > li > a:focus, .nav > li > a:hover {
+            background-color: #faedb6;
+        }
+
+        a {
+            color: inherit;
+        }
+
+            a:focus, a:hover {
+                color: inherit;
+            }
+
+        #div-content .tab-content .tab-pane {
+            padding-top: 10px;
+        }
+
+        .btn-addItem {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+            .btn-addItem:hover {
+                background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+                border: 1px solid #eecc53;
+            }
+
+            .btn-addItem i {
+                font-size: 12px;
+            }
+
+        .btn-app {
+            width: 65px;
+        }
+
+        .modal-open {
+            opacity: 0.7;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: white;
+            /*border: 1px solid #909aa6;*/
+            border-collapse: separate;
+        }
+
+            .modal-content .modal-header {
+                background: #bbcee6 url(/DXR.axd?r=0_4062-wP3qf) repeat-x left top;
+                border-bottom: 1px solid #909aa6;
+                padding: 8px 0 6px 12px;
+                color: #1e395b;
+                font: 11px Verdana, Geneva, sans-serif;
+                height: 29px;
+            }
+
+        .modal-backdrop {
+            opacity: 0.5 !important;
+        }
+
+        .hr-line {
+            border-top: 1px solid #000;
+        }
+
+        .shipping-step {
+            float: left;
+            padding: 0 15px;
+        }
+
+        .dv {
+            margin-left: 0.1px;
+        }
+
+        .swal-modal {
+            width: 420px !important;
+            height: 250px !important;
+        }
+
+        .swal-title {
+            font-size: 15px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+
+        document.onkeydown = chkEvent
+        function chkEvent(e) {
+            var keycode;
+            if (window.event) keycode = window.event.keyCode; //*** for IE ***//
+            else if (e) keycode = e.which; //*** for Firefox ***//
+            if (keycode == 13) {
+                return false;
+            }
+        }
+        $(document).ready(function () {
+            $("#Splitter_0").parent().hide();
+            $("#txtDueDeliveryDate").prop("readonly", "readonly");
+            $("#txtPODate").prop("readonly", "readonly");
+
+            $("#txtDueDeliveryDate").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+            $("#txtPODate").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+            $("#txtReceiveDate").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+
+        });
+
+        function changedPRType() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            if ($('#cbbPRType').val() == "P") {
+                $('#dvQuotation').hide()
+                $('#lbCustomerNo').val("");
+                $('#lbCustomerFirstName').val("");
+                $('#lbQuotationData').val("");
+                $('#dvProductCust').show();
+                $('#dvQuotation2').hide();
+                $('#hdProductType').val("P");
+            }
+            else {
+                $('#dvQuotation').show()
+                $('#lbCustomerNo').val("");
+                $('#lbCustomerFirstName').val("");
+                $('#lbQuotationData').val("");
+                $('#dvProductCust').hide();
+                $('#dvQuotation2').show();
+                $('#hdProductType').val("");
+            }
+            clearGridView();
+        }
+
+        function clearGridView() {
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/ClearGridViewPR",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridViewPR.PerformCallback();
+                    $.LoadingOverlay("hide");
+                },
+                failure: function (response) {
+                    alert(response);
+                    $.LoadingOverlay("hide");
+                }
+            });
+        }
+
+        function changedQuotation() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            //var data = cbbQuotationNo;
+            var key = cbbQuotation.GetValue();
+
+
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/GetQuotationData",
+                data: '{id: "' + key + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#lbQuotationDate').val(data.display_quotation_date);
+                    $('#lbCustomerNo').val(data.customer_code);
+                    $('#lbCustomerFirstName').val(data.customer_name);
+                    $('#hdCustomerId').val(data.customer_id);
+                    $('#hdProductType').val(data.quotation_type);
+
+                    cbbSupplier.PerformCallback();
+                    gridViewPR.PerformCallback();
+
+                },
+                failure: function (response) {
+                    console.log(response.d);
+                    $.LoadingOverlay("hide");
+                }
+
+            });
+
+            $.LoadingOverlay("hide");
+        }
+
+        function changedItemCondition() {
+
+        }
+
+        function searchSeletedGrid(e) {
+            if (e == 13) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                var prType = $('#cbbPRType').val();
+                var txtSearchProduct = $("#txtSearchProduct").val();
+                var txtSearchQuotation = $("#txtSearchQuotation").val();
+               
+
+                if (prType == "QU") {
+                    console.log("qu");
+                    gridViewQuotationDetail.PerformCallback("Search|" + txtSearchQuotation.toString());
+                    $.LoadingOverlay("hide");
+                }
+                else if (prType == "P") {
+                    console.log("p");
+                    gridViewProductDetail.PerformCallback("Search|" + txtSearchProduct.toString());
+                    $.LoadingOverlay("hide");
+                }
+
+
+
+            }
+        }
+
+        function popupAddPRDetail() {
+            try {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                var prType = $('#cbbPRType').val();
+                var product_type = $('#cbbProductType').val();
+                var supplier_id = cbbSupplier.GetValue();
+                if (supplier_id == null) {
+                    $.LoadingOverlay("hide");
+                    alert("กรุณาเลือก Supplier");
+                    return;
+                }
+                if (prType == "P") {
+                    $.ajax({
+                        type: "POST",
+                        url: "PurchaseRequest.aspx/GetProductDetailData",
+                        data: "{qu_id : " + 0 + " ,supplier_id : '" + supplier_id + "',product_type :'" + product_type + "'}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function () {
+
+                            gridViewProductDetail.PerformCallback();
+
+                            $('#modal_product').modal('show');
+
+                            $.LoadingOverlay("hide");
+                        },
+                        failure: function (response) {
+                            $.LoadingOverlay("hide");
+                        }
+                    });
+                }
+                else if (prType == "QU") {
+                    var key = cbbQuotation.GetValue();
+                    if (key == "" || key == null) {
+                        $.LoadingOverlay("hide");
+                        alert("กรุณาเลือกใบเสนอราคา");
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "PurchaseRequest.aspx/GetProductDetailData",
+                        data: "{qu_id : " + 0 + " ,supplier_id : '" + supplier_id + "',product_type :'" + product_type + "'}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function () {
+                            $('#modal_quotation_detail').modal('show');
+                            gridViewQuotationDetail.PerformCallback();
+                            $.LoadingOverlay("hide");
+                        },
+                        failure: function (response) {
+                            console.log(response.d);
+                            $.LoadingOverlay("hide");
+                        }
+
+                    });
+                }
+
+            }
+            catch (ex) {
+                alert(ex);
+            }
+        }
+
+        function selectAllProductDetail() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var prType = $('#cbbPRType').val();
+            var product_type = $('#cbbProductType').val();
+            if (prType == "QU") {
+                var selected = $('#chkAllProductDetail').is(':checked');
+            } else {
+                var selected = $('#chkAllProductDetail').is(':checked');
+            }
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/SelectAllProductDetail",
+                data: '{selected:' + selected + ', type : "' + prType + '" , product_type : "' + product_type + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    if (data.d == "P") {
+
+                        gridViewProductDetail.PerformCallback();
+                        $.LoadingOverlay("hide");
+                    } else if (data.d == "QU") {
+                        gridViewQuotationDetail.PerformCallback();
+                        $.LoadingOverlay("hide");
+                    }
+                },
+                failure: function (data) {
+
+                }
+            });
+
+        }
+
+
+        function chkproduct(s, e) {
+
+            var value = s.GetChecked();
+            var input = s.GetMainElement();
+            var key = $(input).attr("ProductNo");
+            var prType = $('#cbbPRType').val();
+            var product_type = $('#cbbProductType').val();
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/AddSelectedProduct",
+                data: '{key:"' + key + '" , isSelected : ' + value + ' , type : "' + prType + '" , product_type : "' + product_type + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    console.log(response.d);
+                }
+            });
+        }
+
+        function submitProductDetail() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var prType = $('#cbbPRType').val();
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/SubmitProductDetail",
+                data: '{type : "' + prType + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (prType == "P") {
+                        $('#modal_product').modal('hide');
+
+                    }
+                    else if (prType == "QU") {
+                        $('#modal_quotation_detail').modal('hide');
+                    }
+                    gridViewPR.PerformCallback();
+                }
+            });
+            $.LoadingOverlay("hide");
+        }
+
+        function editPRDetail(e) {
+            var key = e;//$(input).attr("saleOrderDetailId");
+            $('#hdSelectedPRDetailId').val(key);
+
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/EditPRDetail",
+                data: '{id:"' + key + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    var pr_status = $('#hdDocumentStatus').val();
+                    if (pr_status == "PT" || pr_status == "CF") {
+                        //$('#dvReceive').show();
+                        $('#txtProductQty').prop('readonly', true);
+                        $('#dvReceive').hide();
+                    }
+                    else {
+                        $('#dvReceive').hide();
+                    }
+                    $('#txtProductDescription').val(data.item_description);
+                    $('#txtProductQty').val(data.qty);
+                    $('#txtReceiveQty').val(data.receive_qty);
+                    $('#txtReceiveDate').val(data.display_receive_date);
+                    $('#purchaseOrderNo').val(data.purchaseOrderNo);
+                    $('#receiveNo').val(data.receiveNo);
+                    $('#modal_pr_detail').modal('show');
+                }
+            });
+
+        }
+
+        function viewReceive(e) {
+            var key = e;//$(input).attr("saleOrderDetailId");
+            $('#hdSelectedPRDetailId').val(key);
+
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/EditPRDetail",
+                data: '{id:"' + key + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+
+                    var pr_status = $('#hdDocumentStatus').val();
+                    if (pr_status == "PT" || pr_status == "CF") {
+                        $('#dvReceive').show();
+                        $('#txtProductQty').prop('readonly', true);
+                    }
+                    else {
+                        $('#dvReceive').hide();
+                    }
+                    if (data.receive_qty_balance == 0) {
+                        $('txtReceiveQty').prop('readonly', true);
+                    }
+                    $('#txtProductDescription').val(data.item_description);
+                    $('#txtProductQty').val(data.qty);
+                    $('#txtReceiveQty').val(0);
+                    $('#txtReceiveDate').val(data.display_receive_date);
+                    $('#purchaseOrderNo').val(data.purchaseOrderNo);
+                    $('#receiveNo').val(data.receiveNo);
+                    $('#txtReceivedQty').val(data.receive_qty_balance);
+                    $('#modal_pr_detail').modal('show');
+                }
+            });
+
+        }
+        function deletePRDetail(e) {
+            var key = e;
+            swal({
+                title: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "PurchaseRequest.aspx/DeletePRDetail",
+                            data: '{id:"' + key + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                $('#hdSelectedPRDetailId').val(0);
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridViewPR.PerformCallback()
+                                    });
+                            }
+                        });
+                    }
+                });
+        }
+
+        function submitPRDetail() {
+            var key = $('#hdSelectedPRDetailId').val();
+            var qty = $('#txtProductQty').val();
+            var receive_qty = $('#txtReceiveQty').val();
+            var receive_date = $('#txtReceiveDate').val();
+            var received_qty = $('#txtReceivedQty').val();
+            var purchaseOrderNo = $('#purchaseOrderNo').val();
+            var receiveNo = $('#receiveNo').val();
+            var pr_status = $('#hdDocumentStatus').val();
+
+            //validate receive qty
+            if (pr_status == "CF" || pr_status == "PT") {
+                if (parseInt(received_qty) != 0) {
+                    if ((parseInt(receive_qty) + parseInt(received_qty)) > parseInt(qty)) {
+                        swal("Warning !", "จำนวนสินค้าที่รับเกินกำหนด", "warning");
+                        return;
+                    }
+                }
+                else {
+                    if (parseInt(receive_qty) > parseInt(qty)) {
+                        swal("Warning !", "จำนวนสินค้าที่รับเกินกำหนด", "warning");
+                        return;
+                    }
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/SubmitPRDetail",
+                data: '{id:"' + key + '",qty:"' + qty + '",receive_qty:"' + receive_qty + '",receive_date:"' + receive_date + '",purchaseOrderNo:"' + purchaseOrderNo + '",receiveNo:"' + receiveNo + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#hdSelectedPRDetailId').val(0);
+                    $('#txtProductDescription').val("");
+                    $('#txtProductQty').val(0);
+                    $('#txtReceiveQty').val(0);
+                    $('#txtReceiveDate').val("");
+                    $('#purchaseOrderNo').val("");
+                    $('#receiveNo').val("");
+                    $('#modal_pr_detail').modal('hide');
+
+                    gridViewPR.PerformCallback()
+                },
+                failure: function (response) {
+                    //alert(response.d);
+                }
+            });
+        }
+
+        function backPage() {
+            window.location.href = "../Master/PurchaseRequestList.aspx";
+        }
+
+        function saveDraft() {
+
+            $('#btnSaveDraft').click();
+        }
+
+        function confirmSave() {
+
+            var pr_no = $('#txtPRNo').val();
+
+            if ($('#cbbPRType').val() == "") {
+                alert("กรุณาเลือกประเภทการยืม");
+                return;
+            }
+            if ($('#cbbPRType').val() != "QU" && cbbCustomer.GetValue == null) {
+                alert("กรุณาเลือกลูกค้า");
+                return;
+            }
+            var pr_type = $('#cbbPRType').val();
+            var product_type = $('#hdProductType').val();
+            var pr_status = $('#hdDocumentStatus').val();
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/ValidateData",
+                data: '{pr_type : "' + pr_type + '" , product_type : "' + product_type + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d == "") {
+                        console.log("testconfirm");
+                        swal("บันทึกสำเร็จ!", {
+                            icon: "success"
+                        })
+                        .then((value) => {
+                            $('#btnConfirm').click();
+                        });
+                    }
+                    else {
+                       
+                            swal(response.d);
+                        
+                    }
+                    },
+                
+                failure: function (response) {
+                    //alert(response.d);
+                }
+            });
+            //$('#btnConfirm').click();
+        }
+        function changedSupplier() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/ChangedSupplier",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridViewPR.PerformCallback()
+                    $.LoadingOverlay("hide");
+                },
+                failure: function (response) {
+                    //alert(response.d);
+                }
+            });
+            //
+
+        }
+
+        function popupMFGDetail(productId, prDetailId) {
+            //var input = s.GetMainElement();
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+            $('#hdSelectedPRDetailId').val(prDetailId);
+
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/GetMFGDetail",
+                data: '{id: ' + productId + '}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#txtMFGProductDescription').val(data.item_description);
+                    $('#hdSelectedProductId').val(data.item_id);
+
+                    setTimeout(function () {
+                        gridMFG.PerformCallback();
+                    }, 100);
+
+                    $('#modal_pr_mfg').modal('show');
+                    $.LoadingOverlay("hide");
+
+
+                }
+            });
+
+        }
+
+        function submitMFG() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+
+            var mfg_no = $('#txtMFGNo').val();
+
+            if (mfg_no == "" || mfg_no == undefined) {
+                $.LoadingOverlay("hide");
+                alert("กรุณากรอก MFG");
+                return;
+            }
+            var product_id = $('#hdSelectedProductId').val();
+            var pr_detail_id = $('#hdSelectedPRDetailId').val()
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/AddMFG",
+                data: '{mfg_no : "' + mfg_no + '" , product_id : ' + product_id + ' , pr_detail_id : ' + pr_detail_id + '}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+
+                    gridMFG.PerformCallback();
+
+                    $('#txtMFGNo').val("");
+                    $('#txtReceiveDate').val("");
+
+                    $.LoadingOverlay("hide");
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+
+        }
+
+        function editMFG(e) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $('#hdEditMFGID').val(e);
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/EditMFG",
+                data: '{id : ' + e + ' }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#txtEditMFGMFGNo').val(data.mfg_no);
+
+
+                    $('#modal_edit_mfg').modal("show");
+
+                    $.LoadingOverlay("hide");
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+
+        }
+
+        function deleteMFG(e) {
+            swal({
+                title: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "PurchaseRequest.aspx/DeleteMFG",
+                            data: '{id : ' + e + ' }',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridMFG.PerformCallback();
+                                    });
+                            },
+                            failure: function (response) {
+                                alert(response.d);
+                            }
+                        });
+                    }
+                });
+        }
+
+        function submitEditMFG() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = $('#hdEditMFGID').val();
+            var mfg_no = $('#txtEditMFGMFGNo').val();
+            var receive_date = $('#txtEditMFGReceiveDate').val();
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/SubmitEditMFG",
+                data: '{id : ' + key + ' , mfg_no : "' + mfg_no + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response.d == "SUCCESS") {
+
+                        $('#hdEditMFGID').val(0);
+                        $('#txtEditMFGMFGNo').val("");
+
+                        gridMFG.PerformCallback();
+
+                        $('#modal_edit_mfg').modal("hide");
+
+                        $.LoadingOverlay("hide");
+                    }
+                    else {
+                        $.LoadingOverlay("hide");
+                        alert(response.d);
+                        return;
+                    }
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+        }
+
+        function submitMFGProduct() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "PurchaseRequest.aspx/SubmitMFGProduct",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    $('#txtMFGProductDescription').val("");
+                    $('#hdSelectedProductId').val(0);
+                    $('#hdSelectedPRDetailId').val(0)
+
+                    gridMFG.PerformCallback();
+
+                    $('#modal_pr_mfg').modal('hide');
+
+                    $.LoadingOverlay("hide");
+                }
+            });
+        }
+        function callReport() {
+            window.open("../Report/DocumentViewer.aspx?ReportArgs=Purchase_Request|" + $("#txtPRNo").val(), "_blank");
+        }
+    </script>
+    <div id="div-content">
+        <div class="row">
+            <button type="button" runat="server" id="btnDraft" onclick="saveDraft()" class="btn-addItem">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Save
+            </button>
+            <button type="button" runat="server" id="btnSave" onclick="confirmSave()" class="btn-addItem">
+                <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Confirm
+            </button>
+            <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem">
+                <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;Report
+            </button>
+            <button type="button" runat="server" id="btnBack" onclick="backPage()" class="btn-addItem">
+                <i class="fa fa-list-ol" aria-hidden="true"></i>&nbsp;List PurchaseRequest
+            </button>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnSaveDraft" Style="visibility: hidden" Text="Save" OnClick="btnSaveDraft_Click"></dx:ASPxButton>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnConfirm" Style="visibility: hidden" Text="Confirm" OnClick="btnConfirm_Click"></dx:ASPxButton>
+        </div>
+        <div class="row">
+            <fieldset>
+                <legend>Header</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="row dv" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">ประเภทการขอซื้อ :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <select class="form-control" id="cbbPRType" onchange="changedPRType()"
+                                        runat="server" data-rule-required="true" data-msg-required="ประเภทการคืน">
+                                        <option value="QU">ขอซื้อจากใบเสนอราคา(Quotation)</option>
+                                        <option value="P">สั่งซื้อสินค้า</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">เลขที่เอกสาร :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input type="text" class="form-control" id="txtPRNo" readonly="" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">วันที่เอกสาร :</label>
+                                <div class="col-xs-8 no-padding">
+                                    <input type="text" class="form-control" id="txtPRDate" readonly="" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row dv" id="dvQuotation" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">เลขที่ใบเสนอราคา :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <dx:ASPxComboBox ID="cbbQuotation" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cbbQuotation" TextField="data_text"
+                                        ClientSideEvents-ValueChanged="changedQuotation" ValueField="data_value">
+                                    </dx:ASPxComboBox>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">วันที่ใบเสนอราคา :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input readonly="" class="form-control" id="lbQuotationDate" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row dv" id="dvProductCust" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">ประเภทสินค้า :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <select class="form-control" id="cbbProductType" onchange="changedSupplier()"
+                                        runat="server" data-rule-required="true" data-msg-required="ประเภทสินค้า">
+                                        <option value="P">สินค้า</option>
+                                        <option value="S">อะไหล่</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">ชื่อลูกค้า :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <dx:ASPxComboBox ID="cbbCustomer" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cbbCustomer" TextField="data_text"
+                                        ValueField="data_value">
+                                    </dx:ASPxComboBox>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row dv" id="dvQuotation2" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">รหัสลูกค้า :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input readonly="" class="form-control" id="lbCustomerNo" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">ชื่อลูกค้า :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input readonly="" class="form-control" id="lbCustomerFirstName" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row dv" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">PO/ลูกค้า :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input class="form-control" id="txtPO" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">วันที่ PO :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <input class="form-control" id="txtPODate" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">กำหนดส่งของ :</label>
+                                <div class="col-xs-8 no-padding">
+                                    <input class="form-control" id="txtDueDeliveryDate" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row dv" runat="server">
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">วัตถุประสงค์ :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <select class="form-control" id="cbbRequestFor" runat="server" data-rule-required="true" data-msg-required="วัตถุประสงค์">
+                                        <option value="S">เพื่อขาย</option>
+                                        <option value="R">เพื่อใช้ในงานซ่อมและติดตั้ง</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-4 no-padding">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Supplier :</label>
+                                <div class="col-xs-9 no-padding">
+                                    <dx:ASPxComboBox ID="cbbSupplier" CssClass="form-control" runat="server"
+                                        ClientInstanceName="cbbSupplier" TextField="data_text" OnCallback="cbbSupplier_Callback"
+                                        ValueField="data_value">
+                                    </dx:ASPxComboBox>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="row">
+                <div class="row form-group">
+                    <button type="button" id="btnAddPRDetail" runat="server" onclick="popupAddPRDetail()"
+                        class="btn-info" style="height: 30px; margin-left: 15px;">
+                        <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;เลือกรายการ สินค้า
+                    </button>
+                </div>
+                <div class="col-xs-12">
+                    <dx:ASPxGridView ID="gridViewPR" ClientInstanceName="gridViewPR" runat="server" Settings-VerticalScrollBarMode="Visible"
+                        Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                        OnCustomCallback="gridViewPR_CustomCallback"
+                        KeyFieldName="id" Width="100%">
+                        <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                        <Paddings Padding="0px" />
+                        <Border BorderWidth="0px" />
+                        <BorderBottom BorderWidth="1px" />
+                        <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                            PageSizeItemSettings-Visible="false">
+                            <PageSizeItemSettings Items="10, 20, 50" />
+                        </SettingsPager>
+                        <Columns>
+                            <dx:GridViewDataTextColumn Caption="#" FieldName="id" CellStyle-HorizontalAlign="Center" Width="50px">
+                                <DataItemTemplate>
+                                    <a id="btnEdit" class="btn btn-mini" onclick="editPRDetail(<%# Eval("id")%>)" title="Edit">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i>
+                                    </a>
+                                    |
+                                    <a id="btnDelete" <%# Convert.ToInt32((Eval("receive_qty_balance"))) > 0 ? "disabled='disabled'" : "" %>
+                                        class="btn btn-mini"
+                                        onclick="deletePRDetail(<%# Eval("id")%>)"
+                                        title="Delete">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </a>
+                                </DataItemTemplate>
+                            </dx:GridViewDataTextColumn>
+                             <dx:GridViewDataTextColumn Caption="MFG" FieldName="id" CellStyle-HorizontalAlign="Center" Width="50px">
+                                <DataItemTemplate>
+                                    <a id="btnMFG" class="btn btn-mini" onclick="popupMFGDetail(<%# Eval("item_id")%>,<%# Eval("id")%>)" title="MFG">
+                                        <i class="fa fa-list" aria-hidden="true"></i>
+                                    </a>
+                                </DataItemTemplate>
+                            </dx:GridViewDataTextColumn>
+                            <dx:GridViewDataColumn FieldName="item_no" Caption="Product No" Width="150px" />
+                            <dx:GridViewDataColumn FieldName="item_description" Caption="Product Name" Width="300px" />
+                            <dx:GridViewDataColumn FieldName="qty" Caption="Quantity" Width="80px" />
+                            <dx:GridViewDataColumn FieldName="item_unit" Caption="Unit" Width="80px" />
+                            <dx:GridViewDataTextColumn Caption="Receive" FieldName="item_Receive" CellStyle-HorizontalAlign="Center" Width="100px">
+                                <DataItemTemplate>
+                                    <button type="button" id="btnviewReceive" onclick="viewReceive(<%# Eval("id") %>)"
+                                        <%# Convert.ToInt32((Eval("receive_qty_balance"))) == Convert.ToInt32((Eval("qty"))) ? "disabled='disabled'" : "" %>
+                                        class="btn-addItem">
+                                        <i class="fas fa-calendar-check"></i>&nbsp;<%# Convert.ToInt32((Eval("receive_qty_balance"))) == Convert.ToInt32((Eval("qty"))) ? "Complete" : "Receive" %>
+                                    </button>
+                                </DataItemTemplate>
+                            </dx:GridViewDataTextColumn>
+                            <dx:GridViewDataTextColumn Caption="MFG Detail" FieldName="mfg_detail" CellStyle-HorizontalAlign="Center" Width="50px">
+                                <DataItemTemplate>
+                                    <a id="btnMFG" class="btn btn-mini" onclick="popupMFGDetail(<%# Eval("item_id")%>,<%# Eval("id")%>)" title="MFG">
+                                        <i class="fa fa-list" aria-hidden="true"></i>
+                                    </a>
+                                </DataItemTemplate>
+                            </dx:GridViewDataTextColumn>
+                        </Columns>
+                    </dx:ASPxGridView>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="modal_quotation_detail" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        รายการ
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                                <div class="col-xs-4 text-left">
+                                <input id="Checkbox1" runat="server" type="checkbox" class="" onclick="selectAllProductDetail()" />&nbsp;เลือกทั้งหมด
+                            </div>
+                            <div class="col-xs-8" style="float: right; margin-bottom: 5px;">
+                                <input type="text" id="txtSearchQuotation" class="form-control searchBoxData" placeholder="กรอกคำค้นหา..." runat="server"
+                                    onkeypress="searchSeletedGrid(event.keyCode)" />
+                                <button type="button" class="btn-addItem" id="btnTextQuotation" onclick="searchSeletedGrid(13);">
+                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+                                </button>
+                            </div>
+                            <div class="col-xs-12">
+                                <dx:ASPxGridView ID="gridViewQuotationDetail" ClientInstanceName="gridViewQuotationDetail" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                    Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                                    OnCustomCallback="gridViewQuotationDetail_CustomCallback"
+                                    OnHtmlDataCellPrepared="gridViewQuotationDetail_HtmlDataCellPrepared"
+                                    KeyFieldName="id" Width="100%">
+                                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                    <Paddings Padding="0px" />
+                                    <Border BorderWidth="0px" />
+                                    <BorderBottom BorderWidth="1px" />
+                                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                        PageSizeItemSettings-Visible="false">
+                                        <PageSizeItemSettings Items="10, 20, 50" />
+                                    </SettingsPager>
+                                    <Columns>
+                                        <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="30px">
+                                            <DataItemTemplate>
+                                                <dx:ASPxCheckBox ID="chkQuotationDetail" runat="server" ValueType="System.Boolean"
+                                                    TextField="Name" ValueField="is_selected" ClientInstanceName="chkQuotationDetail"
+                                                    ProductNo='<%# Eval("product_no")%>'>
+                                                    <ClientSideEvents ValueChanged="function(s, e) { 
+                                                                        chkproduct(s, e); 
+                                                                    }" />
+                                                </dx:ASPxCheckBox>
+                                            </DataItemTemplate>
+                                        </dx:GridViewDataTextColumn>
+                                        <dx:GridViewDataTextColumn FieldName="product_id" Visible="false" Caption="Product ID" VisibleIndex="3" />
+                                        <dx:GridViewDataTextColumn FieldName="product_no" Caption="Product No" VisibleIndex="4" Width="100px" />
+                                        <dx:GridViewDataTextColumn FieldName="quotation_description" Caption="Product Name" VisibleIndex="5" Width="200px" />
+                                        <dx:GridViewDataTextColumn FieldName="qty" Caption="Qty" VisibleIndex="6" Width="50px" />
+                                        <dx:GridViewDataTextColumn FieldName="unit_code" Caption="Unit Code" VisibleIndex="6" Width="50px" />
+
+
+                                    </Columns>
+                                </dx:ASPxGridView>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth"></label>
+                                    <div class="col-xs-7 no-padding text-right">
+                                        <button type="button" runat="server" id="Button1" onclick="submitProductDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                        <button type="button" runat="server" id="Button2" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal_pr_detail" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Edit Purchase Request Detail
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Description :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control" readonly="true" id="txtProductDescription" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Qty :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control numberic" id="txtProductQty" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Purchase Order No :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control" id="purchaseOrderNo" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Document References :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control" id="receiveNo" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="dvReceive">
+
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Received Qty :</label>
+                                        <div class="col-xs-7 no-padding">
+                                            <input type="text" class="form-control numberic" id="txtReceivedQty" readonly="readonly" runat="server" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Receive Qty :</label>
+                                        <div class="col-xs-7 no-padding">
+                                            <input type="text" class="form-control numberic" id="txtReceiveQty" runat="server" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Receive Date :</label>
+                                        <div class="col-xs-7 no-padding">
+                                            <input type="text" class="form-control numberic" readonly="" id="txtReceiveDate" runat="server" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth"></label>
+                                    <div class="col-xs-7 no-padding text-right">
+                                        <button type="button" runat="server" id="Button7" onclick="submitPRDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                        <button type="button" runat="server" id="Button8" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal_product" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        รายการ
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                                <div class="col-xs-4 text-left">
+                                <input id="chkAllProductDetail" runat="server" type="checkbox" class="" onclick="selectAllProductDetail()" />&nbsp;เลือกทั้งหมด
+                            </div>
+                            <div class="col-xs-8" style="float: right; margin-bottom: 5px;">
+                                <input type="text" id="txtSearchProduct" class="form-control searchBoxData" placeholder="กรอกคำค้นหา..." runat="server"
+                                    onkeypress="searchSeletedGrid(event.keyCode)" />
+                                <button type="button" class="btn-addItem" id="btnTextProduct" onclick="searchSeletedGrid(13);">
+                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+                                </button>
+                            </div>
+                            <div class="col-xs-12">
+                                <dx:ASPxGridView ID="gridViewProductDetail" ClientInstanceName="gridViewProductDetail" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                    Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                                    OnCustomCallback="gridViewProductDetail_CustomCallback"
+                                    OnHtmlDataCellPrepared="gridViewProductDetail_HtmlDataCellPrepared"
+                                    KeyFieldName="product_no" Width="100%">
+                                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                    <Paddings Padding="0px" />
+                                    <Border BorderWidth="0px" />
+                                    <BorderBottom BorderWidth="1px" />
+                                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                        PageSizeItemSettings-Visible="false">
+                                        <PageSizeItemSettings Items="10, 20, 50" />
+                                    </SettingsPager>
+                                    <Columns>
+                                        <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="30px">
+                                            <DataItemTemplate>
+                                                <dx:ASPxCheckBox ID="chkProductDetail" runat="server" ValueType="System.Boolean"
+                                                    TextField="Name" ValueField="is_selected" ClientInstanceName="chkProductDetail"
+                                                    ProductNo='<%# Eval("product_no")%>'>
+                                                    <ClientSideEvents ValueChanged="function(s, e) { 
+                                                                        chkproduct(s, e); 
+                                                                    }" />
+                                                </dx:ASPxCheckBox>
+                                            </DataItemTemplate>
+                                        </dx:GridViewDataTextColumn>
+                                        <dx:GridViewDataTextColumn FieldName="product_id" Visible="false" Caption="Product ID" VisibleIndex="3" />
+                                        <dx:GridViewDataTextColumn FieldName="product_no" Caption="Product No" VisibleIndex="4" Width="100px" />
+                                        <dx:GridViewDataTextColumn FieldName="product_name" Caption="Product Name" VisibleIndex="5" Width="200px" />
+                                        <dx:GridViewDataTextColumn FieldName="qty" Caption="Qty" VisibleIndex="6" Width="50px" />
+                                        <dx:GridViewDataTextColumn FieldName="item_type" Caption="Type" VisibleIndex="7" Width="100px" />
+                                    </Columns>
+                                </dx:ASPxGridView>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth"></label>
+                                    <div class="col-xs-7 no-padding text-right">
+                                        <button type="button" runat="server" id="Button3" onclick="submitProductDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                        <button type="button" runat="server" id="Button4" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal_pr_mfg" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        รายการ
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Product :</label>
+                                    <div class="col-xs-7 no-padding">
+                                        <input type="text" class="form-control" readonly="true" id="txtMFGProductDescription" runat="server" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding: 0 10px;">
+                                <fieldset>
+                                    <legend style="text-align: left; margin-bottom: 5px;">MFG</legend>
+                                    <div class="form-group col-xs-12 no-padding">
+                                        <label class="control-label col-xs-2" for="cboSupplier">MFG No</label>
+                                        <div class="col-xs-6 no-padding-right">
+                                            <input type="text" class="form-control" id="txtMFGNo" runat="server" />
+                                        </div>
+                                        <div class="col-xs-2 no-padding text-left">
+                                            <button type="button" class="btn-addItem" onclick="submitMFG()">
+                                                <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;เพิ่ม
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-xs-12 no-padding">
+                                        <dx:ASPxGridView ID="gridMFG" SettingsBehavior-AllowSort="false" ClientInstanceName="gridMFG" runat="server"
+                                            Settings-VerticalScrollBarMode="Visible"
+                                            Settings-VerticalScrollableHeight="300"
+                                            Settings-HorizontalScrollBarMode="Visible"
+                                            EnableCallBacks="true" KeyFieldName="id" OnCustomCallback="gridMFG_CustomCallback"
+                                            Width="100%">
+                                            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                            <Paddings Padding="0px" />
+                                            <Border BorderWidth="0px" />
+                                            <BorderBottom BorderWidth="1px" />
+                                            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                                PageSizeItemSettings-Visible="true">
+                                                <PageSizeItemSettings Items="10, 20, 50" />
+                                            </SettingsPager>
+                                            <Columns>
+                                                <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="80">
+                                                    <DataItemTemplate>
+                                                        <a class="btn btn-mini" onclick="editMFG(<%# Eval("id")%>)" title="Edit">
+                                                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                        </a>|
+                                                            <a class="btn btn-mini" onclick="deleteMFG(<%# Eval("id")%>)" title="Delete" <%# Convert.ToInt32((Eval("id"))) > 0 ? "disabled='disabled'" : "" %>>
+                                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                            </a>
+                                                    </DataItemTemplate>
+                                                </dx:GridViewDataTextColumn>
+                                                <%--<dx:GridViewDataTextColumn FieldName="supplier_no" Caption="No" Width="80px" />--%>
+                                                <dx:GridViewDataTextColumn FieldName="mfg_no" Caption="MFG No" Width="500px" CellStyle-HorizontalAlign="Left" />
+                                            </Columns>
+                                            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+                                            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                                                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                                        </dx:ASPxGridView>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth"></label>
+                                <div class="col-xs-7 no-padding text-right">
+                                    <button type="button" runat="server" id="Button5" onclick="submitMFGProduct()" class="btn-app btn-addItem">ยืนยัน</button>
+                                    <button type="button" runat="server" id="Button6" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal_edit_mfg" role="dialog" data-backdrop="static" data-keyboard="true" tabindex="-1">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="modal-title">Edit MFG</div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="row">
+                            <div class="form-group col-xs-12 no-padding">
+                                <label class="control-label col-xs-4 no-padding" for="txtEditMFGMFGNo">MFG No :</label>
+                                <div class="col-xs-8">
+                                    <input type="text" class="form-control" id="txtEditMFGMFGNo" runat="server" />
+                                </div>
+                            </div>
+                            <asp:HiddenField runat="server" ID="hdEditMFGID" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-addItem" onclick="submitEditMFG()">
+                            <i class="fa fa-save" aria-hidden="true"></i>&nbsp;บันทึก
+                        </button>
+                        <button type="button" class="btn-addItem" data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden">
+            <asp:HiddenField runat="server" ID="hdCustomerId" />
+            <asp:HiddenField runat="server" ID="hdSales" />
+            <asp:HiddenField runat="server" ID="hdCustomerCode" />
+            <asp:HiddenField runat="server" ID="hdSelectedPRDetailId" />
+            <asp:HiddenField runat="server" ID="hdRefQty" />
+            <asp:HiddenField runat="server" ID="hdSelectedProductId" />
+            <asp:HiddenField runat="server" ID="hdDocumentStatus" />
+            <asp:HiddenField runat="server" ID="hdProductType" />
+        </div>
+    </div>
+</asp:Content>

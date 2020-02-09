@@ -1,0 +1,256 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="StockCard.aspx.cs" Inherits="HicomIOS.Master.StockCard" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <script type="text/javascript" src="../Content/Custom.js"></script>
+    <script type="text/javascript" src="../Content/Script.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <style>
+        .modal .control-label {
+            margin: 5px 0 0 0;
+            padding: 0;
+            text-align: right;
+        }
+
+        #SearchBox {
+            display: none;
+        }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        .btn-reportItem {
+            margin-bottom: 7px;
+            margin-left: 15px;
+        }
+
+        .btn-view {
+            width: 25%;
+        }
+    </style>
+    <div id="div-content">
+        <div class="row">
+            <fieldset>
+                <legend>Stock Card</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">Product Type :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbProductType" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbProductType" TextField="data_text"
+                                    EnableCallbackMode="true" ClientSideEvents-ValueChanged="changedProductType"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding" id="productCat">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-2 text-right label-rigth">Product Category :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbProductCat" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbProductCat" TextField="data_text"
+                                    EnableCallbackMode="true"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-2 text-right label-rigth">Product :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbProduct" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbProduct" TextField="data_text"
+                                    EnableCallbackMode="true"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="col-xs-12 no-padding" id="shelf">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-2 text-right label-rigth">Shelf :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbShelf" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbShelf" TextField="data_text"
+                                    EnableCallbackMode="true"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-12 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-1 text-right no-padding">วันที่ :</label>
+                            <div class="col-xs-5">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerFrom" />
+                            </div>
+                            <label class="col-xs-1 no-padding text-center">ถึง</label>
+                            <div class="col-xs-5">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerTo" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 no-padding text-center">
+                    <div class="row form-group">
+                        <div class="col-xs-12 no-padding">
+                            <button type="button"
+                                class="btn-info btn-view" style="height: 30px;"
+                                id="Button1" onclick="view_Click()">
+                                <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
+                                    View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    <div class="row">
+        <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem btn-reportItem">
+            <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;Report
+        </button>
+        <div class="col-xs-12" runat="server" id="dvGridProduct">
+            <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridView"
+                Width="100%" KeyFieldName="id" EnableCallBacks="true"
+                EnableRowsCache="false"
+                SettingsBehavior-AllowSort="false"
+                OnCustomCallback="gridStockCard_CustomCallback">
+                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                <Paddings Padding="0px" />
+                <Border BorderWidth="0px" />
+                <BorderBottom BorderWidth="1px" />
+                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                    PageSizeItemSettings-Visible="true">
+                    <PageSizeItemSettings Items="10, 20, 50" />
+                </SettingsPager>
+                <Columns>
+                    <dx:GridViewDataTextColumn FieldName="no_" Caption="Product No" Width="50px" />
+                    <dx:GridViewDataTextColumn FieldName="name_" Caption="Product Name" Width="200px" />
+                    <dx:GridViewDataTextColumn FieldName="in_" Caption="In" Width="50px" />
+                    <dx:GridViewDataTextColumn FieldName="out_" Caption="Out" Width="50px" />
+                    <dx:GridViewDataTextColumn FieldName="stock_balance" Caption="Balance" Width="100px" />
+                    <dx:GridViewDataTextColumn FieldName="remark" Caption="Remark" Width="100px" />
+                </Columns>
+                <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+                <SettingsPopup>
+                    <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+                </SettingsPopup>
+                <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                    CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+            </dx:ASPxGridView>
+        </div>
+    </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#shelf').hide();
+            $('#productCat').hide();
+        });
+
+        $(function () {
+            $(".picker").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+
+        });
+
+        function changedProductType() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $.ajax({
+                type: "POST",
+                url: "StockCard.aspx/ChangedData",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridView.PerformCallback()
+                },
+                failure: function (response) {
+                }
+            });
+
+          
+            var key = cbbProductType.GetValue();
+
+            $.ajax({
+                type: "POST",
+                url: "StockCard.aspx/GetQuotationData",
+                data: '{id: "' + key + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    var data = response.d;
+                    if (data.type == "P") {
+                        $('#productCat').show();
+                    } else if (data.type == "S") {
+                        $('#shelf').show();
+                    }
+                  
+                },
+                failure: function (response) {
+                    console.log(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+            $.LoadingOverlay("hide");
+
+        }
+
+        function view_Click() {
+
+            var parametersStockCard = {
+                dataStockCard: [{
+                    datepickerFrom: $('#datepickerFrom').val(),
+                    datepickerTo: $('#datepickerTo').val(),
+                    product_id: cbbProduct.GetValue(),
+                    product_type: cbbProductType.GetValue(),
+                }]
+            };
+            $.ajax({
+                type: 'POST',
+                url: "StockCard.aspx/GetViewGrid",
+                data: JSON.stringify(parametersStockCard),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (result) {
+                    gridView.PerformCallback();
+                }
+            });
+        }
+
+        function callReport() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var product_id = cbbProduct.GetValue();
+            var datepickerFrom = $('#datepickerFrom').val();
+            var datepickerTo = $('#datepickerTo').val();
+            var product_type = cbbProductType.GetValue();
+            if ($('#datepickerFrom').val() == '') {
+                $.LoadingOverlay("hide");
+                alert("เอกสารไม่สามารถพิมพ์ได้กรุณากรอกข้อมูลให้ครบ");
+                return;
+            } else {
+                window.open("../Report/DocumentViewer.aspx?ReportArgs=Stock_Card|" + product_id + "|" + datepickerFrom + "|" + datepickerTo + "|" + product_type, "_blank");
+                $.LoadingOverlay("hide");
+            }
+        }
+
+
+
+    </script>
+</asp:Content>

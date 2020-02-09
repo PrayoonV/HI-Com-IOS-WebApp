@@ -1,0 +1,33 @@
+﻿using System;
+using System.Drawing;
+using System.Collections;
+using System.ComponentModel;
+using DevExpress.XtraReports.UI;
+using System.Web.UI;
+
+namespace HicomIOS.Report
+{
+    public partial class Quotation_Approve_Qu : DevExpress.XtraReports.UI.XtraReport
+    {
+        public Quotation_Approve_Qu()
+        {
+            InitializeComponent();
+        }
+        private void xrPictureBox1_BeforePrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        {
+            var picture = Convert.ToString(GetCurrentColumnValue("sign_1"));
+            xrPictureBox1.ImageUrl = "../Images/Sign/" + picture;
+        }
+        private void xrPictureBox2_BeforePrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        {
+            var picture = Convert.ToString(GetCurrentColumnValue("sign_2"));
+            xrPictureBox2.ImageUrl = "../Images/Sign/" + picture;
+        }
+        private void xrPictureBox3_BeforePrint(object sender, System.Drawing.Printing.PrintEventArgs e)
+        {
+            var picture = Convert.ToString(GetCurrentColumnValue("sign_3"));
+            xrPictureBox3.ImageUrl = "../Images/Sign/" + picture;
+        }
+
+    }
+}

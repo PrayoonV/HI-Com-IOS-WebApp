@@ -1,0 +1,243 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Shelf.aspx.cs" Inherits="HicomIOS.Master.Shelf" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <style>
+        .btn-app {
+            width: 80px;
+        }
+
+        .btn-left {
+            float: left !important;
+        }
+
+        .btn-back {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+            .btn-back:hover {
+                background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+                border: 1px solid #eecc53;
+            }
+
+            .btn-back i {
+                font-size: 12px;
+            }
+    </style>
+    <button id="add_NewItem" type="button" onclick="addNewItem()" class="btn-addItem btn-new btn-new1 <%= ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_create) ? "" : "hidden" %>">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        &nbsp;New Shelf
+    </button>
+    <div class="div-search-box">
+        <input type="text" id="txtSearchBoxData" class="form-control" placeholder="กรอกคำค้นหา..." runat="server" onkeypress="searchDataGrid(event.keyCode)" />
+        <button type="button" class="btn-addItem" id="btnSubmitSearch" onclick="searchDataGrid(13);">
+            <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+        </button>
+    </div>
+    <div id="gridCell">
+        <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="notificationGrid"
+            Width="100%" KeyFieldName="id" EnableCallBacks="true" OnCustomCallback="gridView_CustomCallback">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <SettingsLoadingPanel ShowImage="False"></SettingsLoadingPanel>
+            <%-- DXCOMMENT: Configure ASPxGridView's columns in accordance with datasource fields --%>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="20px">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editItem(<%# Eval("id")%>)" title="Edit">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>|
+                        <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>)" title="Delete">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+
+                <dx:GridViewDataTextColumn FieldName="shelf_name" Caption="Name" Width="150px" />
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
+            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+            <SettingsPopup>
+                <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+            </SettingsPopup>
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
+        <%-- modal delete--%>
+        <div class="modal fade" id="modal_delete" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="modal-title">ลบข้อมูล</div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <input type="hidden" name="delete_link" id="delete_link" class="hide" value="">
+                        คุณต้องการลบข้อมูลใช่หรือไม่ ?           
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button"
+                            class="btn-app btn-addItem"
+                            id="btn_delete" onclick="confirmDelete()">
+                            <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                        </button>
+                        <button type="button "
+                            class="btn-app btn-addItem"
+                            data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%-- modal Edit/add--%>
+        <div class="modal fade" id="modal_shelf" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <div class="modal-title" id="modal-title">ข้อมูล</div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth">Shelf Name :</label>
+                                    <div class="col-xs-9">
+                                        <input type="text" class="form-control" id="shelf_name" runat="server" data-rule-required="true" data-msg-required="กรุณากรอกข้อมูล" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="id">
+                        <button type="button"
+                            class="btn-app btn-addItem"
+                            id="_btn_save" onclick="confirm_btn()">
+                            <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                        </button>
+                        <button type="button "
+                            class="btn-app btn-addItem"
+                            data-dismiss="modal">
+                            <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script type="text/javascript">
+        function confirm_btn() {
+            var isValid = false;
+            $("#modal_form input[type=text]").each(function () {
+                if ($(this).val() == "") {
+                    $(this).parent().parent().addClass("has-error");
+                    isValid = true;
+                } else {
+                    $(this).parent().parent().removeClass("has-error");
+                }
+            });
+
+            if (!isValid) {
+                var id = $('#id').val();
+                if (id == "" || id == null) {
+                    console.log("add");
+                    $.ajax({
+                        type: "POST",
+                        url: "Shelf.aspx/ShelfConfirmAdd",
+                        data: '{shelf_name:"' + $('#shelf_name').val() + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            location.reload();
+                        }
+                    });
+
+                } else if (id != "" || id != null) {
+                    console.log("edit");
+                    $.ajax({
+                        type: "POST",
+                        url: "Shelf.aspx/ShelfConfirmEdit",
+                        data: '{shelf_name:"' + $('#shelf_name').val() + '",id:"' + $('#id').val() + '"}',
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (data) {
+                            location.reload();
+                        }
+                    });
+                }
+            }
+        }
+
+        function searchDataGrid(e) {
+            if (e == 13) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+
+                var txtSearch = $("#txtSearchBoxData").val();
+                notificationGrid.PerformCallback(txtSearch.toString());
+
+                $.LoadingOverlay("hide");
+            }
+        }
+
+        function editItem(id) {
+            $.ajax({
+                type: "POST",
+                url: "Shelf.aspx/ShelfEdit",
+                data: '{ id:"' + id + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    $('#id').val(data.d.id)
+                    $('#shelf_name').val(data.d.shelf_name);
+                    $('#modal_shelf').modal("show");
+                    $('#modal-title').text("แก้ไขข้อมูล");
+
+                }
+            });
+        }
+
+        function addNewItem() {
+            $('#shelf_name').val("");
+            $('#modal_shelf').modal("show");
+            $('#modal-title').text("เพิ่มข้อมูล");
+        }
+
+
+        function deleteItem(e) {
+            var id = e;
+            $('#modal_delete').modal("show");
+            $('#btn_delete').val(id);
+        }
+        function confirmDelete() {
+            var id = $('#btn_delete').val();
+            $.ajax({
+                type: "POST",
+                url: "Shelf.aspx/DeleteShelf",
+                data: '{id:"' + id + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        }
+    </script>
+</asp:Content>

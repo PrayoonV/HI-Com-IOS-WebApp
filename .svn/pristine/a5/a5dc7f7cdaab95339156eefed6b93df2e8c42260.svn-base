@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<menu>
+  <group Text="ข้อมูลเกี่ยวกับสินค้า">
+    <item Text="ข้อมูลสินค้า" NavigateUrl="Master/Products.aspx" />
+    <item Text="ข้อมูลหน่วยสินค้า" NavigateUrl="Master/ProductUnit.aspx" />
+    <item Text="ข้อมูลยี่ห้อสินค้า" NavigateUrl="Master/ProductBrand.aspx" />
+    <item Text="ข้อมูลหมวดสินค้า" NavigateUrl="Master/ProductCategory.aspx" />
+    <item Text="ข้อมูลจัดกลุ่มสินค้า" NavigateUrl="Master/ProductSet.aspx" />
+  </group>
+  <group Text="ข้อมูลเกี่ยวกับลูกค้า">
+    <item Text="ข้อมูลลูกค้า" NavigateUrl="Master/Customer.aspx" />
+    <item Text="ข้อมูลลูกค้าสาขาย่อย" NavigateUrl="Master/CustomerBranch.aspx" />
+    <item Text="ข้อมูลกลุ่มลูกค้า" NavigateUrl="Master/CustomerGroup.aspx" />
+    <item Text="ข้อมูลประเภทอุตสาหกรรม" NavigateUrl="Master/CustomerIndustryType.aspx" />
+  </group>
+  <group Text="ข้อมูลเกี่ยวกับพนักงาน">
+    <item Text="ข้อมูลพนักงาน" NavigateUrl="Master/Employee.aspx" />
+    <item Text="ข้อมูลแผนก" NavigateUrl="Master/EmployeeDepartment.aspx" />
+    <item Text="ข้อมูลตำแหน่งงาน" NavigateUrl="Master/EmployeePosition.aspx" />
+  </group>
+  <group Text="ข้อมูลเกี่ยวกับผู้จัดจำหน่าย">
+    <item Text="ข้อมูลผู้จัดจำหน่าย" NavigateUrl="Master/Supplier.aspx" />
+    <item Text="ข้อมูลผู้จัดจำหน่ายสาขาย่อย" NavigateUrl="Master/SupplierBranch.aspx" />
+    <item Text="ข้อมูลกลุ่มผู้จัดจำหน่าย" NavigateUrl="Master/SupplierGroup.aspx" />
+    <item Text="ข้อมูลยี่ห้อผู้จัดจำหน่าย" NavigateUrl="Master/SupplierBrand.aspx" />
+    
+  </group>
+  <group Text="ข้อมูลเกี่ยวกับแผนกพนักงาน">
+    <item Text="ข้อมูลแผนกพนักงาน" NavigateUrl="Master/Department.aspx" />
+  </group>
+  <group Text="ความปลอดภัย">
+    <item Text="ผู้ใช้" />
+    <item Text="กลุ่มผู้ใช้" />
+    <item Text="กำหนดสิทธิ์การใช้หน้าจอ" />
+  </group>
+  <group Text="ตั้งค่าระบบ">
+    <item Text="Notification" NavigateUrl="Master/Notification.aspx" />
+    <item Text="กำหนดเลขที่เอกสาร" />
+    <item Text="กำหนดสิทธิ์การอนุมัติงาน" />
+    <item Text="กำหนดตำแหน่งไฟล์" />
+    <item Text="กำหนดอีเมล์" />
+  </group>
+</menu>

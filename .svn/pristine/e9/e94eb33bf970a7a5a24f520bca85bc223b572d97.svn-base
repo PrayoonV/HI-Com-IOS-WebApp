@@ -1,0 +1,228 @@
+﻿using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+namespace HicomIOS.Master
+{
+
+    public partial class StockInventory : MasterDetailPage
+    {
+        public class StockInventoryData
+        {
+            public object transaction_date { get; set; }
+            public string datepickerFrom { get; set; }
+            public string datepickerTo { get; set; }
+            public string product_no { get; set; }
+            public int product_id { get; set; }
+            public string product_name { get; set; }
+            public string product_type { get; set; }
+            public int product_cat { get; set; }
+            public int shelf { get; set; }
+            public string no_ { get; set; }
+            public string name_ { get; set; }
+            public string cat_name { get; set; }
+            public string remark { get; set; }
+            public int in_ { get; set; }
+            public int out_ { get; set; }
+            public int adj_ { get; set; }
+            public int stock_balance { get; set; }
+            public int stock_current { get; set; }
+        }
+        List<StockInventoryData> stockInventoryData
+        {
+            get
+            {
+                if (Session["SESSION_STOCK_INVENTORY"] == null)
+                    Session["SESSION_STOCK_INVENTORY"] = new List<StockInventoryData>();
+                return (List<StockInventoryData>)Session["SESSION_STOCK_INVENTORY"];
+            }
+            set
+            {
+                Session["SESSION_STOCK_INVENTORY"] = value;
+            }
+        }
+        public override string PageName { get { return "Stock Inventory"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                PrepareData();
+                ClearWoringSession();
+            }
+            else
+            {
+                BindDataGrid();
+            }
+        }
+        private void BindDataGrid()
+        {
+            gridView.DataSource = (from t in stockInventoryData select t).ToList();
+            gridView.DataBind();
+        }
+        protected void ClearWoringSession()
+        {
+            Session.Remove("SESSION_STOCK_INVENTORY");
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+                if (!Page.IsPostBack)
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(string));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    dtSource.Rows.Add("PP", "Product");
+                    dtSource.Rows.Add("SP", "SparePart");
+                    cbbProductType.DataSource = dtSource;
+                    cbbProductType.DataBind();
+                }
+                //SPlanetUtil.BindASPxComboBox(ref cbbProduct, DataListUtil.DropdownStoreProcedureName.Product);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        public override void OnFilterChanged()
+        {
+            //BindGrid();
+        }
+        [WebMethod]
+        public static void ChangedData()
+        {
+            HttpContext.Current.Session.Remove("SESSION_STOCK_INVENTORY");
+        }
+        [WebMethod]
+        public static string GetViewGrid(StockInventoryData[] dataStockInventory)
+        {
+            var result = "";
+            var stockInventoryData = new List<StockInventoryData>();
+            var data = (from t in dataStockInventory select t).FirstOrDefault();
+            if (data != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@product_name", SqlDbType.VarChar,200) { Value = data.product_name.Trim() },
+                             new SqlParameter("@date_from", SqlDbType.VarChar,20) { Value = data.datepickerFrom },
+                             new SqlParameter("@date_to", SqlDbType.VarChar,20) { Value = data.datepickerTo },
+                             new SqlParameter("@product_type", SqlDbType.VarChar,3) { Value = data.product_type },
+                             new SqlParameter("@shelf", SqlDbType.Int) { Value = data.shelf },
+                             new SqlParameter("@product_cat", SqlDbType.Int) { Value = data.product_cat },
+                             new SqlParameter("@product_no", SqlDbType.VarChar,50) { Value = data.product_no.Trim() },
+                        };
+                        conn.Open();
+                        var dsDatastockCard = SqlHelper.ExecuteDataset(conn, "sp_stock_inventory_report", arrParm.ToArray());
+
+                        if (dsDatastockCard.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsDatastockCard.Tables[0].AsEnumerable())
+                            {
+                                stockInventoryData.Add(new StockInventoryData()
+                                {
+                                    transaction_date = row["transaction_date"],
+                                    no_ = Convert.IsDBNull(row["no_"]) ? string.Empty : Convert.ToString(row["no_"]),
+                                    name_ = Convert.IsDBNull(row["name_"]) ? string.Empty : Convert.ToString(row["name_"]),
+                                    cat_name = Convert.IsDBNull(row["cat_name_tha"]) ? string.Empty : Convert.ToString(row["cat_name_tha"]),
+                                    remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                    in_ = Convert.IsDBNull(row["in_"]) ? 0 : Convert.ToInt32(row["in_"]),
+                                    out_ = Convert.IsDBNull(row["out_"]) ? 0 : Convert.ToInt32(row["out_"]),
+                                    adj_ = Convert.IsDBNull(row["adj_"]) ? 0 : Convert.ToInt32(row["adj_"]),
+                                    stock_balance = Convert.IsDBNull(row["stock_balance"]) ? 0 : Convert.ToInt32(row["stock_balance"]),
+                                    stock_current = Convert.IsDBNull(row["product_qty_balance"]) ? 0 : Convert.ToInt32(row["product_qty_balance"]),
+                                });
+                            }
+                        }
+                    }
+
+                    HttpContext.Current.Session["SESSION_STOCK_INVENTORY"] = stockInventoryData;
+                    if (stockInventoryData.Count < 0)
+                    {
+                        result = "error";
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return result;
+
+        }
+        protected void gridStockInventory_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = (from t in stockInventoryData select t).ToList();
+            gridView.DataBind();
+        }
+
+        protected void cbbProductCat_Callback(object sender, CallbackEventArgsBase e)
+        {
+            var productType = e.Parameter.ToString();
+            cbbProductCat_RetreiveDataIntoCombo(productType);
+        }
+        private void cbbProductCat_RetreiveDataIntoCombo(string productType)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = "tha" },
+                            new SqlParameter("@cat_type", SqlDbType.Int) { Value = productType },
+                        };
+                conn.Open();
+                var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product_category_export", arrParm.ToArray());
+                conn.Close();
+                cbbProductCat.DataSource = dsResult;
+                cbbProductCat.TextField = "data_text";
+                cbbProductCat.ValueField = "data_value";
+                cbbProductCat.DataBind();
+            }
+        }
+
+        protected void cbbShelf_Callback(object sender, CallbackEventArgsBase e)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                    };
+                conn.Open();
+                var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_shelf", arrParm.ToArray());
+                conn.Close();
+                cbbShelf.DataSource = dsResult;
+                cbbShelf.TextField = "data_text";
+                cbbShelf.ValueField = "data_value";
+                cbbShelf.DataBind();
+            }
+        }
+    }
+}

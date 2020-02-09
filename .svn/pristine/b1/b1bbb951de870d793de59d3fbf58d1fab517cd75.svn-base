@@ -1,0 +1,529 @@
+﻿using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+namespace HicomIOS.Master
+{
+
+    public partial class StockInventory : MasterDetailPage
+    {
+        public int dataId = 0;
+        List<string> product_id_list = new List<string>();
+        public override string PageName { get { return "StockInventory"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override void OnFilterChanged()
+        {
+
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        public class ReportStockInventoryData
+        {
+            public string datepickerFrom { get; set; }
+            public string datepickerTo { get; set; }
+            public string product_type { get; set; }
+            public string stock_no { get; set; }
+            public string stock_name { get; set; }
+            public string stock_in { get; set; }
+            public string stock_out { get; set; }
+            public string stock_balance { get; set; }
+            public string stock_update { get; set; }
+            public string stock_lost { get; set; }
+        }
+        public class StockInventoryData
+        {
+
+            public int count { get; set; }
+            public bool is_delete { get; set; }
+
+            public int id { get; set; }
+            public string name_tha { get; set; }
+            public string no { get; set; }
+
+        }
+        public class Dataselect
+        {
+            public int id { get; set; }
+            public string name_tha { get; set; }
+            public string no { get; set; }
+            public bool is_selected { get; set; }
+            public int count { get; set; }
+
+        }
+
+        List<Dataselect> dataselect
+        {
+            get
+            {
+                if (Session["SESSION_DATASELECT"] == null)
+                    Session["SESSION_DATASELECT"] = new List<Dataselect>();
+                return (List<Dataselect>)Session["SESSION_DATASELECT"];
+            }
+            set
+            {
+                Session["SESSION_DATASELECT"] = value;
+            }
+        }
+        List<StockInventoryData> stockCardData
+        {
+            get
+            {
+                if (Session["SESSION_STOCK_INVENTORY"] == null)
+                    Session["SESSION_STOCK_INVENTORY"] = new List<StockInventoryData>();
+                return (List<StockInventoryData>)Session["SESSION_STOCK_INVENTORY"];
+            }
+            set
+            {
+                Session["SESSION_STOCK_INVENTORY"] = value;
+            }
+        }
+        List<ReportStockInventoryData> reportStockInventoryData
+        {
+            get
+            {
+                if (Session["SESSION_STOCK_INVENTORY_REPORT"] == null)
+                    Session["SESSION_STOCK_INVENTORY_REPORT"] = new List<ReportStockInventoryData>();
+                return (List<ReportStockInventoryData>)Session["SESSION_STOCK_INVENTORY_REPORT"];
+            }
+            set
+            {
+                Session["SESSION_STOCK_INVENTORY_REPORT"] = value;
+            }
+        }
+
+        protected void ClearWorkingSession()
+        {
+            Session.Remove("SESSION_STOCK_INVENTORY");
+            Session.Remove("SESSION_DATASELECT");
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            dataId = Convert.ToInt32(Request.QueryString["dataId"]);
+
+            if (!Page.IsPostBack)
+            {
+                ClearWorkingSession();
+                PrepareData();
+            }
+            else
+            {
+                BindGridSelecyStockInventory();
+            }
+        }
+
+        protected void PrepareData()
+        {
+            try
+            {
+                var dtSource = new DataTable();
+                dtSource.Columns.Add("data_value", typeof(string));
+                dtSource.Columns.Add("data_text", typeof(string));
+                dtSource.Rows.Add("P", "Product");
+                dtSource.Rows.Add("S", "SparePart");
+                cbbProductType.DataSource = dtSource;
+                cbbProductType.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static void GetProductDetailData()
+        {
+
+            var Dataselect = (List<Dataselect>)HttpContext.Current.Session["SESSION_DATASELECT"]; //sessionเก็บทั้งหมดที่เลือกมาครั้งแรก
+            var StockInventory = (List<StockInventoryData>)HttpContext.Current.Session["SESSION_STOCK_INVENTORY"]; //sessionเก็บที่เลือก
+            var dsResult = new DataSet();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_list");
+                conn.Close();
+            }
+            if (StockInventory == null || StockInventory.Count == 0) // โหลดใหม่เฉพาะ StockInventory Detail = 0
+            {
+                if (dsResult != null)
+                {
+                    Dataselect = new List<Dataselect>();
+                    var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
+                    foreach (var detail in row)
+                    {
+                        Dataselect.Add(new Dataselect()
+                        {
+                            name_tha = Convert.IsDBNull(detail["product_name_tha"]) ? string.Empty : Convert.ToString(detail["product_name_tha"]),
+                            id = Convert.IsDBNull(detail["id"]) ? 0 : Convert.ToInt32(detail["id"]),
+                            no = Convert.IsDBNull(detail["product_no"]) ? string.Empty : Convert.ToString(detail["product_no"]),
+                        });
+                    }
+                }
+            }
+            HttpContext.Current.Session["SESSION_STOCK_INVENTORY"] = StockInventory; // ย้ายดาต้าจริงเข้า Session จำลอง
+            HttpContext.Current.Session["SESSION_DATASELECT"] = Dataselect;
+
+        }
+        protected void gridViewStockInventory_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var splitStr = e.Parameters.ToString().Split('|');
+            string searchText = string.Empty;
+            string issueType = string.Empty;
+            if (splitStr.Length > 1)
+            {
+                searchText = splitStr[1];
+            }
+            if (string.IsNullOrEmpty(searchText))
+            {
+                gridViewStockInventory.DataSource = dataselect;
+                gridViewStockInventory.DataBind();
+            }
+            else
+            {
+                gridViewStockInventory.DataSource = (from t in dataselect
+                                                     where (t.no.ToUpper().Contains(searchText.ToUpper()) || t.name_tha.ToUpper().Contains(searchText.ToUpper()))
+                                                   select t).ToList();
+                gridViewStockInventory.DataBind();
+            }
+        }
+        protected void BindGridSelecyStockInventory()
+        {
+            gridViewStockInventory.DataSource = dataselect;
+            gridViewStockInventory.DataBind();
+        }
+
+        [WebMethod]
+        public static void AddStockInventoryDetail(string id, bool isSelected)
+        {
+            var Dataselect = (List<Dataselect>)HttpContext.Current.Session["SESSION_DATASELECT"]; //sessionเก็บทั้งหมดที่เลือกมาครั้งแรก
+            var SelectStockInventory = (List<StockInventoryData>)HttpContext.Current.Session["SESSION_STOCK_INVENTORY"]; //sessionเก็บที่เลือก
+            var SelectedProductDetailRow = (from t in Dataselect where t.id == Convert.ToInt32(id) select t).FirstOrDefault(); // เลือก Data จากการกดchkทุกๆ1ครั้ง
+            if (Dataselect != null)
+            {
+                if (SelectStockInventory != null) // มี StockInventory Detail
+                {
+                    var rowStockInventoryDetail = (from t in SelectStockInventory where t.id == Convert.ToInt32(id) select t).FirstOrDefault(); // เลือก Data จาก Sale ORder Detail                    
+                        if (rowStockInventoryDetail != null) // มีอยุ่ใน Issue Detail
+                        {
+                            if (isSelected) // Add
+                            {
+                                SelectedProductDetailRow.is_selected = true;
+                                rowStockInventoryDetail.is_delete = false;
+                                //if (Convert.ToInt32(rowStockInventoryDetail.id) < 0) // กรณี add เข้าStockInventory
+                                //{
+                                //    SelectStockInventory.Add(new StockInventoryData()
+                                //    {
+                                //        count = (SelectStockInventory.Count + 1) * -1,
+                                //        id = SelectedProductDetailRow.id,
+                                //        no = SelectedProductDetailRow.no,
+                                //        name_tha = SelectedProductDetailRow.name_tha,
+                                //        is_delete = false,
+                                //    });
+                                //}
+                                //else if (Convert.ToInt32(rowStockInventoryDetail.id) > 0) // กรณี EditMode
+                                //{
+                                //    rowStockInventoryDetail.is_delete = false;
+                                //}
+                            }
+                            else // Remove
+                            {
+                                SelectedProductDetailRow.is_selected = false;
+                                if (Convert.ToInt32(rowStockInventoryDetail.id) < 0) // กรณี Newmode
+                                {
+                                    SelectStockInventory.Remove(rowStockInventoryDetail); // ลบ Issue Detail
+                                }
+                                else  // กรณี EditMode
+                                {
+                                    rowStockInventoryDetail.is_delete = true; // เปลี่ยน Flag เป็นลบ แล้ว เพิ่มกลับไปยัง Sale Order
+                                
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (isSelected) // มีแค่กรณี Selected เป็น True เท่านั้น ถูกติ๊กเท่านั้น
+                            {
+                                SelectedProductDetailRow.is_selected = true;
+                                SelectStockInventory.Add(new StockInventoryData()
+                                {
+                                    count = (SelectStockInventory.Count + 1) * -1,
+                                    id = SelectedProductDetailRow.id,
+                                    no = SelectedProductDetailRow.no,
+                                    name_tha = SelectedProductDetailRow.name_tha,
+                                    is_delete = false,
+                                });
+                            }
+                        }
+                    
+                }
+                else // Add StockInventoryDetail ครั้งแรกสุกที่กด
+                {
+                    SelectStockInventory = new List<StockInventoryData>();
+                    if (SelectedProductDetailRow != null)
+                    {
+                        if (isSelected) // มีแค่กรณี Selected เป็น True เท่านั้น ถูกติ๊กเท่านั้น
+                        {
+                            SelectedProductDetailRow.is_selected = true;
+                            SelectStockInventory.Add(new StockInventoryData()
+                            {
+                                count = (SelectStockInventory.Count + 1) * -1,
+                                id = SelectedProductDetailRow.id,
+                                no = SelectedProductDetailRow.no,
+                                name_tha = SelectedProductDetailRow.name_tha,
+                                is_delete = false,
+                            });
+                        }
+                    }
+                }
+            }
+
+            HttpContext.Current.Session["SESSION_STOCK_INVENTORY"] = SelectStockInventory; // ยัดค่ากลับ Session Seltected STOCK INVENTORY detail data
+            HttpContext.Current.Session["SESSION_DATASELECT"] = Dataselect;                  // ยัดค่ากลับ Session Product Detail Data
+        }
+
+        [WebMethod]
+        public static void GetSparePartDetailData()
+        {
+            var Dataselect = (List<Dataselect>)HttpContext.Current.Session["SESSION_DATASELECT"]; //sessionเก็บทั้งหมดที่เลือกมาครั้งแรก
+            var StockInventory = (List<StockInventoryData>)HttpContext.Current.Session["SESSION_STOCK_INVENTORY"]; //sessionเก็บที่เลือก
+            var dsResult = new DataSet();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                dsResult = SqlHelper.ExecuteDataset(conn, "sp_product_spare_part_list");
+                conn.Close();
+            }
+            if (StockInventory == null || StockInventory.Count == 0) // โหลดใหม่เฉพาะ StockInventory Detail = 0
+            {
+                if (dsResult != null)
+                {
+                    Dataselect = new List<Dataselect>();
+                    var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
+                    foreach (var detail in row)
+                    {
+                        Dataselect.Add(new Dataselect()
+                        {
+                            name_tha = Convert.IsDBNull(detail["part_name_tha"]) ? string.Empty : Convert.ToString(detail["part_name_tha"]),
+                            id = Convert.IsDBNull(detail["id"]) ? 0 : Convert.ToInt32(detail["id"]),
+                            no = Convert.IsDBNull(detail["part_no"]) ? string.Empty : Convert.ToString(detail["part_no"]),
+                        });
+                    }
+                }
+            }
+            HttpContext.Current.Session["SESSION_STOCK_INVENTORY"] = StockInventory; // ย้ายดาต้าจริงเข้า Session จำลอง
+            HttpContext.Current.Session["SESSION_DATASELECT"] = Dataselect;
+
+        }
+
+        [WebMethod]
+        public static string SubmitStockInventoryDetail(string productType, string datepickerFrom, string datepickerTo)
+        {
+            var datanull = 0;
+            var dsResult = new DataSet();
+            var reportStockInventoryData = new List<ReportStockInventoryData>();
+            string product_id_list = string.Empty;
+            var selectedStockInventory = (List<StockInventoryData>)HttpContext.Current.Session["SESSION_STOCK_INVENTORY"];
+            var dataselect = (List<Dataselect>)HttpContext.Current.Session["SESSION_DATASELECT"];
+            if (selectedStockInventory != null)
+            {
+                var row = (from t in selectedStockInventory where t.is_delete != true select t.id ).ToList();
+                foreach (var detail in row)
+                {
+                    if (string.IsNullOrEmpty(product_id_list))
+                    {
+                        product_id_list = "(" + "A" + detail + "A,";
+                    }
+                    else
+                    {
+                        product_id_list += "A" + (detail) + "A,";
+                    }
+                }
+                if (product_id_list.Length > 0)
+                {
+                    product_id_list = product_id_list.Remove(product_id_list.Length - 1);
+                }
+                product_id_list += ")";
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@product_id_list", SqlDbType.VarChar,8000) { Value = product_id_list },
+                            new SqlParameter("@date_from", SqlDbType.VarChar,200) { Value =  datepickerFrom },
+                            new SqlParameter("@date_to", SqlDbType.VarChar,200) { Value =  datepickerTo},
+                            new SqlParameter("@product_type", SqlDbType.VarChar,1) { Value =  productType},
+
+                        };
+
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_stock_inventory_report", arrParm.ToArray());
+
+                    if (dsResult.Tables[0].Rows.Count > 0)
+                    {
+                        datanull = 1;
+                        foreach (var row in dsResult.Tables[0].AsEnumerable())
+                        {
+                            reportStockInventoryData.Add(new ReportStockInventoryData()
+                            {
+                                stock_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                stock_name = Convert.IsDBNull(row["product_name"]) ? string.Empty : Convert.ToString(row["product_name"]),
+                                stock_in = Convert.IsDBNull(row["qty_in"]) ? string.Empty  : Convert.ToString(row["qty_in"]),
+                                stock_out = Convert.IsDBNull(row["qty_out"]) ? string.Empty : Convert.ToString(row["qty_out"]),
+                                stock_balance = Convert.IsDBNull(row["qty_balance"]) ? string.Empty : Convert.ToString(row["qty_balance"]),
+                                stock_update = Convert.IsDBNull(row["stock_update"]) ? string.Empty : Convert.ToString(row["stock_update"]),
+                                stock_lost = Convert.IsDBNull(row["stock_lost"]) ? string.Empty : Convert.ToString(row["stock_lost"]),
+
+                            });
+                        }
+                    }
+
+
+                }
+                HttpContext.Current.Session["SESSION_STOCK_INVENTORY_REPORT"] = reportStockInventoryData;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            if (datanull == 0)
+            {
+                product_id_list = "";
+            }
+            return product_id_list;
+        }
+
+        protected void gridreportStockInventory_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridView.DataSource = (from t in reportStockInventoryData select t).ToList();
+            gridView.DataBind();
+        }
+
+        protected void gridViewStockInventory_HtmlDataCellPrepared(object sender, DevExpress.Web.ASPxGridViewTableDataCellEventArgs e)
+        {
+            ASPxCheckBox checkBox = gridViewStockInventory.FindRowCellTemplateControl(e.VisibleIndex, e.DataColumn, "chkStockInventoryDetail") as ASPxCheckBox;
+            if (checkBox != null)
+            {
+                if (e.DataColumn.FieldName == "is_selected")
+                {
+                    if (stockCardData != null)
+                    {
+                        var row = (from t in stockCardData where t.id == Convert.ToInt32(e.KeyValue) && !t.is_delete select t).FirstOrDefault();
+                        if (row != null)
+                        {
+                            checkBox.Checked = true;
+                        }
+                        else
+                        {
+                            checkBox.Checked = false;
+                        }
+                    }
+                }
+            }
+        }
+        [WebMethod]
+        public static string ChangedData()
+        {
+            string returnData = string.Empty;
+            HttpContext.Current.Session.Remove("SESSION_STOCK_INVENTORY");
+            HttpContext.Current.Session.Remove("SESSION_DATASELECT");
+            HttpContext.Current.Session.Remove("SESSION_STOCK_INVENTORY_REPORT");
+            
+            return returnData;
+        }
+        [WebMethod]
+        public static string SelectAllStockInventory(bool selected, string product_type)
+        {
+            var result = "";
+            var Dataselect = (List<Dataselect>)HttpContext.Current.Session["SESSION_DATASELECT"]; //sessionเก็บทั้งหมดที่เลือกมาครั้งแรก
+            var SelectStockInventory = (List<StockInventoryData>)HttpContext.Current.Session["SESSION_STOCK_INVENTORY"]; //sessionเก็บที่เลือก
+
+
+            /////////
+            if (Dataselect != null)
+            {
+                foreach (var data in Dataselect)
+                {
+                    if (selected)
+                    {
+                        data.is_selected = true;
+                        if (SelectStockInventory != null && SelectStockInventory.Count > 0)
+                        {
+                            var rowExist = (from t in SelectStockInventory where t.id == data.id select t).FirstOrDefault();
+
+                            if (rowExist != null) // กรณี Newmode
+                            {
+                                rowExist.is_delete = false;
+                            }
+                            else
+                            {
+                                SelectStockInventory.Add(new StockInventoryData()
+                                {
+                                    count = (SelectStockInventory.Count + 1) * -1,
+                                    id = data.id,
+                                    no = data.no,
+                                    name_tha = data.name_tha,
+                                    is_delete = false,
+                                });
+                            }
+                        }
+                        else
+                        {
+                            if (SelectStockInventory == null)
+                            {
+                                SelectStockInventory = new List<StockInventoryData>();
+                            }
+                            SelectStockInventory.Add(new StockInventoryData()
+                            {
+                                count = (SelectStockInventory.Count + 1) * -1,
+                                id = data.id,
+                                no = data.no,
+                                name_tha = data.name_tha,
+                                is_delete = false,
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var rowExist = (from t in SelectStockInventory where t.id == data.id select t).FirstOrDefault();
+                        data.is_selected = false;
+                        if (rowExist != null) // กรณี Newmode
+                        {
+                            if (rowExist.id < 0)
+                            {
+                                SelectStockInventory.Remove(rowExist);
+                            }
+                            else
+                            {
+                                rowExist.is_delete = true;
+                            }
+                        }
+                    }
+                }
+            }
+   
+            HttpContext.Current.Session["SESSION_DATASELECT"] = Dataselect;
+            HttpContext.Current.Session["SESSION_STOCK_INVENTORY"] = SelectStockInventory;
+            result = "P";
+
+
+            return result;
+        }
+    }
+}

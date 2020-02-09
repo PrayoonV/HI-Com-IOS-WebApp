@@ -1,0 +1,54 @@
+﻿using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+
+namespace HicomIOS.ClassUtil
+{
+    public class Permission
+    {
+        public static void GetPermission(int user_group_id, string page_name)
+        {
+            var dsDataPermission = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@group_id", SqlDbType.Int) { Value = Convert.ToInt32(user_group_id) },
+                            new SqlParameter("@screen_name", SqlDbType.VarChar,200) { Value = Convert.ToString(page_name) }
+                        };
+                    conn.Open();
+                    dsDataPermission = SqlHelper.ExecuteDataset(conn, "sp_security_permission_screen_list", arrParm.ToArray());
+                    conn.Close();
+                }
+
+                if (dsDataPermission.Tables[0].Rows.Count > 0)
+                {
+                    var row = dsDataPermission.Tables[0].Rows[0];
+                    BasePage.SESSION_PERMISSION_SCREEN = new BasePage.PermissionScreeen();
+                    BasePage.SESSION_PERMISSION_SCREEN.name_eng = Convert.IsDBNull(row["name_eng"]) ? null : Convert.ToString(row["name_eng"]);
+                    BasePage.SESSION_PERMISSION_SCREEN.is_view = Convert.IsDBNull(row["is_view"]) ? false : Convert.ToBoolean(row["is_view"]);
+                    BasePage.SESSION_PERMISSION_SCREEN.is_create = Convert.IsDBNull(row["is_create"]) ? false : Convert.ToBoolean(row["is_create"]);
+                    BasePage.SESSION_PERMISSION_SCREEN.is_edit = Convert.IsDBNull(row["is_edit"]) ? false : Convert.ToBoolean(row["is_edit"]);
+                    BasePage.SESSION_PERMISSION_SCREEN.is_del = Convert.IsDBNull(row["is_del"]) ? false : Convert.ToBoolean(row["is_del"]);
+                    BasePage.SESSION_PERMISSION_SCREEN.is_print = Convert.IsDBNull(row["is_print"]) ? false : Convert.ToBoolean(row["is_print"]);
+                }
+                else {
+                    BasePage.SESSION_PERMISSION_SCREEN = new BasePage.PermissionScreeen();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                //ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}

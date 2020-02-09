@@ -1,0 +1,313 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+
+namespace HicomIOS.Master
+{
+    public partial class Notification : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public override string PageName { get { return "Notification"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public class NotificationDetail
+        {
+            public int id { get; set; }
+            public string notice_type { get; set; }
+            public DateTime notice_date { get; set; }
+            public string date { get; set; }
+            public int customer_id { get; set; }
+            public string subject { get; set; }
+            public string description { get; set; }
+            public string company_name_tha { get; set; }
+            public int is_enable { get; set; }
+            public string enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+            public string display_notice_date { get; set; }
+        }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+        List<NotificationDetail> notificationDetail
+        {
+            get
+            {
+                if (Session["SESSION_NOTIFICATION_LIST"] == null)
+                    Session["SESSION_NOTIFICATION_LIST"] = new List<NotificationDetail>();
+                return (List<NotificationDetail>)Session["SESSION_NOTIFICATION_LIST"];
+            }
+            set
+            {
+                Session["SESSION_NOTIFICATION_LIST"] = value;
+            }
+        }
+
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            if (!Page.IsPostBack)
+            {
+                PrepareData();
+                ClearWoringSession();
+                BindGrid(true);
+
+            }
+            else
+            {
+
+                BindGrid(false);
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+                
+                var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(string));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    dtSource.Rows.Add("RM", "Remind"); 
+                    dtSource.Rows.Add("RE", "Repair");
+                    cboNoticeType.DataSource = dtSource;
+                    cboNoticeType.DataBind();
+               
+                SPlanetUtil.BindASPxComboBox(ref cboCustomer, DataListUtil.DropdownStoreProcedureName.Customer);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void ClearWoringSession()
+        {
+            Session.Remove("SESSION_NOTIFICATION_LIST");
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@customer_id", SqlDbType.Int) { Value = 0 },
+                             new SqlParameter("@user_id", SqlDbType.Int) { Value = ConstantClass.SESSION_USER_ID }
+
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_notification_list", arrParm.ToArray());
+
+                        if (dsResult != null)
+                        {
+                            var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
+                            foreach (var data in row)
+                            {
+                                notificationDetail.Add(new NotificationDetail()
+                                {
+                                    id = Convert.ToInt32(data["id"]),
+                                    notice_type = Convert.IsDBNull(data["notice_type"]) ? null : Convert.ToString(data["notice_type"]),
+                                    notice_date = Convert.ToDateTime(data["notice_date"]),
+                                    customer_id = Convert.IsDBNull(data["customer_id"]) ? 0 : Convert.ToInt32(data["customer_id"]),
+                                    subject     = Convert.IsDBNull(data["subject"]) ? null : Convert.ToString(data["subject"]),
+                                    enable = Convert.IsDBNull(data["enable"]) ? null : Convert.ToString(data["enable"]),
+                                    description = Convert.IsDBNull(data["description"]) ? null : Convert.ToString(data["description"]),
+                                    company_name_tha = Convert.IsDBNull(data["company_name_tha"]) ? null : Convert.ToString(data["company_name_tha"]),
+
+                                });
+                            }
+                        }
+
+                        HttpContext.Current.Session["SESSION_NOTIFICATION_LIST"] = notificationDetail;
+                    }
+                }
+               
+                gridView.DataSource = notificationDetail;
+                gridView.DataBind();
+
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        [WebMethod]
+        public static void DeleteNotification(string id)
+        {
+            
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_notification_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+            }
+            
+        }
+
+        [WebMethod]
+        public static NotificationDetail NotificationEdit(string id)
+        {
+            var callDataNotification = new NotificationDetail();
+            var dsDataNotification = new DataSet();
+            try
+            {
+                using(SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                       new SqlParameter ("@id",SqlDbType.Int){ Value = Convert.ToInt32(id)},
+                       new SqlParameter("@customer_id", SqlDbType.Int) { Value = 0 },
+                       new SqlParameter("@user_id", SqlDbType.Int) { Value = ConstantClass.SESSION_USER_ID }
+                    };
+                    conn.Open();
+                    dsDataNotification = SqlHelper.ExecuteDataset(conn, "sp_notification_list", arrParm.ToArray());
+                    conn.Close();
+                }
+                if (dsDataNotification.Tables.Count > 0)
+                {
+                    var row = dsDataNotification.Tables[0].Rows[0];
+                    callDataNotification.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    callDataNotification.notice_type = Convert.IsDBNull(row["notice_type"]) ? null : Convert.ToString(row["notice_type"]);
+                    callDataNotification.date = Convert.ToString(row["notice_date"]);
+                    callDataNotification.is_enable = Convert.ToInt32(row["is_enable"]);
+                    callDataNotification.customer_id = Convert.IsDBNull(row["customer_id"]) ? 0 : Convert.ToInt32(row["customer_id"]);
+                    callDataNotification.subject = Convert.IsDBNull(row["subject"]) ? null : Convert.ToString(row["subject"]);
+                    callDataNotification.description = Convert.IsDBNull(row["description"]) ? null : Convert.ToString(row["description"]);
+                    callDataNotification.company_name_tha = Convert.IsDBNull(row["company_name_tha"]) ? null : Convert.ToString(row["company_name_tha"]);
+                    callDataNotification.display_notice_date = Convert.IsDBNull(row["notice_date"]) ? null : 
+                                                                    Convert.ToDateTime(row["notice_date"]).ToString("dd/MM/yyyy HH:mm");
+                    
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return callDataNotification;
+        }
+        [WebMethod]
+        public static void NotificationConfirmAdd(NotificationDetail[] dataNotic)
+        {
+            int newID = DataListUtil.emptyEntryID; //idเปล่า
+            var row = (from t in dataNotic select t).FirstOrDefault();
+            if (row != null)
+            {
+                try {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_notification_add", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@subject", SqlDbType.VarChar, 100).Value = row.subject;
+                            cmd.Parameters.Add("@description", SqlDbType.VarChar, 100).Value = row.description;
+                            cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = Convert.ToInt32(row.customer_id);
+                            cmd.Parameters.Add("@notice_type", SqlDbType.VarChar, 2).Value = row.notice_type;
+                            cmd.Parameters.Add("@notice_date", SqlDbType.DateTime).Value = row.notice_date;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = Convert.ToInt32(row.is_enable);
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = 0;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@company_name_tha", SqlDbType.VarChar, 300).Value = row.company_name_tha;
+
+
+                            conn.Open();
+                            newID = Convert.ToInt32(cmd.ExecuteScalar());
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+
+            }
+            
+        }
+        [WebMethod]
+        public static void NotificationConfirmEdit(NotificationDetail[] dataNotic)
+        {
+            var dataedit = (from Notificationedit in dataNotic select Notificationedit).FirstOrDefault();
+            if(dataedit != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_notification_edit", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(dataedit.id);
+                            cmd.Parameters.Add("@subject", SqlDbType.VarChar, 100).Value = dataedit.subject;
+                            cmd.Parameters.Add("@description", SqlDbType.VarChar, 100).Value = dataedit.description;
+                            cmd.Parameters.Add("@notice_date", SqlDbType.DateTime).Value = dataedit.notice_date;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = Convert.ToInt32(dataedit.is_enable);
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+        }
+    }
+}

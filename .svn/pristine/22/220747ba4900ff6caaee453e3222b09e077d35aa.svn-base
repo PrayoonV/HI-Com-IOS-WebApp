@@ -1,0 +1,334 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="QuotationList.aspx.cs" Inherits="HicomIOS.Master.QuotationList" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <style>
+        .btn-labelEdit {
+            cursor: pointer;
+        }
+
+        a:link {
+            text-decoration: none !important;
+        }
+
+        a:active {
+            text-decoration: underline !important;
+        }
+
+        a:hover {
+            text-decoration: underline !important;
+        }
+
+        .swal-modal {
+            width: 420px !important;
+            height: 250px !important;
+        }
+
+        .swal-title {
+            font-size: 18px !important;
+        }
+
+        .swal-overlay:before {
+            height: 40% !important;
+        }
+
+        .swal-button {
+            padding: 5px 15px;
+        }
+
+        .disabled {
+            pointer-events: none;
+        }
+    </style>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="text/javascript">
+        //$('#gridCell').css({
+        //    'height': '550px;'
+        //});
+    </script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <button type="button" onclick="NewQuotationList()" class="btn-addItem btn-new btn-new1 <%= ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_create) ? "" : "hidden" %>">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        &nbsp;New Quotation
+    </button>
+    <div class="div-search-box">
+        <input type="text" id="txtSearchBoxData" class="form-control" placeholder="กรอกคำค้นหา..." runat="server" onkeypress="searchDataGrid(event.keyCode)" />
+        <button type="button" class="btn-addItem" id="btnSubmitSearch" onclick="searchDataGrid(13);">
+            <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+        </button>
+    </div>
+    <div id="gridCell">
+        <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridView"
+            Width="100%" KeyFieldName="id" EnableCallBacks="true" OnCustomCallback="gridView_CustomCallback">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editNotice(<%# Eval("id")%>)" title="Edit">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                        |
+                        <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteNotice(<%# Eval("id")%>)" title="Delete">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn Caption="Revision" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
+                    <DataItemTemplate>
+                        <a id="btnRevision" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>"
+                            href="javascript:revisionQuotation(<%# Eval("id")%>, '<%# ((bool)Eval("is_revise_doc")) ? "0" : "1"%>')"
+                            <%# ((bool)Eval("is_revise_doc")) ? "" : "disabled" %>
+                            title="Revision">
+                            <i class="fa fa-file-o" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn Caption="Clone" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
+                    <DataItemTemplate>
+                        <a id="btnClone" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_create) ? "" : "disabled" %>"
+                            onclick="cloneQuotation(<%# Eval("id")%>)" title="Clone">
+                            <i class="fa fa-copy" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn Caption="Print" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
+                    <DataItemTemplate>
+                        <a id="btnPrint" class="btn btn-mini" onclick="printQuotation(<%# Eval("id")%>)" title="Print">
+                            <i class="fa fa-print" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="70px">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn-labelEdit  <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editNotice(<%# Eval("id")%>)" title="Edit">
+                            <%# Eval("quotation_no")%>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="quotation_status_display" Caption="Status" Width="50px" />
+                <dx:GridViewDataTextColumn FieldName="company_name_tha" Caption="Customer Name" Width="200px" />
+                <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false"
+                    FieldName="grand_total" Caption="Grand Total(THB)" Width="60px">
+                    <PropertiesSpinEdit DisplayFormatString="n" DisplayFormatInEditMode="true" MinValue="0" MaxValue="99999999">
+                        <ValidationSettings Display="Dynamic" RequiredField-IsRequired="true" />
+                    </PropertiesSpinEdit>
+                </dx:GridViewDataSpinEditColumn>
+                <dx:GridViewDataTextColumn FieldName="sales_name" Caption="Sales Name" Width="90px" />
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
+            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
+
+
+    </div>
+    <script type="text/javascript">
+            $(document).ready(function () {
+
+                var h = window.innerHeight;
+                gridView.SetHeight(h - 155);
+            });
+            ASPxClientControl.GetControlCollection().BrowserWindowResized.AddHandler(function (s, e) {
+                console.log(s);
+                var dimensions = {
+                    height: (event.srcElement || event.currentTarget).innerHeight,
+                    width: (event.srcElement || event.currentTarget).innerWidth
+                };
+                //console.log(dimensions);
+                //var a = $('#gridView').length;
+                var height = dimensions.height - 152;
+                //document.getElementById('gridCell').setAttribute("style", "height:" + height + "px");
+                console.log(height);
+                gridView.SetHeight(height);
+            });
+            function NewQuotationList() {
+                window.location.href = "Quotation.aspx";
+            }
+
+            function editNotice(e) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                //var input = s.GetMainElement();
+                var key = e;//$(input).attr("noticeId");
+
+                window.location.href = "Quotation.aspx?dataId=" + key;
+                $.LoadingOverlay("hide");
+            }
+
+            function cloneQuotation(e) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                //var input = s.GetMainElement();
+                var key = e;//$(input).attr("noticeId");
+
+                window.location.href = "Quotation.aspx?cloneId=" + key;
+                $.LoadingOverlay("hide");
+            }
+            function revisionQuotation(e, isRevise) {
+                if (isRevise == "1") {
+                    return false;
+                }                
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                //var input = s.GetMainElement();
+                var key = e;//$(input).attr("noticeId");
+
+                window.location.href = "Quotation.aspx?revisionId=" + key;
+                $.LoadingOverlay("hide");
+            }
+            function printQuotation(e) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+                var key = e;
+
+                $.ajax({
+                    type: "POST",
+                    url: "QuotationList.aspx/GetQuotationData",
+                    data: '{id:"' + key + '"}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var data = response.d;
+                        //if (data.quotation_status == "FL") {
+                        //    $.LoadingOverlay("hide");
+                        //    alert("เอกสาร " + data.quotation_no + " ไม่สามารถพิมพ์ได้");
+                        //    return;
+                        //}
+                        var QuotationType = data.quotation_type;
+                        var isDiscount = false;
+                        if (data.is_discount_by_item) {
+
+                            isDiscount = true;
+                        }
+
+                        var is_net = data.is_net;
+
+                        console.log("is_net=" + is_net);
+                        //if (data.discount1_type != null) {
+                        //    isDiscount = true;
+                        //}
+                        //if (data.discount2_type != null) {
+                        //    isDiscount = true;
+                        //}
+                        if (!is_net) {
+                            if (QuotationType == "P" && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "P" && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "A" && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "A" && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "S" && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "S" && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "M" && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "M" && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Report|" + data.quotation_no, "_blank");
+                            } else if ((QuotationType == "C" || QuotationType == "O") && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if ((QuotationType == "C" || QuotationType == "O") && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "D" && isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Discount_Item_Report|" + data.quotation_no, "_blank");
+                            } else if (QuotationType == "D" && !isDiscount) {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                        }
+                        else {
+
+                            if (QuotationType == "S") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "P") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "A") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "S") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "M") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_PartNo_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "C" || QuotationType == "O") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                            else if (QuotationType == "D") {
+                                window.open("../Report/DocumentViewer.aspx?ReportArgs=Quotaion_Description_Report|" + data.quotation_no, "_blank");
+                            }
+                        }
+
+                        $.LoadingOverlay("hide");
+
+                    }
+
+                });
+
+
+            }
+
+            function deleteNotice(e) {
+                var id = e;
+                swal({
+                    title: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $.ajax({
+                                type: "POST",
+                                url: "QuotationList.aspx/DeleteQuatationList",
+                                data: '{id:"' + id + '"}',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.d == "success") {
+                                        swal("ลบข้อมูลสำเร็จ!", {
+                                            icon: "success"
+                                        })
+                                            .then((value) => {
+                                                window.location.reload();
+                                            });
+                                    } else {
+                                        swal("การลบข้อมูลผิดพลาด!", {
+                                            icon: "error"
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+            }
+
+            function searchDataGrid(e) {
+                if (e == 13) {
+                    $.LoadingOverlay("show", {
+                        zIndex: 9999
+                    });
+
+                    var txtSearch = $("#txtSearchBoxData").val();
+                    gridView.PerformCallback(txtSearch.toString());
+
+                    $.LoadingOverlay("hide");
+                }
+            }
+    </script>
+</asp:Content>

@@ -1,0 +1,87 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="StockCheckingList.aspx.cs" Inherits="HicomIOS.Master.StockCheckingList" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+     <style>
+       .btn-labelEdit{
+                cursor: pointer; 
+       }
+          a:link {
+            text-decoration: none !important;
+        }
+
+        a:active {
+            text-decoration: underline !important;
+        }
+
+        a:hover {
+            text-decoration: underline !important;;
+        }
+        .disabled {
+          pointer-events: none;
+         }
+    </style>
+    <script type="text/javascript">
+        $('#gridCell').css({
+            'height': '550px;'
+        });
+    </script>
+    <button type="button" onclick="addNewItem()" class="btn-addItem btn-new btn-new1" style="height: 30px; position: absolute; top: 77px;">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+        &nbsp;New Stock Checking
+    </button>
+    <div id="gridCell">
+        <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridView"
+            Width="100%" KeyFieldName="transection_no">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <%-- DXCOMMENT: Configure ASPxGridView's columns in accordance with datasource fields --%>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption="#" FieldName="transection_no" CellStyle-HorizontalAlign="Center" Width="30px">
+                    <DataItemTemplate>
+                        <a id="btnView" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="viewItem('<%# Eval("transection_no").ToString()%>')" title="View">
+                            <i class="fa fa-eye" aria-hidden="true"></i>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="transection_no" Caption="Transection No" Width="100px" >
+                <DataItemTemplate>
+                        <a id="btnEdit" class="btn-labelEdit <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="viewItem('<%# Eval("transection_no").ToString()%>')" title="View">
+                           <%# Eval("transection_no")%>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="transection_date" Caption="Transection Date" Width="100px" />
+                <dx:GridViewDataTextColumn FieldName="display_product_type" Caption="Product Type" Width="100px" />
+                <dx:GridViewDataTextColumn FieldName="display_transection_type" Caption="Transection Type" Width="100px" />
+                <dx:GridViewDataTextColumn FieldName="display_movement_type" Caption="Movement Type" Width="100px" />
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="250" />
+            <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+            <SettingsPopup>
+                <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+            </SettingsPopup>
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
+    </div>
+    <script type="text/javascript">
+        function addNewItem() {
+            window.location.href = "StockChecking.aspx";
+        }
+
+        function viewItem(e) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = e;
+            window.location.href = "StockChecking.aspx?dataNo=" + key;
+            $.LoadingOverlay("hide");
+        }
+
+    </script>
+</asp:Content>

@@ -1,0 +1,243 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class StockCard : MasterDetailPage
+    {
+        public class StockCardData
+        {
+            public string datepickerFrom { get; set; }
+            public string datepickerTo { get; set; }
+            public int product_id { get; set; }
+            public string product_type { get; set; }
+            public int product_cat { get; set; }
+            public int shelf { get; set; }
+            public string no_ { get; set; }
+            public string name_ { get; set; }
+            public string cat_name { get; set; }
+            public string remark { get; set; }
+            public int in_ { get; set; }
+            public int out_ { get; set; }
+            public int stock_balance { get; set; }
+        }
+        List<StockCardData> stockCardData
+        {
+            get
+            {
+                if (Session["SESSION_STOCK_CARD"] == null)
+                    Session["SESSION_STOCK_CARD"] = new List<StockCardData>();
+                return (List<StockCardData>)Session["SESSION_STOCK_CARD"];
+            }
+            set
+            {
+                Session["SESSION_STOCK_CARD"] = value;
+            }
+        }
+        public override string PageName { get { return "Stock Card"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            if (!Page.IsPostBack)
+            {
+                PrepareData();
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+
+                var dtSource = new DataTable();
+                dtSource.Columns.Add("data_value", typeof(string));
+                dtSource.Columns.Add("data_text", typeof(string));
+                dtSource.Rows.Add("PP", "Product");
+                dtSource.Rows.Add("SP", "SparePart");
+                cbbProductType.DataSource = dtSource;
+                cbbProductType.DataBind();
+
+                //SPlanetUtil.BindASPxComboBox(ref cbbProduct, DataListUtil.DropdownStoreProcedureName.Product);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+
+        public override void OnFilterChanged()
+        {
+            //BindGrid();
+        }
+        [WebMethod]
+        public static string ChangedData()
+        {
+            string returnData = string.Empty;
+            HttpContext.Current.Session.Remove("SESSION_STOCK_CARD");
+            return returnData;
+        }
+        [WebMethod]
+        public static string GetViewGrid(StockCardData[] dataStockCard)
+        {
+            var result = "";
+            var stockCardData = new List<StockCardData>();
+            var data = (from t in dataStockCard select t).FirstOrDefault();
+            if (data != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@product_id", SqlDbType.Int) { Value = data.product_id },
+                             new SqlParameter("@date_from", SqlDbType.VarChar,20) { Value = data.datepickerFrom },
+                             new SqlParameter("@date_to", SqlDbType.VarChar,20) { Value = data.datepickerTo },
+                             new SqlParameter("@product_type", SqlDbType.VarChar,3) { Value = data.product_type },
+                             new SqlParameter("@shelf", SqlDbType.Int) { Value = data.shelf },
+                             new SqlParameter("@product_cat", SqlDbType.Int) { Value = data.product_cat },
+                        };
+                        conn.Open();
+                      var  dsDatastockCard = SqlHelper.ExecuteDataset(conn, "sp_stock_card_report", arrParm.ToArray());
+
+                        if (dsDatastockCard.Tables[0].Rows.Count > 0)
+                        {
+                            foreach (var row in dsDatastockCard.Tables[0].AsEnumerable())
+                            {
+                                stockCardData.Add(new StockCardData()
+                                {
+                                    no_ = Convert.IsDBNull(row["no_"]) ? string.Empty : Convert.ToString(row["no_"]),
+                                    name_ = Convert.IsDBNull(row["name_"]) ? string.Empty : Convert.ToString(row["name_"]),
+                                    remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                    in_ = Convert.IsDBNull(row["in_"]) ? 0 : Convert.ToInt32(row["in_"]),
+                                    out_ = Convert.IsDBNull(row["out_"]) ? 0 : Convert.ToInt32(row["out_"]),
+                                    cat_name = Convert.IsDBNull(row["cat_name_tha"]) ? string.Empty : Convert.ToString(row["cat_name_tha"]),
+                                    stock_balance = Convert.IsDBNull(row["stock_balance"]) ? 0 : Convert.ToInt32(row["stock_balance"]),
+                                });
+                            }
+                        }
+                    }
+
+                    HttpContext.Current.Session["SESSION_STOCK_CARD"] = stockCardData;
+                    if (stockCardData.Count < 0)
+                    {
+                        result = "error";
+                        
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return result;
+
+        }
+        protected void gridStockCard_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            
+            gridView.DataSource = (from t in stockCardData select t).ToList();
+            gridView.DataBind();
+        }
+
+        protected void cbbProductCat_Callback(object sender, CallbackEventArgsBase e)
+        {
+            var productTtype = e.Parameter.ToString();
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@type", SqlDbType.VarChar,3) { Value = productTtype},
+                    };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product_category", arrParm.ToArray());
+                    conn.Close();
+                   cbbProductCat.DataSource = dsResult;
+                   cbbProductCat.TextField = "data_text";
+                   cbbProductCat.ValueField = "data_value";
+                   cbbProductCat.DataBind();
+            }
+        }
+        protected void cbbProduct_Callback(object sender, CallbackEventArgsBase e)
+        {
+            var productTtype = e.Parameter.ToString();
+            if (productTtype == "PP")
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                    };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product", arrParm.ToArray());
+                    conn.Close();
+                    cbbProduct.DataSource = dsResult;
+                    cbbProduct.TextField = "data_text";
+                    cbbProduct.ValueField = "data_value";
+                    //cbbProduct.SelectedIndex = "All";
+                    cbbProduct.DataBind();
+
+                }
+            }
+            else if (productTtype == "SP")
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                    };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product_spare_part", arrParm.ToArray());
+                    conn.Close();
+                    cbbProduct.DataSource = dsResult;
+                    cbbProduct.TextField = "data_text";
+                    cbbProduct.ValueField = "data_value";
+                    cbbProduct.DataBind();
+
+                }
+            }
+        }
+        protected void cbbShelf_Callback(object sender, CallbackEventArgsBase e)
+        {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                    };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_shelf", arrParm.ToArray());
+                    conn.Close();
+                    cbbShelf.DataSource = dsResult;
+                    cbbShelf.TextField = "data_text";
+                    cbbShelf.ValueField = "data_value";
+                    cbbShelf.DataBind();
+                
+            }
+           
+        }
+    }
+
+}
+

@@ -1,0 +1,389 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="StockInventory.aspx.cs" Inherits="HicomIOS.Master.StockInventory" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+   <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <style>
+        #SearchBox{
+            display:none;
+        }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            margin: 1px 0 0;
+        }
+
+        .modal-open {
+            opacity: 0.7;
+        }
+
+        .modal-content {
+            border-radius: 0;
+            background-color: white;
+            /*border: 1px solid #909aa6;*/
+            border-collapse: separate;
+        }
+        .modal-content .modal-header {
+            background: #bbcee6 url(/DXR.axd?r=0_4062-wP3qf) repeat-x left top;
+            border-bottom: 1px solid #909aa6;
+            padding: 8px 0 6px 12px;
+            color: #1e395b;
+            font: 11px Verdana, Geneva, sans-serif;
+            height: 29px;
+       }
+        .btn-reportItem {
+            margin-bottom: 7px;
+            margin-left: 15px;
+        }
+    </style>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".picker").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+            var h = window.innerHeight;
+            gridView.SetHeight(h - 290);
+        });
+        ASPxClientControl.GetControlCollection().BrowserWindowResized.AddHandler(function (s, e) {
+            console.log(s);
+            var dimensions = {
+                height: (event.srcElement || event.currentTarget).innerHeight,
+                width: (event.srcElement || event.currentTarget).innerWidth
+            };
+            //console.log(dimensions);
+            //var a = $('#gridView').length;
+            var height = dimensions.height - 292;
+            //document.getElementById('gridCell').setAttribute("style", "height:" + height + "px");
+            console.log(height);
+            gridView.SetHeight(height);
+        });
+        function popupStockInventoryDetail() {
+
+            var productType = cbbProductType.GetValue();
+            var datepickerFrom = $('#datepickerFrom').val();
+            var datepickerTo = $('#datepickerTo').val();
+            if (productType == "" || productType == null || productType == undefined) {
+                alert("กรุณาเลือกประเภทสินค้า");
+                return;
+            }
+            else if (datepickerFrom == "" || datepickerFrom == null && datepickerTo == "" || datepickerTo == null) {
+                alert("กรุณาเลือกวันที่ออกรายงาน");
+                return;
+            }
+            if (productType == 'P') {
+                $.ajax({
+                    type: "POST",
+                    url: "StockInventory.aspx/GetProductDetailData",
+                    data: {},
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function () {
+
+                        gridViewStockInventory.PerformCallback();
+                        $('#hdproductType').val(productType);
+                        $('#hddatepickerFrom').val(datepickerFrom);
+                        $('#hddatepickerTo').val(datepickerTo);
+                        setTimeout(function () {
+                            $('#modal_StockInventory').modal('show');
+                        }, 0.8);
+                    }
+
+                });
+            }
+            else if (productType == 'S') {
+                $.ajax({
+                    type: "POST",
+                    url: "StockInventory.aspx/GetSparePartDetailData",
+                    data: {},
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+
+                        gridViewStockInventory.PerformCallback();
+                        $('#hdproductType').val(productType);
+                        $('#hddatepickerFrom').val(datepickerFrom);
+                        $('#hddatepickerTo').val(datepickerTo);
+
+                        setTimeout(function () {
+
+                            $('#modal_StockInventory').modal('show');
+                        }, 0.8);
+                    }
+
+                });
+            }
+
+        }
+        function changedProductType() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $('#datepickerFrom').val("");
+            $('#datepickerTo').val("");
+            
+            $.ajax({
+                type: "POST",
+                url: "StockInventory.aspx/ChangedData",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridView.PerformCallback()
+                },
+                failure: function (response) {
+                }
+            });
+         
+            $.LoadingOverlay("hide");
+
+        }
+        function chkproduct(s, e) {
+            var value = s.GetChecked();
+            var input = s.GetMainElement();
+            var id = $(input).attr("ProductDetailId");
+            $.ajax({
+                type: "POST",
+                url: "StockInventory.aspx/AddStockInventoryDetail",
+                data: '{id:"' + id + '" , isSelected : ' + value + '}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    console.log("Add Complete");
+                }
+            });
+        }
+
+        function submitStockInventoryDetail() {
+            var productType = $('#hdproductType').val();
+            var datepickerFrom = $('#hddatepickerFrom').val();
+            var datepickerTo = $('#hddatepickerTo').val();
+            console.log(datepickerFrom);
+            console.log(datepickerTo);
+            console.log(productType);
+            $.ajax({
+                type: "POST",
+                url: "StockInventory.aspx/SubmitStockInventoryDetail",
+                data: '{productType:"' + productType + '" , datepickerFrom : "' + datepickerFrom + '" , datepickerTo : "' + datepickerTo + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    setTimeout(function () {
+                        $('#modal_StockInventory').modal('hide');
+                    }, 0.5);
+                    console.log(response.d);
+                    if (response.d != "") {
+                        gridView.PerformCallback();
+                        $('#hdproductIdList').val(response.d);
+                    } else {
+                        alert("ไม่พบข้อมูลนี้ ในช่วงวันที่ " + datepickerFrom + " ถึง " + datepickerTo);
+                        location.reload();
+                    }
+                }
+
+            });
+        }
+        function callReport() {
+            var productType = $('#hdproductType').val();
+            var datepickerFrom = $('#hddatepickerFrom').val();
+            var datepickerTo = $('#hddatepickerTo').val();
+            var productIdList = $('#hdproductIdList').val();
+            console.log(productType);
+            console.log(datepickerFrom);
+            console.log(datepickerTo);
+            console.log(productIdList);
+            window.open("../Report/DocumentViewer.aspx?ReportArgs=Stock_Inventory_Products|" + productIdList + "|" + datepickerFrom + "|" + datepickerTo + "|" + productType, "_blank");
+        }
+        function selectAllStockInventory() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var product_type = $('#cbbProductType').val();
+            var selected = $('#chkAllStockInventory').is(':checked');
+            $.ajax({
+                type: "POST",
+                url: "StockInventory.aspx/SelectAllStockInventory",
+                data: '{selected:' + selected + ',product_type: "' + product_type + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                   
+                        gridViewStockInventory.PerformCallback();
+                        $.LoadingOverlay("hide");
+                },
+                failure: function (data) {
+
+                }
+            });
+
+        }
+        function searchSeletedGrid(e) {
+            if (e == 13) {
+                $.LoadingOverlay("show", {
+                    zIndex: 9999
+                });
+
+                var TextStockInventory = $("#TextStockInventory").val();
+                gridViewStockInventory.PerformCallback("Search|" + TextStockInventory.toString());
+
+                $.LoadingOverlay("hide");
+            }
+        }
+    </script>
+    <div id="div-content">
+        <div class="row">
+            <fieldset>
+                <legend>StockInventory</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">ประเภทสินค้า:</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbProductType" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbProductType" TextField="data_text"
+                                    EnableCallbackMode="true" ClientSideEvents-ValueChanged="changedProductType"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-1 text-right no-padding">วันที่ :</label>
+                            <div class="col-xs-5">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerFrom" />
+                            </div>
+                            <label class="col-xs-1 no-padding text-center">ถึง</label>
+                            <div class="col-xs-5">
+                                <input class="form-control picker" runat="server" type="text" id="datepickerTo" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-2 no-padding">
+                        <div class="row form-group">
+                            <div class="col-xs-9 no-padding">
+                                <button type="button" id="btnStockInventoryDetail" runat="server" onclick="popupStockInventoryDetail()"
+                                    class="btn-info" style="height: 30px;">
+                                    <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;เลือกรายการสินค้า
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="row">
+                <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem btn-reportItem">
+                    <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;Report
+                </button>
+                <div class="col-xs-12">
+                    <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridView"
+                        Width="100%" KeyFieldName="id" EnableCallBacks="true"
+                        EnableRowsCache="false"
+                        SettingsBehavior-AllowSort="false"
+                        OnCustomCallback="gridreportStockInventory_CustomCallback">
+                        <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                        <Paddings Padding="0px" />
+                        <Border BorderWidth="0px" />
+                        <BorderBottom BorderWidth="1px" />
+                        <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                            PageSizeItemSettings-Visible="true">
+                            <PageSizeItemSettings Items="10, 20, 50" />
+                        </SettingsPager>
+                        <Columns>
+
+                            <dx:GridViewDataTextColumn FieldName="stock_no" Caption="Stock No" Width="50px" />
+                            <dx:GridViewDataTextColumn FieldName="stock_name" Caption="Stock Name" Width="200px" />
+                            <dx:GridViewDataTextColumn FieldName="stock_in" Caption="Stock In" Width="50px" />
+                            <dx:GridViewDataTextColumn FieldName="stock_out" Caption="Stock Out" Width="50px" />
+                            <dx:GridViewDataTextColumn FieldName="stock_balance" Caption="Stock Balance" Width="100px" />
+                            <dx:GridViewDataTextColumn FieldName="stock_update" Caption="Stock Update" Width="100px" />
+                            
+                        </Columns>
+                        <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+                        <SettingsPopup>
+                            <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+                        </SettingsPopup>
+                        <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                            CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                    </dx:ASPxGridView>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal ดูสินค้า-->
+        <div class="modal fade" id="modal_StockInventory" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        รายการ
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-4 text-left">
+                                <input id="chkAllStockInventory"  runat="server" type="checkbox" class="" onclick="selectAllStockInventory()" />&nbsp;เลือกทั้งหมด
+                            </div>
+                            <div class="col-xs-8" style="float: right; margin-bottom: 5px;">
+                                <input type="text" id="TextStockInventory" class="form-control searchBoxData" placeholder="กรอกคำค้นหา..." runat="server"
+                                    onkeypress="searchSeletedGrid(event.keyCode)" />
+                                <button type="button" class="btn-addItem" id="btnTextStockInventory" onclick="searchSeletedGrid(13);">
+                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+                                </button>
+                            </div>
+                            <div class="col-xs-12">
+                                <dx:ASPxGridView ID="gridViewStockInventory" ClientInstanceName="gridViewStockInventory" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                    Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                                    OnCustomCallback="gridViewStockInventory_CustomCallback"
+                                    OnHtmlDataCellPrepared="gridViewStockInventory_HtmlDataCellPrepared"
+                                    KeyFieldName="id" Width="100%">
+                                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                    <Paddings Padding="0px" />
+                                    <Border BorderWidth="0px" />
+                                    <BorderBottom BorderWidth="1px" />
+                                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                        PageSizeItemSettings-Visible="false">
+                                        <PageSizeItemSettings Items="10, 20, 50" />
+                                    </SettingsPager>
+                                    <Columns>
+                                        <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="30px">
+                                            <DataItemTemplate>
+                                                <dx:ASPxCheckBox ID="chkStockInventoryDetail" runat="server" ValueType="System.Boolean"
+                                                    TextField="Name" ValueField="is_selected" ClientInstanceName="chkStockInventoryDetail"
+                                                    ProductDetailId='<%# Eval("id")%>'>
+                                                    <ClientSideEvents ValueChanged="function(s, e) { 
+                                                                        chkproduct(s, e); 
+                                                                    }" />
+                                                </dx:ASPxCheckBox>
+                                            </DataItemTemplate>
+                                        </dx:GridViewDataTextColumn>
+                                        <dx:GridViewDataColumn FieldName="no" Caption="Product No" Width="150px" />
+                                        <dx:GridViewDataColumn FieldName="name_tha" Caption="Product Name" Width="200px" />
+
+                                    </Columns>
+                                </dx:ASPxGridView>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="row form-group">
+                                    <label class="col-xs-3 text-right label-rigth"></label>
+                                    <div class="col-xs-7 no-padding text-right">
+                                        <button type="button" runat="server" id="Button1" onclick="submitStockInventoryDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                        <button type="button" runat="server" id="Button2" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hidden">
+            <input runat="server" id="hdproductType" />
+            <input runat="server" id="hddatepickerFrom" />
+            <input runat="server" id="hddatepickerTo" />
+            <input runat="server" id="hdproductIdList" />
+        </div>
+    </div>
+</asp:Content>

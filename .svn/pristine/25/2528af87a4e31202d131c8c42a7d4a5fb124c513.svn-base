@@ -1,0 +1,344 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="Notification.aspx.cs" Inherits="HicomIOS.Master.Notification" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <style>
+        .btn-app {
+            width: 80px;
+        }
+
+        .btn-left {
+            float: left !important;
+        }
+
+        .btn-back {
+            height: 25px;
+            padding: 3px 15px;
+            color: #1E395B;
+            font: 11px Verdana, Geneva, sans-serif;
+            border: 1px solid #abbad0;
+            background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+        }
+
+            .btn-back:hover {
+                background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+                border: 1px solid #eecc53;
+            }
+
+            .btn-back i {
+                font-size: 12px;
+            }
+    </style>
+    <div class="content">
+        <div class="row">
+        <button id="add_NewItem" runat="server" type="button" onclick="addNewItem()" class="btn-addItem btn-new btn-new1" style="height: 30px; position: absolute; top: 77px;">
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            &nbsp;New Notification
+        </button>
+            </div>
+        <div id="gridCell">
+            <dx:ASPxGridView ID="gridView" runat="server" AutoGenerateColumns="False" ClientInstanceName="notificationGrid"
+                Width="100%" KeyFieldName="id">
+                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                <Paddings Padding="0px" />
+                <Border BorderWidth="0px" />
+                <BorderBottom BorderWidth="1px" />
+                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                    PageSizeItemSettings-Visible="true">
+                    <PageSizeItemSettings Items="10, 20, 50" />
+                </SettingsPager>
+                <SettingsLoadingPanel ShowImage="False"></SettingsLoadingPanel>
+                <%-- DXCOMMENT: Configure ASPxGridView's columns in accordance with datasource fields --%>
+                <Columns>
+                    <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="80px">
+                        <DataItemTemplate>
+                            <a id="btnEdit" class="btn btn-mini" onclick="editItem(<%# Eval("id")%>)" title="Edit">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </a>|
+                        <a id="btnDelete" class="btn btn-mini" onclick="deleteItem(<%# Eval("id")%>)" title="Delete">
+                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        </a>
+                        </DataItemTemplate>
+                    </dx:GridViewDataTextColumn>
+                    <dx:GridViewDataTextColumn FieldName="id" Caption="ID" ReadOnly="True" Width="100px" />
+                    <dx:GridViewDataTextColumn FieldName="subject" Caption="Subject" Width="250px" />
+                    <dx:GridViewDataTextColumn FieldName="description" Caption="Description" Width="250px" />
+                    <dx:GridViewDataTextColumn FieldName="enable" Caption="Notice"  />
+                </Columns>
+                <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
+                <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+                <SettingsPopup>
+                    <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+                </SettingsPopup>
+                <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                    CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+            </dx:ASPxGridView>
+            <%-- modal delete--%>
+            <div class="modal fade" id="modal_delete" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <div class="modal-title">ลบข้อมูล</div>
+                        </div>
+                        <div class="modal-body text-center">
+                            <input type="hidden" name="delete_link" id="delete_link" class="hide" value="">
+                            คุณต้องการลบข้อมูลใช่หรือไม่ ?           
+                        </div>
+                        <div class="modal-footer">
+
+                            <button type="button"
+                                class="btn-app btn-addItem"
+                                id="btn_delete" onclick="confirmDelete()">
+                                <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                            </button>
+                            <button type="button "
+                                class="btn-app btn-addItem"
+                                data-dismiss="modal">
+                                <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%-- modal Edit/add--%>
+            <div class="modal fade" id="modal_notice" role="dialog" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <div class="modal-title" id="modal-title">ข้อมูล</div>
+                        </div>
+                        <div class="modal-body text-center">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Customer :</label>
+                                        <div class="col-xs-9">
+                                            <dx:ASPxComboBox ID="cboCustomer" CssClass="form-control" runat="server"
+                                                ClientInstanceName="cboCustomer" TextField="data_text"
+                                                EnableCallbackMode="true"
+                                                ValueField="data_value">
+                                            </dx:ASPxComboBox>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">NoticeType :</label>
+                                        <div class="col-xs-9">
+                                            <dx:ASPxComboBox ID="cboNoticeType" CssClass="form-control" runat="server"
+                                                ClientInstanceName="cboNoticeType" TextField="data_text"
+                                                EnableCallbackMode="true"
+                                                ValueField="data_value">
+                                            </dx:ASPxComboBox>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Subject :</label>
+                                        <div class="col-xs-9">
+                                            <input type="text" class="form-control" id="subject" runat="server" data-rule-required="true" data-msg-required="กรุณากรอกหมวดหมู่สินค้า" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Description :</label>
+                                        <div class="col-xs-9">
+                                            <input type="text" class="form-control" id="description" runat="server" data-rule-required="true" data-msg-required="กรุณากรอกหมวดหมู่สินค้า" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">NoticeDate :</label>
+                                        <div class="col-xs-9">
+                                            <input type="text" class="form-control datepicker numberic" id="notice_date" runat="server" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div class="row form-group">
+                                        <label class="col-xs-3 text-right label-rigth">Notifications :</label>
+                                        <div class="col-xs-9">
+                                            <button type="button" id="btn_enable" class="btn btn-left btn-toggle active" data-toggle="button" aria-pressed="true" autocomplete="off">
+                                                <div class="handle"></div>
+                                            </button>
+                                            <input type="hidden" id="enable">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" id="id">
+                            <button type="button"
+                                class="btn-app btn-addItem"
+                                id="_btn_saveEdit" onclick="confirm_btn()">
+                                <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                            </button>
+                            <button type="button "
+                                class="btn-app btn-addItem"
+                                data-dismiss="modal">
+                                <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+        });
+        function confirm_btn() {
+            var id = $('#id').val();
+            var btnto = 1;
+            if ($('#btn_enable').attr("aria-pressed") == "false") {
+                btnto = 0;
+            }
+            if (id == "" || id == null) {
+                var dateNotification = $("#notice_date").val();
+                if (dateNotification == "") {
+                    alert("กรุณาเลือกวันที่แจ้งเตือน");
+                    $.LoadingOverlay("hide");
+                    return;
+                }
+                var date = $('#notice_date').handleDtpicker('getDate');
+                var notice_date = date.toISOString();
+
+                var parametersNotic = {
+                    dataNotic: [{
+                        subject: $('#subject').val(),
+                        description: $('#description').val(),
+                        customer_id: cboCustomer.GetValue(),
+                        notice_type: cboNoticeType.GetValue(),
+                        notice_date: notice_date,
+                        is_enable: btnto,
+                        company_name_tha : cboCustomer.GetText()
+                    }]
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "Notification.aspx/NotificationConfirmAdd",
+                    data: JSON.stringify(parametersNotic),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        location.reload();
+                    }
+                });
+
+
+            }
+            else if (id != "" || id != null) {
+                var date = $('#notice_date').handleDtpicker('getDate');
+                var notice_date = date.toISOString();
+                var parametersNotic = {
+                    dataNotic: [{
+                        subject: $('#subject').val(),
+                        description: $('#description').val(),
+                        notice_date: notice_date,
+                        is_enable: btnto,
+                        id: $('#id').val(),
+
+                    }]
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "Notification.aspx/NotificationConfirmEdit",
+                    data: JSON.stringify(parametersNotic),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (data) {
+                        location.reload();
+                    }
+                });
+
+            }
+
+
+        }
+
+        function editItem(id) {
+            $.ajax({
+                type: "POST",
+                url: "Notification.aspx/NotificationEdit",
+                data: '{ id:"' + id + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+
+                    $('#notice_date').val(data.d.display_notice_date);
+                    $('#subject').val(data.d.subject);
+                    $('#id').val(data.d.id);
+                    $('#description').val(data.d.description);
+                    $('#enable').val(data.d.is_enable);
+                    cboCustomer.SetText(data.d.company_name_tha);
+                    cboCustomer.SetEnabled(false);
+                    cboNoticeType.SetText(data.d.notice_type);
+                    cboNoticeType.SetEnabled(false);
+                    $('#modal_notice').modal("show");
+                    $('#modal-title').text("แก้ไขข้อมูล");
+                    var enable = $('#enable').val();
+                    console.log("enable=hh" + $('#enable').val());
+                    if (enable == 0) {
+                        $('#btn_enable').attr("aria-pressed", "false");
+                        $("#btn_enable").removeClass("btn btn-left btn-toggle active");
+                        $('#btn_enable').addClass("btn btn-left btn-toggle");
+                    }
+                    else if (enable == 1) {
+                        $('#btn_enable').attr("aria-pressed", "true");
+                        $("#btn_enable").removeClass("btn btn-left btn-toggle ");
+                        $('#btn_enable').addClass("btn btn-left btn-toggle active");
+                    }
+
+
+                }
+            });
+        }
+
+        function addNewItem() {
+            $('#description').val("");
+            $('#subject').val("");
+            $('#id').val("");
+            $('#notice_date').val("");
+            $('#enable').val("");
+
+            cboCustomer.SetText(" ");
+            cboCustomer.SetEnabled(true);
+            cboNoticeType.SetText(" ");
+            cboNoticeType.SetEnabled(true);
+            $('#modal_notice').modal("show");
+            $('#modal-title').text("เพิ่มข้อมูล");
+        }
+
+
+        function deleteItem(e) {
+            var id = e;
+            $('#modal_delete').modal("show");
+            $('#btn_delete').val(id);
+        }
+        function confirmDelete() {
+            var id = $('#btn_delete').val();
+            $.ajax({
+                type: "POST",
+                url: "Notification.aspx/DeleteNotification",
+                data: '{id:"' + id + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    window.location = "Notification.aspx";
+                }
+            });
+        }
+    </script>
+</asp:Content>

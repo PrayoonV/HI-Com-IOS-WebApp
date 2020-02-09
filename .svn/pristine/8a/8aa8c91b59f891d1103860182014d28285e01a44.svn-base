@@ -1,0 +1,808 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="AnnualService.aspx.cs" Inherits="HicomIOS.Master.AnnualService" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <script type="text/javascript" src="../Content/Custom.js"></script>
+    <script type="text/javascript" src="../Content/Script.js"></script>
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Content/Site.css">
+    <style>
+        .modal .control-label {
+            margin: 5px 0 0 0;
+            padding: 0;
+            text-align: right;
+        }
+
+        #SearchBox {
+            display: none;
+        }
+
+        .no-padding {
+            padding: 0px;
+        }
+
+        fieldset {
+            border: none !important;
+        }
+
+        .btn-setying {
+            width: 130px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.selectDate').datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
+        });
+        function changeSelectCustomerMFG() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = cbbCustomerMFG.GetValue();
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/GetMFGData",
+                data: '{id: "' + key + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridViewCustomerMFG.PerformCallback();
+                }
+
+            });
+
+            $.LoadingOverlay("hide");
+        }
+
+        function detailItem(e, s) {
+
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+            $('#hdCustomerId').val(e);
+            $('#hdCustomerMfgId').val(s);
+            $('#annualServiceYear').modal("show")
+            GridAnnualServiceYear.PerformCallback();
+            //$.ajax({
+            //    type: "POST",
+            //    url: "AnnualService.aspx/GetDetailItem",
+            //    data: '{customer_id: "' + customer_id + '",customer_mfg_id: "' + customer_mfg_id + '" }',
+            //    contentType: "application/json; charset=utf-8",
+            //    dataType: "json",
+            //    success: function (response) {
+            //        if (response != null) {
+            //            cboTypeContract.SetText(response.d["type_name"]);
+            //            $('#setting_date').val(response.d["setting_date"]);
+            //            $('#startingDate').val(response.d["starting_date"]);
+            //            $('#Hdservice_master_id').val(response.d["service_master_id"]);
+            //            $('#Hdcustomer_id').val(customer_id);
+            //            $('#hdcustomer_mfg_id').val(customer_mfg_id);
+            //            $('#expireDate').val(response.d["expire_date"]);
+
+
+
+            //        }
+            //        GridViewmasterList.PerformCallback();
+            //        gridFile.PerformCallback();
+            //        $('#modal_form').modal("show")
+            //    }
+
+            //});
+
+            $.LoadingOverlay("hide");
+        }
+
+        function addServiceYear() {
+            var service_time = $('#service_time').val();
+            var service_free = $('#service_free').val();
+            var service_remark = $('#service_remark').val();
+
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/AddServiceYear",
+                data: '{service_time: "' + service_time + '",service_free: "' + service_free + '",service_remark: "' + service_remark + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    if (response != null) {
+                        GridAnnualServiceYear.PerformCallback();
+                    }
+                }
+            });
+        }
+
+        function addmasterList(e) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var TypeContract = cboTypeContract.GetValue();
+            var setting_date = $('#setting_date').val();
+            var startingDate = $('#startingDate').val();
+            var expireDate = $('#expireDate').val();
+            if (TypeContract == null || setting_date == "" || startingDate == "" || expireDate == "") {
+                $.LoadingOverlay("hide");
+                alert("กรุณากรอกข้อมูลให้ครบ");
+                return;
+            }
+            else {
+                $('#txtCheckingDate').val("");
+                $('#txtRemark').val("");
+                $("#statusCheck").css('display', 'none');
+                $('#modal_add_checking').modal("show")
+            }
+            $.LoadingOverlay("hide");
+        }
+        function submit_add_checking() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = $('#Idmaster').val();
+            var service_master_id = $('#Hdservice_master_id').val();
+            var statusCheck = $('#statusCheck').val();
+
+            var CheckingDate = $('#txtCheckingDate').val();
+            var Remark = $('#txtRemark').val();
+            if (CheckingDate == "" || CheckingDate == undefined || Remark == "" || Remark == undefined) {
+                $.LoadingOverlay("hide");
+                alert("กรุณากรอกข้อมูลให้ครบ");
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/AddChecking",
+                data: '{id : "' + key + '",CheckingDate : "' + CheckingDate + '",Remark : "' + Remark + '",service_master_id: "' + service_master_id + '",statusCheck: "' + statusCheck + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+
+                    GridViewmasterList.PerformCallback();
+
+                    $('#txtMFGNo').val("");
+                    $('#txtReceiveDate').val("");
+                    $('#modal_add_checking').modal("hide")
+                    $.LoadingOverlay("hide");
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+
+        }
+
+        function editMasterList(e) {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            $('#Idmaster').val(e);
+            var TypeContract = cboTypeContract.GetValue();
+            var setting_date = $('#setting_date').val();
+            var startingDate = $('#startingDate').val();
+            var expireDate = $('#expireDate').val();
+
+            if (TypeContract == null || setting_date == "" || startingDate == "" || expireDate == "") {
+                $.LoadingOverlay("hide");
+                alert("กรุณากรอกข้อมูลให้ครบ");
+                return;
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "AnnualService.aspx/SelectEditChecking",
+                    data: '{id : ' + e + ' }',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        var data = response.d;
+                        $('#txtCheckingDate').val(data.checking_date);
+                        $('#txtRemark').val(data.checking_remark);
+
+                        $('#Hdservice_master_id').val(data.service_master_id);
+                        $('#Idmaster').val(e);
+                        if ($('#Idmaster').val() > 0) {
+                            $("#statusCheck").css('display', '');
+                        }
+                        $('#modal_add_checking').modal("show")
+
+                        $.LoadingOverlay("hide");
+
+                    },
+                    failure: function (response) {
+                        alert(response.d);
+                        $.LoadingOverlay("hide");
+                    }
+                });
+            }
+        }
+        function onUploadFilePdf(s, e) {
+            //gridFile.PerformCallback(); 
+            //if (e.isValid)
+            //    document.getElementById("imgSign").src = "/Images/Sign/" + e.callbackData;
+            //setElementVisible("imgSign", e.isValid);
+            var description = $('#txtFileName').val();
+
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/UpdateDescriptionFile",
+                data: '{id : ' + parseInt(e.callbackData) + ' ,description : "' + description + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#txtFileName').val("");
+                    gridFile.PerformCallback();
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                    $.LoadingOverlay("hide");
+                }
+            });
+        }
+        function deleteMasterList(e) {
+            //var input = s.GetMainElement();
+            var id = e;//$(input).attr("noticeId");
+            $('#modal_delete').modal("show");
+            $('#btn_delete').val(id);
+
+        }
+        function submitdelete() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            //var input = s.GetMainElement();
+            var id = $('#btn_delete').val();
+
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/DeleteMasterList",
+                data: '{id: "' + id + '"}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    $('#modal_delete').modal("hide");
+                    GridViewmasterList.PerformCallback();
+
+                },
+                failure: function (response) {
+                    alert(response.d);
+                }
+            });
+            $.LoadingOverlay("hide");
+        }
+
+        function submitForm() {
+            var TypeContract = cboTypeContract.GetValue();
+            var setting_date = $('#setting_date').val();
+            var startingDate = $('#startingDate').val();
+            var expireDate = $('#expireDate').val();
+            if (TypeContract == null || setting_date == "" || startingDate == "" || expireDate == "") {
+                $.LoadingOverlay("hide");
+                alert("กรุณากรอกข้อมูลให้ครบ");
+                return;
+            } else {
+                var parametersAdd = {
+                    masterData: [
+                        {
+                            type_of_contract_id: parseInt(cboTypeContract.GetValue()),
+                            setting_date: setting_date,
+                            starting_date: startingDate,
+                            expire_date: expireDate,
+                            customer_id: $('#Hdcustomer_id').val(),
+                            customer_mfg_id: $('#hdcustomer_mfg_id').val(),
+                            service_master_id: $('#Hdservice_master_id').val(),
+                        }
+                    ]
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: "AnnualService.aspx/SubmitMasterData",
+                    data: JSON.stringify(parametersAdd),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.d > 0) {
+                            console.log("success");
+                            var con = confirm("บันทึกข้อมูลสำเร็จ");
+                            if (con) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "AnnualService.aspx/CleaSession",
+                                    data: {},
+                                    contentType: "application/json; charset=utf-8",
+                                    dataType: "json",
+                                    success: function (response) {
+                                        window.location.href = "AnnualService.aspx?dataId=" + result.d;
+                                    }
+
+                                });
+
+                            }
+                        }
+                        else {
+                            alertMessage(result.d, "E");
+
+                        }
+                    }
+                });
+            }
+
+        }
+    </script>
+    <div id="div-content">
+        <div class="row">
+            <fieldset>
+                <legend>Annual Service</legend>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-2 text-right label-rigth">ลูกค้า :</label>
+                            <div class="col-xs-10 no-padding">
+                                <dx:ASPxComboBox ID="cbbCustomerMFG" CssClass="form-control" runat="server"
+                                    ClientInstanceName="cbbCustomerMFG" TextField="data_text"
+                                    ClientSideEvents-ValueChanged="changeSelectCustomerMFG" ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="row">
+            <div class="col-xs-12" runat="server" id="dvGridProduct">
+                <dx:ASPxGridView ID="gridViewCustomerMFG" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridViewCustomerMFG"
+                    Width="100%" KeyFieldName="id" EnableCallBacks="true"
+                    EnableRowsCache="false"
+                    SettingsBehavior-AllowSort="false"
+                    OnCustomCallback="gridViewCustomerMFG_CustomCallback">
+                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                    <Paddings Padding="0px" />
+                    <Border BorderWidth="0px" />
+                    <BorderBottom BorderWidth="1px" />
+                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                        PageSizeItemSettings-Visible="true">
+                        <PageSizeItemSettings Items="10, 20, 50" />
+                    </SettingsPager>
+                    <Columns>
+
+                        <dx:GridViewDataTextColumn FieldName="model" Caption="Model" Width="150px" />
+                        <dx:GridViewDataTextColumn FieldName="mfg" Caption="MFG" Width="50px" />
+                        <dx:GridViewDataTextColumn FieldName="unitwarraty" Caption="Unit Warraty" Width="50px" />
+                        <dx:GridViewDataTextColumn FieldName="airendwarraty" Caption="Air End Warraty" Width="50px" />
+                        <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="50px">
+                            <DataItemTemplate>
+                                <button type="button" id="btnviewReceive" onclick="detailItem(<%# Eval("customer_id")%>, '<%# Eval("customer_mfg_id")%>')" class="btn-addItem btn-setying">
+                                    <i class="fas fa-calendar-check"></i>&nbsp;Setting Contract
+                                </button>
+                            </DataItemTemplate>
+                        </dx:GridViewDataTextColumn>
+                    </Columns>
+                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+                    <SettingsPopup>
+                        <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+                    </SettingsPopup>
+                    <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                        CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                </dx:ASPxGridView>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL -->
+    <div class="modal fade" id="modal_form" role="dialog" data-backdrop="static" data-keyboard="true" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="modal-title">Annual Service</div>
+                </div>
+                <div class="modal-body text-center">
+
+                    <ul class="nav nav-tabs" style="margin-top: 0px;">
+                        <li class="active"><a data-toggle="tab" href="#masterList">Master</a></li>
+                        <li><a data-toggle="tab" href="#fileUpload">File Upload</a></li>
+                    </ul>
+                    <div class="tab-content" style="padding: 10px 0;">
+                        <%-------------------------------------------------------%>
+                        <div id="masterList" class="tab-pane fade in active">
+                            <div class="row">
+                                <div style="padding: 0 10px;">
+                                    <fieldset>
+                                        <div class="row">
+                                            <div class="form-group col-xs-6 no-padding">
+                                                <label class="control-label col-xs-4 no-padding" for="txtProductNameTHA">Type Of Contract:</label>
+                                                <div class="col-xs-8">
+                                                    <dx:ASPxComboBox ID="cboTypeContract" CssClass="form-control" runat="server"
+                                                        ClientInstanceName="cboTypeContract" TextField="data_text"
+                                                        ValueField="data_value">
+                                                        <%--OnCallback="cboSupplier_Callback"--%>
+                                                    </dx:ASPxComboBox>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-xs-6 no-padding">
+                                                <label class="control-label col-xs-4 no-padding">Setting Date:</label>
+                                                <div class="col-xs-8">
+                                                    <input type="text" class="form-control selectDate" id="setting_date" runat="server" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-xs-6 no-padding">
+                                                <label class="control-label col-xs-4 no-padding" for="txtProductNameTHA">Starting Date:</label>
+                                                <div class="col-xs-8">
+                                                    <input type="text" class="form-control selectDate" id="startingDate" runat="server" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-xs-6 no-padding">
+                                                <label class="control-label col-xs-4 no-padding">Expire Date:</label>
+                                                <div class="col-xs-8">
+                                                    <input type="text" class="form-control selectDate" id="expireDate" runat="server" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="form-group col-xs-3">
+                                                <button type="button" class="btn-addItem" onclick="addmasterList()">
+                                                    <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;เพิ่มรายการ การตรวจสอบ
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-xs-12 no-padding">
+                                            <dx:ASPxGridView ID="GridViewmasterList" SettingsBehavior-AllowSort="false" ClientInstanceName="GridViewmasterList" runat="server"
+                                                Settings-VerticalScrollBarMode="Visible"
+                                                Settings-VerticalScrollableHeight="300"
+                                                Settings-HorizontalScrollBarMode="Visible"
+                                                EnableCallBacks="true" KeyFieldName="id" OnCustomCallback="GridViewmasterList_CustomCallback"
+                                                Width="100%">
+                                                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                                <Paddings Padding="0px" />
+                                                <Border BorderWidth="0px" />
+                                                <BorderBottom BorderWidth="1px" />
+                                                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                                    PageSizeItemSettings-Visible="true">
+                                                    <PageSizeItemSettings Items="10, 20, 50" />
+                                                </SettingsPager>
+                                                <Columns>
+                                                    <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="100">
+                                                        <DataItemTemplate>
+                                                            <a class="btn btn-mini" onclick="editMasterList(<%# Eval("id")%>)" title="Edit">
+                                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                            </a>
+                                                            <a id="btnDelete" class="btn btn-mini" onclick="deleteMasterList(<%# Eval("id")%>)" title="Delete">
+                                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                                            </a>
+                                                        </DataItemTemplate>
+                                                    </dx:GridViewDataTextColumn>
+                                                    <dx:GridViewDataTextColumn FieldName="checking_date" Caption="รายการเข้าตรวจสอบ" CellStyle-HorizontalAlign="Left" Width="320" />
+                                                    <dx:GridViewDataTextColumn FieldName="status_name" Caption="สถานะ" CellStyle-HorizontalAlign="Left" Width="200" />
+                                                    <dx:GridViewDataTextColumn FieldName="checking_remark" Caption="หมายเหตุ" CellStyle-HorizontalAlign="Left" Width="250" />
+                                                </Columns>
+                                                <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+                                                <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                                                    CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                                            </dx:ASPxGridView>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <input hidden="hidden" id="Hdcustomer_id" runat="server" />
+                            <input hidden="hidden" id="hdcustomer_mfg_id" runat="server" />
+                            <input hidden="hidden" id="Hdservice_master_id" runat="server" />
+                            <%--<input hidden="hidden"  id="editMasterListId" runat="server" />--%>
+                        </div>
+                        <%--------------------------------------------------------------%>
+                        <div id="fileUpload" class="tab-pane fade">
+                            <div class="row">
+                                <div style="padding: 0 10px;">
+                                    <fieldset>
+                                        <div class="form-group col-xs-12 no-padding">
+                                            <label class="control-label col-xs-2" for="cboSupplier">รายละเอียด: </label>
+                                            <div class="col-xs-3  no-padding-right">
+                                                <input type="text" class="form-control" id="txtFileName" runat="server" />
+                                            </div>
+
+                                            <label class="control-label col-xs-2 no-padding" for="cboSupplier">Upload File: </label>
+                                            <div class="col-xs-3">
+                                                <dx:ASPxUploadControl ID="uploadPdf" ClientInstanceName="uploadPdf" runat="server" UploadMode="Auto" AutoStartUpload="True" Width="100%"
+                                                    ShowProgressPanel="True" CssClass="uploadControl" DialogTriggerID="externalDropZone" OnFileUploadComplete="upload_FilePdfUploadComplete">
+                                                    <AdvancedModeSettings EnableDragAndDrop="false" EnableFileList="False" EnableMultiSelect="False" ExternalDropZoneID="externalDropZone" DropZoneText="" />
+                                                    <ValidationSettings MaxFileSize="4194304" AllowedFileExtensions=".pdf" ErrorStyle-CssClass="validationMessage">
+                                                        <ErrorStyle CssClass="validationMessage"></ErrorStyle>
+                                                    </ValidationSettings>
+                                                    <BrowseButton Text="Upload" />
+                                                    <DropZoneStyle CssClass="uploadControlDropZone" />
+                                                    <ProgressBarStyle CssClass="uploadControlProgressBar" />
+                                                    <ClientSideEvents
+                                                        FileUploadComplete="onUploadFilePdf"></ClientSideEvents>
+                                                </dx:ASPxUploadControl>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-xs-12 no-padding">
+                                            <dx:ASPxGridView ID="gridFile" SettingsBehavior-AllowSort="false" ClientInstanceName="gridFile" runat="server"
+                                                Settings-VerticalScrollBarMode="Visible"
+                                                Settings-VerticalScrollableHeight="300"
+                                                Settings-HorizontalScrollBarMode="Visible"
+                                                EnableCallBacks="true" KeyFieldName="id" OnCustomCallback="gridFile_CustomCallback"
+                                                Width="100%">
+                                                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                                <Paddings Padding="0px" />
+                                                <Border BorderWidth="0px" />
+                                                <BorderBottom BorderWidth="1px" />
+                                                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                                    PageSizeItemSettings-Visible="true">
+                                                    <PageSizeItemSettings Items="10, 20, 50" />
+                                                </SettingsPager>
+                                                <Columns>
+                                                    <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="150">
+                                                        <DataItemTemplate>
+                                                            <a class="btn btn-mini" onclick="editMFG(<%# Eval("id")%>)" title="Edit">
+                                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                                            </a>
+                                                        </DataItemTemplate>
+                                                    </dx:GridViewDataTextColumn>
+                                                    <dx:GridViewDataTextColumn FieldName="description" Caption="รายละเอียด" CellStyle-HorizontalAlign="Left" Width="350" />
+                                                    <dx:GridViewDataTextColumn FieldName="file_name" Caption="ชื่อไฟล์" CellStyle-HorizontalAlign="Left" Width="350" />
+                                                </Columns>
+                                                <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+                                                <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                                                    CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                                            </dx:ASPxGridView>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+
+                        <%---------------------------------------------------%>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-addItem" onclick="submitForm()">
+                        <i class="fa fa-save" aria-hidden="true"></i>&nbsp;บันทึก
+                    </button>
+                    <button type="button" class="btn-addItem" data-dismiss="modal">
+                        <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal-->
+    <div class="modal fade" id="modal_add_checking" role="dialog" data-backdrop="static" data-keyboard="true" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="modal-title">เพิ่มรายการ การตรวจสอบ</div>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="row">
+                        <div class="form-group col-xs-12 no-padding">
+                            <label class="control-label col-xs-2 no-padding" for="txtAddress">เข้าตรวจสอบวันที่:</label>
+                            <div class="col-xs-10">
+                                <input type="text" class="form-control selectDate" id="txtCheckingDate" runat="server" />
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 no-padding">
+                            <label class="control-label col-xs-2 no-padding" for="txtAddress">Remark:</label>
+                            <div class="col-xs-10">
+                                <input type="text" class="form-control" id="txtRemark" runat="server" />
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 no-padding" id="statusCheck">
+                            <label class="control-label col-xs-2 no-padding" for="txtstatusCheck">สถานะ:</label>
+                            <div class="col-xs-10">
+                                <select class="form-control" id="cbbstatusCheck" runat="server">
+                                    <option value="0">รอการตรวจสอบ</option>
+                                    <option value="1">ตรวจสอบแล้ว</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <input hidden="hidden" id="Idmaster" runat="server" />
+                    <%--idของรายการเข้าตรวจสอบ modalเล็กที่2--%>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-addItem" onclick="submit_add_checking()">
+                        <i class="fa fa-save" aria-hidden="true"></i>&nbsp;บันทึก
+                    </button>
+                    <button type="button" class="btn-addItem" data-dismiss="modal">
+                        <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal_delete" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="modal-title">ลบข้อมูล</div>
+                </div>
+                <div class="modal-body text-center">
+                    <input type="hidden" name="delete_link" id="delete_link" class="hide" value="">
+                    คุณต้องการลบข้อมูลใช่หรือไม่ ?           
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                        class="btn-addItem"
+                        id="btn_delete" onclick="submitdelete()">
+                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;ตกลง
+                    </button>
+                    <button type="button"
+                        class="btn-addItem"
+                        data-dismiss="modal">
+                        <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก               
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal แทรก-->
+    <div class="modal fade" id="annualServiceYear" role="dialog" data-backdrop="static" data-keyboard="true" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <div class="modal-title">Annual Service Year</div>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="row">
+                        <div style="padding: 0 10px;">
+                            <fieldset>
+                                <div class="row">
+                                    <div class="form-group col-xs-12 no-padding">
+                                        <label class="control-label col-xs-4 no-padding">เข้าService ครั้งที่ :</label>
+                                        <div class="col-xs-6">
+                                            <select class="form-control" id="service_time" runat="server">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-xs-12 no-padding">
+                                        <label class="control-label col-xs-4 no-padding">Service Free :</label>
+                                        <div class="col-xs-6">
+                                            <select class="form-control" id="service_free" runat="server">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-xs-12 no-padding">
+                                        <label class="control-label col-xs-4 no-padding">service_remark :</label>
+                                        <div class="col-xs-6">
+                                            <input type="text" class="form-control" id="service_remark" runat="server" />
+                                        </div>
+
+                                        <button type="button" class="btn-addItem" onclick="addServiceYear()">
+                                            <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;สร้าง
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="form-group col-xs-12 no-padding">
+                                    <dx:ASPxGridView ID="GridAnnualServiceYear" SettingsBehavior-AllowSort="false" ClientInstanceName="GridAnnualServiceYear" runat="server"
+                                        Settings-VerticalScrollBarMode="Visible"
+                                        Settings-VerticalScrollableHeight="300"
+                                        Settings-HorizontalScrollBarMode="Visible"
+                                        EnableCallBacks="true" KeyFieldName="id" OnCustomCallback="GridAnnualServiceYear_CustomCallback"
+                                        Width="100%">
+                                        <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                        <Paddings Padding="0px" />
+                                        <Border BorderWidth="0px" />
+                                        <BorderBottom BorderWidth="1px" />
+                                        <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                            PageSizeItemSettings-Visible="true">
+                                            <PageSizeItemSettings Items="10, 20, 50" />
+                                        </SettingsPager>
+                                        <Columns>
+                                            <dx:GridViewDataTextColumn FieldName="service_time" Caption="Service ครั้งที่" CellStyle-HorizontalAlign="Left" />
+                                            <dx:GridViewDataTextColumn FieldName="starting_date" Caption="Test Run Date" CellStyle-HorizontalAlign="Left" Width="130px" />
+                                            <dx:GridViewDataTextColumn FieldName="setting_date" Caption="Setting Date" CellStyle-HorizontalAlign="Left" Width="130px"/>
+                                            <dx:GridViewDataTextColumn FieldName="expire_date" Caption="Expire Date" CellStyle-HorizontalAlign="Left" Width="130px"/>
+                                            <dx:GridViewDataTextColumn FieldName="service_free" Caption="Free Service" CellStyle-HorizontalAlign="Left" Width="80px"/>
+                                            <dx:GridViewDataTextColumn FieldName="service_remark" Caption="Remark" CellStyle-HorizontalAlign="Left" Width="180px" />
+                                            <dx:GridViewDataTextColumn Caption="Action" FieldName="id" CellStyle-HorizontalAlign="Center" Width="100px">
+                                                <DataItemTemplate>
+                                                    <button type="button" id="btnSetting" onclick="setting(<%# Eval("customer_id")%>, '<%# Eval("customer_mfg_id")%>')" class="btn-addItem btn-setying">
+                                                        <i class="fas fa-calendar-check"></i>&nbsp;Setting
+                                                    </button>
+                                                </DataItemTemplate>
+                                            </dx:GridViewDataTextColumn>
+                                        </Columns>
+                                        <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
+
+                                        <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                                            CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+                                    </dx:ASPxGridView>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <input hidden="hidden" id="hdCustomerId" runat="server" />
+                    <input hidden="hidden" id="hdCustomerMfgId" runat="server" />
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-addItem" onclick="submitServiceYear()">
+                        <i class="fa fa-save" aria-hidden="true"></i>&nbsp;บันทึก
+                    </button>
+                    <button type="button" class="btn-addItem" data-dismiss="modal">
+                        <i class="fa fa-ban" aria-hidden="true"></i>&nbsp;ยกเลิก
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</asp:Content>

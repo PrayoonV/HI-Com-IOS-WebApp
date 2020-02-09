@@ -1,0 +1,337 @@
+﻿using DevExpress.Web;
+using System;
+
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+using System.Data.SqlClient;
+using Microsoft.ApplicationBlocks.Data;
+using System.Web.Services;
+using HicomIOS.ClassUtil;
+
+namespace HicomIOS.Master
+{
+    public partial class Config : MasterDetailPage
+    {
+        private int dataId = 0;
+        public override string PageName { get { return "Config"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override void OnFilterChanged()
+        {
+
+        }
+
+        public class ConfigList
+        {
+            public int id { get; set; }
+            public string config_document { get; set; }
+            public string config_type { get; set; }
+            public string config_description { get; set; }
+            public bool is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+        }
+
+        public class ZipcodeList {
+            public int amphur_id { get; set; }
+            public int district_id { get; set; }
+            public string zipcode { get; set; }
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // Setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            try
+            {
+                if (!IsPostBack)
+                {
+                    LoadData();                 
+                }
+                else
+                {
+                   
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void LoadData()
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_config_list", conn))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                                {
+                                    new SqlParameter("@config_document", SqlDbType.Char,2) { Value =""},
+                                    new SqlParameter("@config_type", SqlDbType.Char,1) { Value =""},
+                                    new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                                };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_config_list_doc", arrParm.ToArray());
+                        conn.Close();
+                        ViewState["dsResult"] = dsResult;
+                    }
+
+                    //Bind data into GridView
+                    gridView.DataSource = dsResult;
+                    gridView.FilterExpression = FilterBag.GetExpression(false);
+                    gridView.DataBind();
+
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [WebMethod]
+        public static string InsertConfig(ConfigList[] configAddData)
+        {
+            var row = (from t in configAddData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_config_add", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@config_document", SqlDbType.Char, 2).Value = row.config_document;
+                            cmd.Parameters.Add("@config_type", SqlDbType.Char, 1).Value = row.config_type;
+                            cmd.Parameters.Add("@config_description", SqlDbType.VarChar, 50).Value = row.config_description;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static ConfigList GetEditConfig(string id)
+        {
+            var configpData = new ConfigList();
+            var dsDataConfig = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@config_document", SqlDbType.Char,2) { Value = ""},
+                        new SqlParameter("@config_type", SqlDbType.Char,1) { Value = "" },
+                        new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                    };
+                    conn.Open();
+                    dsDataConfig = SqlHelper.ExecuteDataset(conn, "sp_config_list", arrParm.ToArray());
+                    conn.Close();
+                }
+
+                if (dsDataConfig.Tables.Count > 0)
+                {
+                    var row = dsDataConfig.Tables[0].Rows[0];
+                    configpData.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    configpData.config_document = Convert.IsDBNull(row["config_document"]) ? null : Convert.ToString(row["config_document"]);
+                    configpData.config_type = Convert.IsDBNull(row["config_type"]) ? null : Convert.ToString(row["config_type"]);
+                    configpData.config_description = Convert.IsDBNull(row["config_description"]) ? null : Convert.ToString(row["config_description"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return configpData;
+        }
+
+        [WebMethod]
+        public static string UpdateConfig(ConfigList[] configUpdateData)
+        {
+            var row = (from t in configUpdateData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_config_edit", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                            cmd.Parameters.Add("@config_document", SqlDbType.Char, 2).Value = row.config_document;
+                            cmd.Parameters.Add("@config_type", SqlDbType.Char, 1).Value = row.config_type;
+                            cmd.Parameters.Add("@config_description", SqlDbType.VarChar, 50).Value = row.config_description;
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = 1;
+
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string DeleteConfig(string id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_config_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string ChangeStatus(string id, string is_enable, string table_name)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_status_edit", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@table_name", SqlDbType.VarChar, 150).Value = Convert.ToString(table_name);
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@is_enable", SqlDbType.Bit).Value = Convert.ToInt32(is_enable);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static ZipcodeList GetZipcode(string districtID)
+        {
+            var zipcodeData = new ZipcodeList();
+            var dsZipcode = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@district_id", SqlDbType.Int) { Value = Convert.ToInt32(districtID) }
+                        };
+                    conn.Open();
+                    dsZipcode = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_5_zipcode", arrParm.ToArray());
+                    conn.Close();
+                }
+
+                if (dsZipcode.Tables.Count > 0)
+                {
+                    var row = dsZipcode.Tables[0].Rows[0];
+
+                    zipcodeData.amphur_id = Convert.IsDBNull(row["amphur_id"]) ? 0 : Convert.ToInt32(row["amphur_id"]);
+                    zipcodeData.district_id = Convert.IsDBNull(row["district_id"]) ? 0 : Convert.ToInt32(row["district_id"]);
+                    zipcodeData.zipcode = Convert.IsDBNull(row["zipcode"]) ? null : Convert.ToString(row["zipcode"]);
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return zipcodeData;
+        }
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_config_list", conn))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                                {
+                                    new SqlParameter("@config_document", SqlDbType.Char,2) { Value =""},
+                                    new SqlParameter("@config_type", SqlDbType.Char,1) { Value =""},
+                                    new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                                };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_config_list_doc", arrParm.ToArray());
+                        conn.Close();
+                        ViewState["dsResult"] = dsResult;
+                    }
+
+                    //Bind data into GridView
+                    gridView.DataSource = dsResult;
+                    gridView.FilterExpression = FilterBag.GetExpression(false);
+                    gridView.DataBind();
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        }
+}

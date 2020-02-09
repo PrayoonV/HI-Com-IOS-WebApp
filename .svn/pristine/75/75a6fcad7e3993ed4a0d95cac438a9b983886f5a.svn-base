@@ -1,0 +1,233 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class Approve : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public override string PageName { get { return "Approve"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public class ApproveDetail
+        {
+            public int id { get; set; }
+            public string approve_doc { get; set; }
+            public string approve_type { get; set; }
+            public string name_app1 { get; set; }
+            public string name_app2 { get; set; }
+            public string name_app3 { get; set; }
+            public string approve_id1 { get; set; }
+            public string approve_id2 { get; set; }
+            public string approve_id3 { get; set; }
+
+        }
+        List<ApproveDetail> approveDetail
+        {
+            get
+            {
+                if (Session["SESSION_APPROVE_LIST"] == null)
+                    Session["SESSION_APPROVE_LIST"] = new List<ApproveDetail>();
+                return (List<ApproveDetail>)Session["SESSION_APPROVE_LIST"];
+            }
+            set
+            {
+                Session["SESSION_APPROVE_LIST"] = value;
+            }
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+
+            if (!IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                ClearWoringSession();
+                BindGrid(true);
+                PrepareData();
+            }
+            else
+            {
+                BindGrid(false);
+            }
+        }
+        protected void PrepareData()
+        {
+            try
+            {
+                //SPlanetUtil.BindASPxComboBox(ref cboApprove1, DataListUtil.DropdownStoreProcedureName.Employee_List);
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = "tha" },
+                            new SqlParameter("@department_id", SqlDbType.Int) { Value = 0 },
+                        };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_employee", arrParm.ToArray());
+
+                    conn.Close();
+                    cboApprove1.DataSource = dsResult;
+                    cboApprove1.TextField = "data_text";
+                    cboApprove1.ValueField = "data_value";
+                    cboApprove1.DataBind();
+
+                    cboApprove2.DataSource = dsResult;
+                    cboApprove2.TextField = "data_text";
+                    cboApprove2.ValueField = "data_value";
+                    cboApprove2.DataBind();
+
+                    cboApprove3.DataSource = dsResult;
+                    cboApprove3.TextField = "data_text";
+                    cboApprove3.ValueField = "data_value";
+                    cboApprove3.DataBind();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+        protected void ClearWoringSession()
+        {
+            Session.Remove("SESSION_APPROVE_LIST");
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void BindGrid(bool isForceRefreshData = false)
+
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                             new SqlParameter("@id", SqlDbType.Int) { Value = 0}
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_approve_list", arrParm.ToArray());
+
+                        if (dsResult != null)
+                        {
+                            var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
+                            foreach (var data in row)
+                            {
+                                approveDetail.Add(new ApproveDetail()
+                                {
+
+                                    id = Convert.ToInt32(data["id"]),
+                                    approve_doc = Convert.IsDBNull(data["approve_doc"]) ? null : Convert.ToString(data["approve_doc"]),
+                                    approve_type = Convert.IsDBNull(data["approve_type"]) ? null : Convert.ToString(data["approve_type"]),
+                                    name_app1 = Convert.IsDBNull(data["name_app1"]) ? null : Convert.ToString(data["name_app1"]),
+                                    name_app2 = Convert.IsDBNull(data["name_app2"]) ? null : Convert.ToString(data["name_app2"]),
+                                    name_app3 = Convert.IsDBNull(data["name_app3"]) ? null : Convert.ToString(data["name_app3"]),
+                                });
+                            }
+                        }
+
+                        HttpContext.Current.Session["SESSION_APPROVE_LIST"] = approveDetail;
+                    }
+                }
+
+                gridView.DataSource = approveDetail;
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static ApproveDetail EditApprove(string id)
+        {
+            var dataApprove = new ApproveDetail();
+            var dsApprove = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                       new SqlParameter ("@id",SqlDbType.Int){ Value = Convert.ToInt32(id)}
+                    };
+                    conn.Open();
+                    dsApprove = SqlHelper.ExecuteDataset(conn, "sp_approve_list", arrParm.ToArray());
+                    conn.Close();
+                }
+                if (dsApprove.Tables.Count > 0)
+                {
+                    var row = dsApprove.Tables[0].Rows[0];
+                    dataApprove.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    dataApprove.name_app1 = Convert.IsDBNull(row["name_app1"]) ? null : Convert.ToString(row["name_app1"]);
+                    dataApprove.name_app2 = Convert.IsDBNull(row["name_app2"]) ? null : Convert.ToString(row["name_app2"]);
+                    dataApprove.name_app3 = Convert.IsDBNull(row["name_app3"]) ? null : Convert.ToString(row["name_app3"]);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return dataApprove;
+        }
+
+        [WebMethod]
+        public static void SubmitApprove(ApproveDetail[] approveData)
+        {
+            var dataApprove = new ApproveDetail();
+            var dsApprove = new DataSet();
+            var row = (from t in approveData select t).FirstOrDefault();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_approve_edit", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                        cmd.Parameters.Add("@approve_id1", SqlDbType.Int).Value = Convert.ToInt32(row.approve_id1);
+                        cmd.Parameters.Add("@approve_id2", SqlDbType.Int).Value = Convert.ToInt32(row.approve_id2);
+                        cmd.Parameters.Add("@approve_id3", SqlDbType.Int).Value = Convert.ToInt32(row.approve_id3);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+    }
+}

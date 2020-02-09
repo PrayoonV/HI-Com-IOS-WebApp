@@ -1,0 +1,381 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+
+namespace HicomIOS.Master
+{
+    public partial class ReturnList : MasterDetailPage
+    {
+        private string strReturnType = string.Empty;
+        private DataSet dsResult;
+        public override string PageName { get { return "Return List" + (string.IsNullOrEmpty(Request.QueryString["type"]) ? "" : " " + Request.QueryString["type"].ToUpper()); } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public class ReturnDetail
+        {
+            public int id { get; set; }
+            public string return_no { get; set; }
+            public string product_no { get; set; }
+            public int product_id { get; set; }
+            public string product_name { get; set; }
+            public string product_type { get; set; }
+            public int qty { get; set; }
+            public int old_qty { get; set; }
+            public int ref_qty { get; set; }
+            public string product_unit { get; set; }
+            public bool is_delete { get; set; }
+            public int ref_id { get; set; }
+            public string mfg_no { get; set; }
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+            strReturnType = string.IsNullOrEmpty(Request.QueryString["type"]) ? "" : Request.QueryString["type"].ToUpper();
+            hdReturnType.Value = strReturnType;
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_RETURN_LIST"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override void RefreshEntry()     //Popup Menu Select Refresh Data
+        {
+            BindGrid(true);
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" },
+                             new SqlParameter("@return_type", SqlDbType.VarChar, 200) { Value = strReturnType == "" ? "" :strReturnType }
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_return_header_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_RETURN_LIST"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;//(from t in dsResult.Tables[0].AsEnumerable() where t.Field<string>("return_type") == strReturnType select t).ToList();
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string DeleteReturn(string id)
+        {
+            string returnData = "success";
+            var returnDetailList = new List<ReturnDetail>();
+            var dsReturnData = new DataSet();
+            var returnNo = string.Empty;
+            var refNo = string.Empty;
+            var returnType = string.Empty;
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+                        };
+                        dsReturnData = SqlHelper.ExecuteDataset(tran, "sp_return_list_data", arrParm.ToArray());
+
+                        if (dsReturnData.Tables.Count > 0)
+                        {
+                            #region Header
+                            var header = (from t in dsReturnData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                            if (header != null)
+                            {
+                                refNo = Convert.IsDBNull(header["ref_no"]) ? string.Empty : Convert.ToString(header["ref_no"]);
+                                returnNo = Convert.IsDBNull(header["return_no"]) ? string.Empty : Convert.ToString(header["return_no"]);
+                                returnType = Convert.IsDBNull(header["return_type"]) ? string.Empty : Convert.ToString(header["return_type"]);
+
+                            }
+                            #endregion
+                            #region Detail
+                            var detail = (from t in dsReturnData.Tables[1].AsEnumerable() select t).ToList();
+                            if (detail != null)
+                            {
+                                returnDetailList = new List<ReturnDetail>();
+                                foreach (var row in detail)
+                                {
+                                    returnDetailList.Add(new ReturnDetail()
+                                    {
+                                        id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                        ref_id = Convert.IsDBNull(row["ref_id"]) ? 0 : Convert.ToInt32(row["ref_id"]),
+                                        is_delete = Convert.IsDBNull(row["is_delete"]) ? false : Convert.ToBoolean(row["is_delete"]),
+                                        product_id = Convert.IsDBNull(row["product_id"]) ? 0 : Convert.ToInt32(row["product_id"]),
+                                        product_name = Convert.IsDBNull(row["product_name"]) ? string.Empty : Convert.ToString(row["product_name"]),
+                                        product_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                        product_unit = Convert.IsDBNull(row["product_unit"]) ? string.Empty : Convert.ToString(row["product_unit"]),
+                                        qty = Convert.IsDBNull(row["qty"]) ? 0 : Convert.ToInt32(row["qty"]),
+                                        ref_qty = Convert.IsDBNull(row["ref_qty"]) ? 0 : Convert.ToInt32(row["ref_qty"]),
+                                        return_no = Convert.IsDBNull(row["return_no"]) ? string.Empty : Convert.ToString(row["return_no"]),
+                                        mfg_no = Convert.IsDBNull(row["mfg_no"]) ? string.Empty : Convert.ToString(row["mfg_no"]),
+                                        product_type = Convert.IsDBNull(row["product_type"]) ? string.Empty : Convert.ToString(row["product_type"]),
+                                        old_qty = Convert.IsDBNull(row["old_qty"]) ? 0 : Convert.ToInt32(row["old_qty"]),
+                                    });
+                                }
+                            }
+                            #endregion
+                        }
+                        using (SqlCommand cmd = new SqlCommand("sp_return_header_delete", conn, tran))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                        #region Transection
+                        var transNo = string.Empty;
+                        using (SqlCommand cmd = new SqlCommand("sp_gen_transection_no", conn, tran))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            transNo = Convert.ToString(cmd.ExecuteScalar());
+
+                        }
+                        string stock_type = string.Empty;
+
+                        foreach (var row in returnDetailList)
+                        {
+
+                            using (SqlCommand cmd = new SqlCommand("sp_stock_movement_add", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@transection_no", SqlDbType.VarChar, 20).Value = transNo;
+
+                                cmd.Parameters.Add("@product_type", SqlDbType.VarChar, 1).Value = row.product_type;
+                                cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.product_id;
+
+                                cmd.Parameters.Add("@transection_type", SqlDbType.VarChar, 50).Value = "RETURN";
+                                cmd.Parameters.Add("@movement_type", SqlDbType.VarChar, 3).Value = returnType == "IS" ? "OUT" : "IN";
+                                cmd.Parameters.Add("@checking_type", SqlDbType.NVarChar, 1).Value = "W";
+                                cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty;// คืนค่า
+                                cmd.Parameters.Add("@stock_balance", SqlDbType.Int).Value = 0; // คำนวนจาก Store
+                                cmd.Parameters.Add("@remark", SqlDbType.VarChar, 500).Value = "คืนค่าจาก Return";//row.remark;
+                                cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.Parameters.Add("@ref_doc_id", SqlDbType.Int).Value = id; // คำนวนจาก Store
+                                cmd.Parameters.Add("@ref_doc_no", SqlDbType.VarChar, 20).Value = returnNo;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        #endregion
+                        #region Detail
+                        foreach (var row in returnDetailList)
+                        {
+                            using (SqlCommand cmd = new SqlCommand("sp_return_detail_edit", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = row.id;
+                                cmd.Parameters.Add("@return_no", SqlDbType.VarChar, 20).Value = returnNo;
+                                cmd.Parameters.Add("@return_id", SqlDbType.Int).Value = id;
+                                cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.product_id;
+                                cmd.Parameters.Add("@product_no", SqlDbType.VarChar, 20).Value = row.product_no;
+                                cmd.Parameters.Add("@product_name", SqlDbType.VarChar, 200).Value = row.product_name;
+                                cmd.Parameters.Add("@mfg_no", SqlDbType.VarChar, 20).Value = row.mfg_no;
+                                cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty;
+                                cmd.Parameters.Add("@product_unit", SqlDbType.VarChar, 5).Value = row.product_unit;
+                                cmd.Parameters.Add("@ref_qty", SqlDbType.Int).Value = row.ref_qty;
+                                cmd.Parameters.Add("@ref_id", SqlDbType.Int).Value = row.ref_id;
+                                cmd.Parameters.Add("@ref_type", SqlDbType.VarChar, 2).Value = returnType;
+                                cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = 1;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+                        }
+                        #endregion
+
+
+                        if (returnType == "IS")
+                        #region Issue Update Status
+                        {
+                            using (SqlCommand cmd = new SqlCommand("sp_issue_update_status", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@ref_no", SqlDbType.VarChar, 20).Value = returnType;
+                                cmd.Parameters.Add("@ref_type", SqlDbType.VarChar, 2).Value = "RE";
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+                        }
+                        #endregion
+                        else if (returnType == "BR")
+                        {
+                            #region Borrow Update Status
+
+                            using (SqlCommand cmd = new SqlCommand("sp_borrow_update_status", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@ref_no", SqlDbType.VarChar, 20).Value = returnType;
+                                cmd.Parameters.Add("@ref_type", SqlDbType.VarChar, 2).Value = "RE";
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+
+                            #endregion
+                        }
+                        else if (returnType == "PR")
+                        {
+                            using (SqlCommand cmd = new SqlCommand("sp_purchase_request_update_status", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@ref_no", SqlDbType.VarChar, 20).Value = returnType;
+                                cmd.Parameters.Add("@ref_type", SqlDbType.VarChar, 2).Value = "RE";
+
+                                cmd.ExecuteNonQuery();
+
+                            }
+                        }
+                    }
+
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        //throw ex;
+                        return ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+                        }
+                    }
+
+                    return returnData;
+                }
+            }
+        }
+
+        [WebMethod]
+        public static ReturnDetail GetReturnData(string id, string hdReturnType)
+        {
+            var data = new ReturnDetail();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value =Convert.ToInt32(id) },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" },
+                            new SqlParameter("@return_type", SqlDbType.VarChar, 200) { Value = hdReturnType == "" ? "" :hdReturnType }
+                        };
+                conn.Open();
+                var dsReturnData = SqlHelper.ExecuteDataset(conn, "sp_return_header_list", arrParm.ToArray());
+                conn.Close();
+
+                if (dsReturnData.Tables.Count > 0)
+                {
+                    if (dsReturnData.Tables[0].Rows.Count > 0)
+                    {
+                        var row = (from t in dsReturnData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                        if (row != null)
+                        {
+
+                            data.return_no = Convert.IsDBNull(row["return_no"]) ? string.Empty : Convert.ToString(row["return_no"]);
+
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = e.Parameters.ToString() },
+                            new SqlParameter("@return_type", SqlDbType.VarChar, 200) { Value = strReturnType == "" ? "" :strReturnType }
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_return_header_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_RETURN_LIST"] = dsResult;
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;//(from t in dsResult.Tables[0].AsEnumerable() where t.Field<string>("return_type") == strReturnType select t).ToList(); ;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}

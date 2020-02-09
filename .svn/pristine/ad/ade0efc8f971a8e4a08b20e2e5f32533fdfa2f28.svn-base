@@ -1,0 +1,150 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Xml;
+using DevExpress.Web;
+
+namespace HicomIOS
+{
+    public partial class MainMaster : System.Web.UI.MasterPage
+    {
+        protected BasePage BasePage { get { return Page as BasePage; } }
+        Dictionary<string, string> ReportNames = new Dictionary<string, string>();
+
+        protected FilterBag FilterBag { get { return BasePage.FilterBag; } }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                string strBaseUrl = Request.Url.Scheme + "://" + Request.Url.Authority + Request.ApplicationPath.TrimEnd('/') + "/";
+                //string strPathName = Request.Url.Segments[1].Substring(0,Request.Url.Segments[1].Length - 1);
+
+                // Insert cort script 
+                ScriptManager.RegisterClientScriptInclude(this, this.GetType(), "main_core", strBaseUrl + "Content/Script.js");
+
+                // Update Filter Control
+                if (!IsPostBack)
+                {
+                    //LoadFilterControlColumns();
+                    //UpdateFilterControlExpression();
+                }
+            }
+            catch (Exception ex)
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage('Error','E')", true);
+            }
+        }
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            try
+            {
+                SetupPage();
+
+                //  What if path changed then clear search value
+                string path = HttpContext.Current.Request.Url.AbsolutePath;
+                if (Session["PATH"] == null)
+                {
+                    Session["PATH"] = "";
+                }
+                if (Session["PATH"].ToString() != path)
+                {
+                    Session["PATH"] = path;
+                    Session["SEARCH"] = "";
+                    Session["PAGE"] = "0";
+                    Session["ROW"] = "0";
+                    Session["COLUMN"] = "";
+                    Session["ORDER"] = "1";
+                }
+            }
+            catch (Exception ex)
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage('Error','E')", true);
+            }
+        }
+
+        public void SetupPage()
+        {
+            BasePage.Title = BasePage.PageName + " - Hi-Com Corporation";
+        }
+
+
+        #region "Filter Control"
+
+        protected void MainCallbackPanel_Callback(object sender, CallbackEventArgsBase e)
+        {
+            try
+            {
+                var args = SPlanetUtil.DeserializeCallbackArgs(e.Parameter);
+                if (args.Count == 0)
+                    return;
+                if (args[0] == "SaveEditForm")          // When click Save button in EditForm Popup Windows
+                    BasePage.SaveEditFormChanges(args[2]);
+                if (args[0] == "DeleteEntry")           // When click Delete button at Toolbar menu
+                    BasePage.DeleteEntry(args[1]);
+                if (args[0] == "RefreshEntry")           // When click Refresh button at Toolbar menu
+                    BasePage.RefreshEntry();
+                if (args[0] == "FilterChanged")         // When click Save button in Filter Popup Windows
+                {
+                    FilterBag.FilterControlExpression = args[1];
+                    UpdateFilterControlExpression();
+                    //MainCallbackPanel.JSProperties["cpSelectedFilterNavBarItemName"] = FilterBag.GetActiveFilterName();
+                    BasePage.OnFilterChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        protected void UpdateFilterControlExpression()
+        {
+            FilterControl.FilterExpression = FilterBag.FilterControlExpression;
+        }
+
+        protected void LoadFilterControlColumns()
+        {
+            foreach (var column in BasePage.GetFilterColumns())
+                FilterControl.Columns.Add(column);
+        }
+
+        protected void CustomFilterTextBox_Load(object sender, EventArgs e)
+        {
+            CustomFilterTextBox.ClientEnabled = SaveCustomFilterCheckBox.Checked;
+        }
+
+        protected void SaveFilterButton_Click(object sender, EventArgs e)
+        {
+            var filterItem = FilterBag.CreateCustomFilter(CustomFilterTextBox.Text, FilterControl.FilterExpression);
+            FilterBag.FilterControlExpression = filterItem.Expression;
+            UpdateFilterControlExpression();
+            FilterPopup.ShowOnPageLoad = false;
+            BasePage.OnFilterChanged();
+        }
+        #endregion
+
+        protected void PageViewerPopup_CustomJSProperties(object sender, DevExpress.Web.CustomJSPropertiesEventArgs e)
+        {
+            var reportTypes = Enum.GetValues(typeof(ReportType)).OfType<ReportType>();
+            e.Properties["cpReportDisplayNames"] = reportTypes.ToDictionary(r => r.ToString(), r => HicomReportUtil.GetReportDisplayName(r));
+        }
+
+        protected void HiddenField_Init(object sender, EventArgs e)
+        {
+            SPlanetUtil.RegisterStateHiddenField(HiddenField);
+        }
+        public void AlertMessage(string errorMessage)
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage(" + errorMessage + ",'E')", true);
+        }
+        public void ConfirmMessage(string confirmMessage, string button)
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "ConfirmMessage", "confirmMessage(" + confirmMessage + "," + button +")", true);
+        }
+    }
+}

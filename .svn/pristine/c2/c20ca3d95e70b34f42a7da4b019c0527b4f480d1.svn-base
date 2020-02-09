@@ -1,0 +1,1463 @@
+﻿html, body {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: #1e395b !important;
+    text-decoration: none !important;
+}
+
+/* Header */
+.dxpnl-edge.t.headerPane {
+    background-color: #EDEDED;
+    background-position: left top;
+    background-repeat: no-repeat;
+}
+
+    .dxpnl-edge.t.headerPane.panel {
+        padding: 0;
+    }
+
+.headerMenu {
+    border-width: 0 !important;
+    border-top-width: 1px !important;
+}
+
+.expandedPanel {
+    padding: 2px !important;
+}
+
+    .expandedPanel .headerMenu {
+        border-top-width: 0 !important;
+    }
+
+.templateTitle {
+    float: left;
+    margin: 10px;
+}
+
+.expandedPanel .templateTitle {
+    display: none;
+}
+
+.dxpnl-edge.t.headerPane.bar .templateTitle {
+    margin: 0;
+}
+
+.templateTitle a {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+
+.loginControl {
+    float: right;
+    margin: 24px 25px 12px;
+    font-size: 12px;
+}
+
+.expandedPanel .loginControl {
+    float: none;
+    margin-left: 12px;
+    margin-bottom: 24px;
+}
+
+.loginControl a {
+    color: black;
+    text-decoration: none;
+    border-bottom: dashed 1px black;
+    display: inline-block;
+}
+
+
+/* Footer */
+.dxpnl-edge.b.footerPane {
+    background-color: #EDEDED;
+}
+
+    .dxpnl-edge.b.footerPane.panel {
+        padding: 0;
+    }
+
+.footerMenu {
+    float: right;
+    padding-top: 7px;
+}
+
+.copyright {
+    float: left;
+    margin: 11px 15px 11px;
+}
+
+.content {
+    padding: 5px;
+}
+
+/* Left Panel */
+.leftPane.panel {
+    padding: 1px;
+    width: 150px;
+}
+
+/* Right Panel */
+.rightPane.panel {
+    padding: 0;
+    width: 250px;
+}
+
+/* Account */
+.accountHeader h2 {
+    margin: 10px 0 7px 0;
+    font-size: 16px;
+}
+
+.accountHeader p {
+    margin: 0;
+    padding: 0;
+}
+
+.accountHeader {
+    margin-bottom: 20px;
+}
+
+
+/* iOS */
+.dxpnlControl_iOS.leftPane,
+.dxpnlControl_iOS.rightPane,
+.dxpnlControl_iOS.contentPane {
+    border-width: 1px !important;
+}
+
+    .dxpnlControl_iOS.leftPane.panel {
+        width: 300px;
+    }
+
+.dxpnlControl_iOS.rightPane {
+    width: 450px;
+}
+
+.dxpnlControl_iOS .templateTitle {
+    margin: 17px 25px;
+}
+
+    .dxpnlControl_iOS .templateTitle a {
+        color: #303030;
+        font-size: 26px;
+        line-height: 1em;
+        font-weight: bold;
+    }
+
+.dxpnlControl_iOS .loginControl a {
+    color: #0160E7;
+    text-decoration: underline;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.dxpnlControl_iOS.mainContentPane {
+    border-width: 0px !important;
+    box-shadow: initial;
+    -webkit-box-shadow: initial;
+    -moz-box-shadow: initial;
+}
+
+.dxpnlControl_iOS.dxpnl-edge.b.footerPane {
+    border-width: 1px !important;
+}
+
+.dxpnlControl_iOS .accountHeader p {
+    color: #303030;
+}
+
+.dxpnlControl_iOS .accountHeader h2 {
+    color: #303030;
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+
+/* Aqua */
+.dxpnlControl_Aqua.dxpnl-edge.t.headerPane,
+.dxpnlControl_Aqua.dxpnl-edge.b.footerPane,
+.dxpnlControl_Aqua .footerMenu li {
+    background-color: #BFDBFF;
+}
+
+.dxpnlControl_Aqua.dxpnl-edge.t.headerPane {
+    background-image: url('images/AquaHeader.jpg');
+}
+
+.dxpnlControl_Aqua .accountHeader h2 {
+    color: #5689C5;
+}
+
+.dxpnlControl_Aqua .loginControl a,
+.dxpnlControl_Aqua .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+/* DevEx */
+.dxpnlControl_DevEx.dxpnl-edge.t.headerPane,
+.dxpnlControl_DevEx.dxpnl-edge.b.footerPane,
+.dxpnlControl_DevEx .footerMenu li {
+    background-color: #F2F3F4;
+}
+
+.dxpnlControl_DevEx .templateTitle a,
+.dxpnlControl_DevEx .loginControl,
+.dxpnlControl_DevEx .loginControl a {
+    color: #4B4B57;
+}
+
+    .dxpnlControl_DevEx .loginControl a {
+        border-bottom-color: #4B4B57;
+    }
+
+
+/* BlackGlass */
+.dxpnlControl_BlackGlass.dxpnl-edge.t.headerPane,
+.dxpnlControl_BlackGlass.dxpnl-edge.b.footerPane,
+.dxpnlControl_BlackGlass .footerMenu li {
+    background-color: #2A2A2A;
+    color: white;
+}
+
+.dxpnlControl_BlackGlass.dxpnl-edge.t.headerPane {
+    background-image: url('images/BlackGlassHeader.jpg');
+}
+
+.dxpnlControl_BlackGlass .leftPanel li[class$="dxnb-last"] ul {
+    border-bottom: 1px solid black;
+}
+
+.dxpnlControl_BlackGlass .accountHeader p {
+    color: #585858;
+}
+
+.dxpnlControl_BlackGlass .loginControl a,
+.dxpnlControl_BlackGlass .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+/* Glass */
+.dxpnlControl_Glass.dxpnl-edge.t.headerPane,
+.dxpnlControl_Glass.dxpnl-edge.b.footerPane,
+.dxpnlControl_Glass .footerMenu li {
+    background-color: #CFE0E7;
+}
+
+.dxpnlControl_Glass.dxpnl-edge.t.headerPane {
+    background-image: url('images/GlassHeader.jpg');
+}
+
+.dxpnlControl_Glass .footerMenu * {
+    background-image: none !important;
+}
+
+.dxpnlControl_Glass .templateTitle a,
+.dxpnlControl_Glass .loginControl,
+.dxpnlControl_Glass .loginControl a {
+    color: #4B4B57;
+}
+
+    .dxpnlControl_Glass .loginControl a {
+        border-bottom-color: #4B4B57;
+    }
+
+.dxpnlControl_Glass .accountHeader h2 {
+    color: #387FA4;
+}
+
+.dxpnlControl_Glass .accountHeader p {
+    color: #575757;
+}
+
+
+
+/* Office2003Blue */
+.dxpnlControl_Office2003Blue.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2003Blue.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2003Blue .footerMenu li {
+    background-color: #BCD4F6;
+}
+
+.dxpnlControl_Office2003Blue .footerMenu div {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Blue .leftPanel > ul {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Blue .templateTitle a,
+.dxpnlControl_Office2003Blue .loginControl,
+.dxpnlControl_Office2003Blue .loginControl a {
+    color: #4B4B57;
+}
+
+    .dxpnlControl_Office2003Blue .loginControl a {
+        border-bottom-color: #4B4B57;
+    }
+
+.dxpnlControl_Office2003Blue .accountHeader p {
+    color: #424242;
+}
+
+
+/* Office2003Olive */
+.dxpnlControl_Office2003Olive.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2003Olive.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2003Olive .footerMenu li {
+    background-color: #D6DCBB;
+}
+
+.dxpnlControl_Office2003Olive .footerMenu div {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Olive .leftPanel > ul {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Olive .templateTitle a,
+.dxpnlControl_Office2003Olive .loginControl,
+.dxpnlControl_Office2003Olive .loginControl a {
+    color: #4B4B57;
+}
+
+    .dxpnlControl_Office2003Olive .loginControl a {
+        border-bottom-color: #4B4B57;
+    }
+
+.dxpnlControl_Office2003Olive .accountHeader p {
+    color: #424242;
+}
+
+/* Office2003Silver */
+.dxpnlControl_Office2003Silver.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2003Silver.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2003Silver .footerMenu li {
+    background-color: #D0D0DE;
+}
+
+.dxpnlControl_Office2003Silver .footerMenu div {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Silver .leftPanel > ul {
+    background: transparent none;
+}
+
+.dxpnlControl_Office2003Silver .templateTitle a,
+.dxpnlControl_Office2003Silver .loginControl,
+.dxpnlControl_Office2003Silver .loginControl a {
+    color: #4B4B57;
+}
+
+    .dxpnlControl_Office2003Silver .loginControl a {
+        border-bottom-color: #4B4B57;
+    }
+
+.dxpnlControl_Office2003Silver .accountHeader p {
+    color: #424242;
+}
+
+/* Office2010Black */
+.dxpnlControl_Office2010Black.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2010Black.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2010Black .footerMenu li {
+    background-color: #393939;
+    color: white;
+}
+
+.dxpnlControl_Office2010Black .footerMenu a {
+    color: white !important;
+}
+
+.dxpnlControl_Office2010Black .accountHeader h2 {
+    color: #3C3C3C;
+}
+
+.dxpnlControl_Office2010Black .loginControl a,
+.dxpnlControl_Office2010Black .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+/* Office2010Blue */
+.dxpnlControl_Office2010Blue.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2010Blue.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2010Blue .footerMenu li {
+    background-color: #D3E4F6;
+}
+
+.dxpnlControl_Office2010Blue .templateTitle a,
+.dxpnlControl_Office2010Blue .loginControl,
+.dxpnlControl_Office2010Blue .loginControl a {
+    color: Black;
+}
+
+    .dxpnlControl_Office2010Blue .loginControl a {
+        border-bottom-color: Black;
+    }
+
+.dxpnlControl_Office2010Blue .accountHeader h2 {
+    color: #498BC2;
+}
+
+
+/* Office2010Silver */
+.dxpnlControl_Office2010Silver.dxpnl-edge.t.headerPane,
+.dxpnlControl_Office2010Silver.dxpnl-edge.b.footerPane,
+.dxpnlControl_Office2010Silver .footerMenu li {
+    background-color: #A9ACB4;
+    color: white;
+}
+
+.dxpnlControl_Office2010Silver .accountHeader h2 {
+    color: #3B3B3B;
+}
+
+.dxpnlControl_Office2010Silver .loginControl a,
+.dxpnlControl_Office2010Silver .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+
+/* PlasticBlue */
+.dxpnlControl_PlasticBlue.dxpnl-edge.t.headerPane,
+.dxpnlControl_PlasticBlue.dxpnl-edge.b.footerPane,
+.dxpnlControl_PlasticBlue .footerMenu li {
+    background-color: #3C4F8F;
+    color: white;
+}
+
+.dxpnlControl_PlasticBlue.dxpnl-edge.t.headerPane {
+    background-image: url('images/PlasticBlueHeader.jpg');
+}
+
+.dxpnlControl_PlasticBlue .accountHeader h2 {
+    color: #5A83D0;
+}
+
+.dxpnlControl_PlasticBlue .accountHeader p {
+    color: #575757;
+}
+
+.dxpnlControl_PlasticBlue .loginControl a,
+.dxpnlControl_PlasticBlue .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+/* RedWine */
+.dxpnlControl_RedWine.dxpnl-edge.t.headerPane,
+.dxpnlControl_RedWine.dxpnl-edge.b.footerPane,
+.dxpnlControl_RedWine .footerMenu li {
+    background-color: #78002B;
+    color: white;
+}
+
+.dxpnlControl_RedWine.dxpnl-edge.t.headerPane {
+    background-image: url('images/RedWineHeader.jpg');
+    background-position: top right;
+}
+
+.dxpnlControl_RedWine .footerMenu div {
+    background: transparent none;
+}
+
+.dxpnlControl_RedWine .accountHeader h2 {
+    color: #8A0A37;
+}
+
+.dxpnlControl_RedWine .loginControl a,
+.dxpnlControl_RedWine .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+
+/* SoftOrange */
+.dxpnlControl_SoftOrange.dxpnl-edge.t.headerPane,
+.dxpnlControl_SoftOrange.dxpnl-edge.b.footerPane,
+.dxpnlControl_SoftOrange .footerMenu li {
+    background-color: #F9F9F9 !important;
+    background-image: none !important;
+}
+
+.dxpnlControl_SoftOrange .templateTitle a,
+.dxpnlControl_SoftOrange .loginControl,
+.dxpnlControl_SoftOrange .loginControl a {
+    color: Black;
+}
+
+    .dxpnlControl_SoftOrange .loginControl a {
+        border-bottom-color: Black;
+    }
+
+.dxpnlControl_SoftOrange .accountHeader h2 {
+    color: Black;
+}
+
+.dxpnlControl_SoftOrange .accountHeader p {
+    color: #707070;
+}
+
+
+/* Youthful */
+.dxpnlControl_Youthful.dxpnl-edge.t.headerPane,
+.dxpnlControl_Youthful.dxpnl-edge.b.footerPane,
+.dxpnlControl_Youthful .footerMenu li {
+    background-color: #8AA150;
+    color: white !important;
+}
+
+.dxpnlControl_Youthful .accountHeader h2 {
+    color: #80A70E;
+}
+
+.dxpnlControl_Youthful .loginControl a,
+.dxpnlControl_Youthful .templateTitle a {
+    color: White;
+    border-color: White;
+}
+
+/* Metropolis */
+.dxpnlControl_Metropolis.dxpnl-edge.t.headerPane,
+.dxpnlControl_Metropolis .footerMenu li {
+    background-color: White;
+    color: Black;
+}
+
+.dxpnlControl_Metropolis.rightPane {
+    width: 400px;
+}
+
+.dxpnlControl_Metropolis .accountHeader h2 {
+    color: #3B3B3B;
+}
+
+.dxpnlControl_Metropolis .loginControl a,
+.dxpnlControl_Metropolis .templateTitle a {
+    color: Black;
+    border-color: Black;
+}
+
+.dxpnlControl_Metropolis .templateTitle a {
+    font-size: 28px;
+}
+
+/* MetropolisBlue */
+.dxpnlControl_MetropolisBlue.dxpnl-edge.t.headerPane,
+.dxpnlControl_MetropolisBlue .footerMenu li {
+    background-color: White;
+    color: Black;
+}
+
+.dxpnlControl_MetropolisBlue.rightPane {
+    width: 400px;
+}
+
+.dxpnlControl_MetropolisBlue .accountHeader h2 {
+    color: #3B3B3B;
+}
+
+.dxpnlControl_MetropolisBlue .loginControl a,
+.dxpnlControl_MetropolisBlue .templateTitle a {
+    color: Black;
+    border-color: Black;
+}
+
+.dxpnlControl_MetropolisBlue .templateTitle a {
+    font-size: 28px;
+}
+
+/* Moderno */
+.dxpnlControl_Moderno.dxpnl-edge.t.headerPane,
+.dxpnlControl_Moderno .footerMenu li {
+    background-color: White;
+    color: Black;
+}
+
+.dxpnlControl_Moderno.headerPane .headerMenu .dxm-main {
+    border-color: #d1d1d1;
+    border-style: solid;
+}
+
+.dxpnlControl_Moderno.leftPane {
+    padding: 0px;
+}
+
+    .dxpnlControl_Moderno.leftPane .dxnbLite_Moderno .dxnb-gr:first-child .dxnb-header,
+    .dxpnlControl_Moderno.leftPane .dxnbLite_Moderno .dxnb-gr:first-child .dxnb-headerCollapsed {
+        border-top: 0px;
+    }
+
+.dxpnlControl_Moderno.rightPane {
+    width: 350px;
+}
+
+.dxpnlControl_Moderno .accountHeader h2 {
+    color: #3B3B3B;
+}
+
+.dxpnlControl_Moderno .loginControl a,
+.dxpnlControl_Moderno .templateTitle a {
+    font-size: 14px;
+    color: #0072c6;
+    border-color: #0072c6;
+}
+
+.dxpnlControl_Moderno .templateTitle a {
+    font-size: 28px;
+}
+
+.dxpnlControl_Moderno .contentPane .dxgvControl_Moderno .dxgvTable_Moderno {
+    border: 0 !important;
+}
+
+.dxpnlControl_Moderno .contentPane .dxgvControl_Moderno .dxgvHeader_Moderno {
+    border-top: 0 !important;
+}
+
+.dxpnlControl_Moderno.dxpnl-edge.b.footerPane {
+    background: #EDEDED;
+}
+
+/* Mulberry */
+.dxpnlControl_Mulberry .footerMenu li {
+    background-color: White;
+    color: Black;
+}
+
+.dxpnlControl_Mulberry .accountHeader h2 {
+    color: #3B3B3B;
+}
+
+.dxpnlControl_Mulberry .loginControl a,
+.dxpnlControl_Mulberry .templateTitle a {
+    color: #BF4E6A;
+    border-color: #BF4E6A;
+    font-size: 14px;
+}
+
+.dxpnlControl_Mulberry .templateTitle a {
+    font-size: 28px;
+}
+
+.dxpnlControl_Mulberry.dxpnl-edge.t.headerPane,
+.dxpnlControl_Mulberry.dxpnl-edge.b.footerPane {
+    background: #F1F2F5;
+}
+
+.dxpnlControl_Mulberry .contentPane .dxgvControl_Mulberry .dxgvTable_Mulberry {
+    border: 0 !important;
+}
+
+.dxpnlControl_Mulberry .contentPane .dxgvControl_Mulberry .dxgvHeader_Mulberry {
+    border-top: 0 !important;
+}
+
+/*MastePage*/
+.mainSplitterContainer {
+    padding-right: 20px;
+}
+
+.mainSplitter,
+.mainSplitter .dxsplLCC {
+    background-color: #ffffff;
+}
+
+    .mainSplitter .dxsplLCC {
+        padding: 0;
+    }
+
+    .mainSplitter .logoPane,
+    .mainSplitter .toolbarPane,
+    .mainSplitter .mainContentPane,
+    .mainSplitter .footerImagePane,
+    .mainSplitter .footerTextPane {
+        border: none;
+    }
+
+        .mainSplitter .logoPane .dxsplLCC,
+        .mainSplitter .toolbarPane .dxsplLCC {
+            padding-top: 5px;
+            padding-left: 5px;
+        }
+
+.toolbarPane .dxm-ltr {
+    float: left;
+}
+
+.mainSplitter .logoPane .dxsplLCC > img {
+    margin-left: 20px;
+}
+
+.mainSplitter .logoPane .navigationMenu.dxm-main {
+    margin: 0 0 30px 19px;
+}
+
+    .mainSplitter .logoPane .navigationMenu.dxm-main,
+    .mainSplitter .logoPane .navigationMenu.dxm-main .dxm-item,
+    .mainSplitter .logoPane .navigationMenu.dxm-main .dxm-hovered {
+        background: none !important;
+        border: 0 !important;
+    }
+
+        .mainSplitter .logoPane .navigationMenu.dxm-main .dxm-content {
+            padding: 0 0 4px !important;
+        }
+
+        .mainSplitter .logoPane .navigationMenu.dxm-main .dxm-popOut {
+            padding: 7px 10px 9px !important;
+        }
+
+.mainSplitter .logoPane .navigationPopupMenu.dxm-popup .dxm-item,
+.mainSplitter .logoPane .navigationPopupMenu.dxm-popup .dxm-item a.dx {
+    color: #BF4E6A;
+}
+
+.mainSplitter .logoPane .navigationPopupMenu.dxm-popup .dxm-selected {
+    background-color: #BF4E6A;
+    color: white;
+}
+
+.mainSplitter .logoPane .navigationPopupMenu.dxm-popup .dxm-content {
+    padding: 11px 60px 11px 12px !important;
+}
+
+.mainSplitter .toolbarPane .dxm-main {
+    margin-left: -2px;
+}
+
+.mainSplitter .toolbarPane .dxm-image {
+    margin: -2px;
+}
+
+.mainSplitter .mainContentPane.frame .dxsplLCC {
+    border: 1px solid #c7c9cc;
+    background-color: #fafafa;
+}
+
+.mainSplitter .footerImagePane .dxsplLCC {
+    padding: 38px 27px;
+}
+
+.mainSplitter .footerTextPane .dxsplLCC {
+    padding: 30px 30px 30px 0;
+}
+
+    .mainSplitter .footerTextPane .dxsplLCC div {
+        font-size: 16px;
+        color: #7f8082;
+        border-left: 1px solid #c7c9cc;
+        padding: 0 14px;
+    }
+
+    .mainSplitter .footerTextPane .dxsplLCC a {
+        color: #5e6d9d;
+    }
+
+/* Search Box */
+.searchBox {
+    float: right;
+    margin: 3px 1px 0 0;
+}
+
+    .searchBox .button {
+        background: White !important;
+        border-color: White !important;
+        box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+    }
+
+        .searchBox .button .sprite {
+            background: url("Images/Buttons/SearchButtonSprite.png") no-repeat;
+            height: 20px;
+            width: 17px;
+        }
+
+            .searchBox .button .sprite.hover {
+                background-position: -36px;
+            }
+
+            .searchBox .button .sprite.pressed {
+                background-position: -18px;
+            }
+
+/* Popups Control */
+.filterPopup .dxpc-header,
+.editFormPopup .dxpc-header {
+    border-bottom: none;
+    padding: 20px 20px 8px;
+}
+
+    .filterPopup .dxpc-header span,
+    .editFormPopup .dxpc-header span {
+        color: #BF4E6A;
+        font-size: 14px;
+    }
+
+.filterPopup .dxpc-content,
+.filterPopup .dxpc-contentWrapper,
+.editFormPopup .dxpc-content,
+.editFormPopup .dxpc-contentWrapper {
+    background-color: #fafafa;
+}
+
+.filterPopup .filterControl {
+    border: 1px solid #E1E1E1;
+}
+
+.filterPopup .dxeTAR {
+    margin-top: 17px;
+}
+
+.filterPopup .dxeErrorFrameSys {
+    padding: 2px 0;
+}
+
+.filterPopup .dxichCellSys {
+    padding-left: 1px;
+    padding-bottom: 3px;
+}
+
+    .filterPopup .dxichCellSys span {
+        margin-left: 0;
+    }
+
+.filterPopup .dxbButtonSys {
+    float: right;
+    margin: 20px 0 20px 6px;
+}
+
+/* Report & Spreadsheet Viewer */
+.pageViewerPopup {
+    border: none !important;
+}
+
+    .pageViewerPopup .dxpc-header {
+        border-bottom: 1px solid #EBEBEB;
+    }
+
+    .pageViewerPopup > .dxpc-contentWrapper > .dxpc-content {
+        padding: 0;
+    }
+
+.reportContainer .dxsplCC .dxsplP .dxsplLCC {
+    border: none;
+    background: #FFFFFF;
+}
+
+.reportContainer .dxmLiteReportToolbarPane {
+    border: none;
+}
+
+.reportContainer .dxsplP > tbody > tr > td {
+    border: none;
+}
+
+.reportContainer,
+.spreadsheetContainer {
+    height: 100%;
+    margin: 0;
+    background: white;
+}
+
+    .spreadsheetContainer .dxssControlSys {
+        border: none;
+    }
+
+/* End of Style */
+
+.nav-side-menu {
+    overflow: auto;
+    font-family: verdana;
+    font-size: 12px;
+    font-weight: 200;
+    background-color: #e9f0f9;
+    position: fixed;
+    top: 73px;
+    width: 150px;
+    height: 100%;
+    color: #020203;
+    border-right: 1px solid #8ba0bc;
+}
+
+    .nav-side-menu .brand {
+        background-color: #808080;
+        line-height: 50px;
+        display: block;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .nav-side-menu .toggle-btn {
+        display: none;
+    }
+
+    .nav-side-menu ul,
+    .nav-side-menu li {
+        list-style: none;
+        padding: 0px;
+        margin: 0px;
+        line-height: 30px;
+        cursor: pointer;
+        /*    
+    .collapsed{
+       .arrow:before{
+                 font-family: FontAwesome;
+                 content: "\f053";
+                 display: inline-block;
+                 padding-left:10px;
+                 padding-right: 10px;
+                 vertical-align: middle;
+                 float:right;
+            }
+     }
+*/
+    }
+
+        .nav-side-menu ul :not(collapsed) .arrow:before,
+        .nav-side-menu li :not(collapsed) .arrow:before {
+            font-family: FontAwesome;
+            content: "\f078";
+            display: inline-block;
+            padding-left: 10px;
+            padding-right: 10px;
+            vertical-align: middle;
+            float: right;
+        }
+
+        .nav-side-menu ul .active,
+        .nav-side-menu li .active {
+            border-left: 3px solid #d19b3d;
+            background-color: #d19b3d;
+        }
+
+        .nav-side-menu ul .sub-menu li.active,
+        .nav-side-menu li .sub-menu li.active {
+            color: #4f5b69;
+            border-left: 3px solid #cfddee;
+            background-color: #faedb6;
+        }
+
+            .nav-side-menu ul .sub-menu li.active a,
+            .nav-side-menu li .sub-menu li.active a {
+                color: #4f5b69;
+            }
+
+        .nav-side-menu ul .sub-menu li,
+        .nav-side-menu li .sub-menu li {
+            background-color: #effbfb;
+            border: none;
+            line-height: 28px;
+            border-bottom: 1px solid #e8e9ed;
+            margin-left: 0px;
+        }
+
+            .nav-side-menu ul .sub-menu li:last-child,
+            .nav-side-menu li .sub-menu li:last-child {
+                border-bottom: 0px;
+            }
+
+            .nav-side-menu ul .sub-menu li:hover,
+            .nav-side-menu li .sub-menu li:hover {
+                color: #4f5b69;
+                border-left: 3px solid #cfddee;
+                background-color: #faedb6;
+            }
+
+            .nav-side-menu ul .sub-menu li:before,
+            .nav-side-menu li .sub-menu li:before {
+                display: inline-block;
+                padding-left: 10px;
+                padding-right: 10px;
+                vertical-align: middle;
+            }
+
+    .nav-side-menu li {
+        padding-left: 0;
+        border-bottom: 1px solid #8ba0bc;
+    }
+
+        .nav-side-menu li a {
+            text-decoration: none;
+            color: #020203;
+        }
+
+            .nav-side-menu li a i {
+                padding-left: 10px;
+                width: 20px;
+                padding-right: 20px;
+            }
+
+        .nav-side-menu li:hover {
+            background-color: #cfddee;
+        }
+
+@media (max-width: 767px) {
+    .nav-side-menu {
+        position: relative;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+        .nav-side-menu .toggle-btn {
+            display: block;
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            z-index: 10 !important;
+            padding: 3px;
+            background-color: #ffffff;
+            color: #000;
+            width: 40px;
+            text-align: center;
+        }
+
+    .brand {
+        text-align: left !important;
+        font-size: 22px;
+        padding-left: 20px;
+        line-height: 50px !important;
+    }
+}
+
+@media (min-width: 767px) {
+    .nav-side-menu .menu-list .menu-content {
+        display: block;
+    }
+}
+
+.btn-mini {
+    padding: 0;
+}
+
+
+/* Custom CSS */
+fieldset {
+    border: 1px solid #4b4b57;
+    display: block;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}
+
+legend {
+    width: auto;
+    display: block;
+    -webkit-padding-start: 2px;
+    -webkit-padding-end: 2px;
+    border-width: initial;
+    border-style: none;
+    border-color: initial;
+    border-image: initial;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: inherit;
+    font-weight: bold;
+}
+
+/*#Splitter_0 {
+    display: none;
+}*/
+
+#div-content {
+    padding: 5px 20px;
+    background-color: #ffffff;
+    margin: 0;
+}
+
+    #div-content .row.form-group {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+.no-padding {
+    padding: 0px;
+}
+
+.no-padding-right {
+    padding-right: 0px;
+}
+
+.no-margin {
+    margin: 0px;
+}
+
+.label-rigth {
+    padding: 4px 8px 0 0;
+}
+
+.form-group {
+    margin-bottom: 6px;
+}
+
+    .form-group label {
+        font-weight: normal;
+    }
+
+.form-control {
+    border-radius: 0;
+    padding: 0 3px;
+    font-size: 11px;
+    height: 22px;
+}
+
+table.form-control {
+    padding: 0;
+}
+
+input[type=checkbox], input[type=radio] {
+    margin: 1px 0 0;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+    border: 1px solid #4b4b57;
+    border-bottom-color: transparent;
+}
+
+.nav-tabs {
+    border-bottom: 1px solid #4b4b57;
+}
+
+    .nav-tabs > li > a {
+        border-radius: 0;
+    }
+
+        .nav-tabs > li > a:hover {
+            border-color: #eee #eee #4b4b57;
+        }
+
+.nav > li > a:focus, .nav > li > a:hover {
+    background-color: #faedb6;
+}
+
+a {
+    color: inherit;
+}
+
+    a:focus, a:hover {
+        color: inherit;
+    }
+
+#div-content .tab-content .tab-pane {
+    padding-top: 10px;
+}
+
+.btn-addItem {
+    height: 25px;
+    padding: 3px 15px;
+    color: #1E395B;
+    font: 11px Verdana, Geneva, sans-serif;
+    border: 1px solid #abbad0;
+    background: #d1dfef url(/DXR.axd?r=0_3934-wP3qf) repeat-x left top;
+}
+
+    .btn-addItem:hover {
+        background: #fcf8e5 url(/DXR.axd?r=0_3935-wP3qf) repeat-x left top;
+        border: 1px solid #eecc53;
+    }
+
+    .btn-addItem i {
+        font-size: 12px;
+    }
+
+.btn-new1 {
+    position: absolute;
+    top: 85px;
+}
+
+.btn-new2 {
+    position: absolute;
+    top: 80px;
+    left: 265px;
+}
+
+.btn-app {
+    width: 65px;
+}
+
+.modal-open {
+    opacity: 0.7;
+}
+
+.modal-content {
+    border-radius: 0;
+    background-color: white;
+    /*border: 1px solid #909aa6;*/
+    border-collapse: separate;
+}
+
+    .modal-content .modal-header {
+        background: #bbcee6 url(/DXR.axd?r=0_4062-wP3qf) repeat-x left top;
+        border-bottom: 1px solid #909aa6;
+        padding: 8px 0 6px 12px;
+        color: #1e395b;
+        font: 11px Verdana, Geneva, sans-serif;
+        height: 29px;
+    }
+
+.modal-backdrop {
+    opacity: 0.5 !important;
+}
+
+.modal-header .close {
+    margin-top: 0;
+    margin-right: 5px;
+    font-size: 15px;
+    color: #333;
+    opacity: 1;
+}
+
+.hr-line {
+    border-top: 1px solid #000;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.shipping-step {
+    float: left;
+    padding: 0 15px;
+}
+
+/*
+#Splitter_1_CC {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+*/
+
+.btn-new {
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
+/*********toggle*****************/
+.btn-toggle {
+    margin: 0 4rem;
+    padding: 0;
+    position: relative;
+    border: none;
+    height: 1.5rem;
+    width: 3rem;
+    border-radius: 1.5rem;
+    color: #6b7381;
+    background: #bdc1c8;
+}
+
+    .btn-toggle:focus,
+    .btn-toggle.focus,
+    .btn-toggle:focus.active,
+    .btn-toggle.focus.active {
+        outline: none;
+    }
+
+    .btn-toggle:before,
+    .btn-toggle:after {
+        line-height: 1.5rem;
+        width: 4rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: absolute;
+        bottom: 0;
+        transition: opacity .25s;
+    }
+
+    .btn-toggle:before {
+        content: 'Off';
+        left: -4rem;
+    }
+
+    .btn-toggle:after {
+        content: 'On';
+        right: -4rem;
+        opacity: .5;
+    }
+
+    .btn-toggle > .handle {
+        position: absolute;
+        top: 0.1875rem;
+        left: 0.1875rem;
+        width: 1.125rem;
+        height: 1.125rem;
+        border-radius: 1.125rem;
+        background: #fff;
+        transition: left .25s;
+    }
+
+    .btn-toggle.active {
+        transition: background-color 0.25s; /***การเคลื่อนไหวของสีตอนเปลี่ยน**/
+        background-color: #29b5a8;
+    }
+
+        .btn-toggle.active > .handle {
+            left: 1.6875rem;
+            transition: left .25s;
+        }
+
+        .btn-toggle.active:before {
+            opacity: .5;
+        }
+
+        .btn-toggle.active:after {
+            opacity: 1;
+        }
+
+    /****on off inside*/
+    .btn-toggle.btn-sm:before,
+    .btn-toggle.btn-sm:after {
+        line-height: -0.5rem;
+        color: #fff;
+        letter-spacing: .75px;
+        left: 0.4125rem;
+        width: 2.325rem;
+    }
+
+    .btn-toggle.btn-sm:before {
+        text-align: right;
+    }
+
+    .btn-toggle.btn-sm:after {
+        text-align: left;
+        opacity: 0;
+    }
+
+    .btn-toggle.btn-sm.active:before {
+        opacity: 0;
+    }
+
+    .btn-toggle.btn-sm.active:after {
+        opacity: 1;
+    }
+
+    .btn-toggle.btn-sm {
+        margin: 0 0.5rem;
+        padding: 0;
+        position: relative;
+        border: none;
+        height: 1.5rem;
+        width: 3rem;
+        border-radius: 1.5rem;
+    }
+
+        .btn-toggle.btn-sm:focus,
+        .btn-toggle.btn-sm.focus,
+        .btn-toggle.btn-sm:focus.active,
+        .btn-toggle.btn-sm.focus.active {
+            outline: none;
+        }
+
+        .btn-toggle.btn-sm:before,
+        .btn-toggle.btn-sm:after {
+            line-height: 1.5rem;
+            width: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: absolute;
+            bottom: 0;
+            transition: opacity .25s;
+        }
+
+        .btn-toggle.btn-sm:before {
+            content: 'Off';
+            left: -0.5rem;
+        }
+
+        .btn-toggle.btn-sm:after {
+            content: 'On';
+            right: -0.5rem;
+            opacity: .5;
+        }
+
+        .btn-toggle.btn-sm > .handle {
+            position: absolute;
+            top: 0.1875rem;
+            left: 0.1875rem;
+            width: 1.125rem;
+            height: 1.125rem;
+            border-radius: 1.125rem;
+            background: #fff;
+            transition: left .25s;
+        }
+
+        .btn-toggle.btn-sm.active {
+            transition: background-color 0.25s;
+        }
+
+            .btn-toggle.btn-sm.active > .handle {
+                left: 1.6875rem;
+                transition: left .25s;
+            }
+
+            .btn-toggle.btn-sm.active:before {
+                opacity: .5;
+            }
+
+            .btn-toggle.btn-sm.active:after {
+                opacity: 1;
+            }
+
+
+
+.btn-addItem.disabled {
+    cursor: no-drop;
+}
+
+.dxgvDataRow_Office2010Blue:hover {
+    background-color: bisque;
+}
+
+.dxgvDataRow_Office2010Blue:hover {
+    background-color: bisque;
+}
+
+.disabled {
+    cursor: no-drop;
+}
+
+#SearchBox {
+    display: none;
+}
+
+.div-search-box {
+    position: absolute;
+    top: 85px;
+    right: 5px;
+}
+
+#txtSearchBoxData {
+    width: 250px;
+    height: 25px;
+    float: left;
+}
+
+#btnSubmitSearch {
+    height: 25px;
+    margin-left: 3px;
+    float: left;
+}
+.searchBoxData {
+    width: 250px;
+    height: 25px;
+    float: left;
+}

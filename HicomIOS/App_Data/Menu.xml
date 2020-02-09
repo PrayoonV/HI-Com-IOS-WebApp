@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Pages>
+  <UserGroup>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </UserGroup>
+
+  <UserGroupMapping>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </UserGroupMapping>
+
+
+  <Employee>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Employee>
+
+  <Customer>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="Filter" Text="Filter" ToolTip="Custom filter" ImageUrl="Content/Images/MenuIcons/Filter.png" BeginGroup="True" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Customer>
+
+  <CustomerBranch>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </CustomerBranch>
+
+  <CustomerGroup>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </CustomerGroup>
+
+  <CustomerIndustryType>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </CustomerIndustryType>
+
+  <Products>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Products>
+
+  <ProductBrand>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </ProductBrand>
+
+  <ProductUnit>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </ProductUnit>
+
+  <ProductCategory>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </ProductCategory>
+
+  <ProductSet>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </ProductSet>
+
+  <EmployeeDepartment>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </EmployeeDepartment>
+
+  <EmployeePosition>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </EmployeePosition>
+
+  <Supplier>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Supplier>
+
+  <SupplierBranch>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </SupplierBranch>
+
+  <Department>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Department>
+
+  <SupplierGroup>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </SupplierGroup>
+
+  <SupplierBrand>
+    <Item Name="New" Text="New" ToolTip="New product" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete product" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </SupplierBrand>
+
+  <Notification>
+    <Item Name="New" Text="New" ToolTip="New Notification" ImageUrl="Content/Images/BottonIcons/document_add.png"  />
+    <Item Name="Delete" Text="Delete" ToolTip="Delete Notification" ImageUrl="Content/Images/BottonIcons/document_edit.png"  />
+    <Item Name="Print" Text="Print" ToolTip="Print report" ImageUrl="Content/Images/MenuIcons/Print.png" BeginGroup="True" DropDownMode="True" ReportName="ProductOrders">
+      <Item Name="FirstReport" Text="Order Details Report" ReportName="ProductOrders" />
+      <Item Name="SecondReport" Text="Sales Summary Report" ReportName="ProductSalesSummary" />
+      <Item Name="ThidrReport" Text="Specification Summary Report" ReportName="ProductProfile" />
+    </Item>
+    <Item Name="ExportToSpreadsheet" Text="Export" ToolTip="Export to spreadsheet" ImageUrl="Content/Images/MenuIcons/Spreadsheet.png" ReportName="ProductOrders" />
+    <Item Name="ColumnsCustomization" Text="Customize" ToolTip="Customize columns" ImageUrl="Content/Images/MenuIcons/ColumnCustomization.png" UrlDisabled="Content/Images/MenuIcons/ColumnCustomization_Disabled.png" GroupName="ColumnsCustomization" />
+  </Notification>
+  <Quatation>
+  </Quatation>
+</Pages>

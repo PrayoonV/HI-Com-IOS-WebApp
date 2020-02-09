@@ -1,0 +1,591 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+
+namespace HicomIOS.Master
+{
+    public partial class SupplierBranch : MasterDetailPage
+    {
+        private DataSet dsResult;
+        private DataTable dtProvince = new DataTable();
+        private DataTable dtAmphur = new DataTable();
+        private DataTable dtDistrict = new DataTable();
+        public class SupplierBranchList
+        {
+            public int id { get; set; }
+            public string supplier_code { get; set; }
+            public string branch_no { get; set; }
+            public string branch_name_tha { get; set; }
+            public string branch_name_eng { get; set; }
+            public string address_tha { get; set; }
+            public string address_eng { get; set; }
+            public int geo_id { get; set; }
+            public int province_id { get; set; }
+            public int amphur_id { get; set; }
+            public int district_id { get; set; }
+            public string zipcode { get; set; }
+            public bool is_enable { get; set; }
+            public bool is_delete { get; set; }
+            public int created_by { get; set; }
+            public DateTime created_date { get; set; }
+            public int updated_by { get; set; }
+            public DateTime updated_date { get; set; }
+            public List<ProvinceClass> provinceList { get; set; }
+            public List<AmphurClass> amphurList { get; set; }
+            public List<DistrictClass> districtList { get; set; }
+        }
+
+        public class ProvinceClass
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public class AmphurClass
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public class DistrictClass
+        {
+            public int id { get; set; }
+            public string name { get; set; }
+        }
+
+        public override string PageName { get { return "Supplier Branch"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public override long SelectedItemID
+        {
+            get
+            {
+                var ItemID = gridView.GetRowValues(gridView.FocusedRowIndex, gridView.KeyFieldName);
+                return ItemID != null ? (int)ItemID : DataListUtil.emptyEntryID;
+            }
+            set
+            {
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(value);
+            }
+        }
+
+        // ClientInstanceName that use in Script.js
+        private string strClientInstanceName_gridView;
+        private string strClientInstanceName_UserControlEditForm = "";
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                // Load Combobox Thailand Geo Data
+                SPlanetUtil.BindASPxComboBox(ref cboGEO, DataListUtil.DropdownStoreProcedureName.Thailand_Geo);
+
+                // Setting height gridView
+                gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+                dsResult = null;
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)ViewState["dsResult"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_supplier_branch_list", arrParm.ToArray());
+                        ViewState["dsResult"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        protected void cboProvince_Callback(object source, CallbackEventArgsBase e)
+        {
+            FillProvinceCombo(e.Parameter);
+        }
+        protected void cboAmphur_Callback(object source, CallbackEventArgsBase e)
+        {
+            FillAmphurCombo(e.Parameter);
+        }
+        protected void cboDistrict_Callback(object source, CallbackEventArgsBase e)
+        {
+            FillDistrictCombo(e.Parameter);
+        }
+
+        protected void FillProvinceCombo(string geoId)
+        {
+            try
+            {
+                dtProvince = new DataTable();
+                dtProvince.Columns.Add("data_text", typeof(string));
+                dtProvince.Columns.Add("data_value", typeof(int));
+                dtProvince.Columns.Add("geo_id", typeof(int));
+
+                if (!string.IsNullOrEmpty(geoId))
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(int));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        conn.Open();
+                        using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, DataListUtil.DropdownStoreProcedureName.Thailand_Province))
+                        {
+                            if (dsResult != null)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    if (Convert.ToString(row["geo_id"]) == geoId)
+                                    {
+                                        dtProvince.Rows.Add(row[1], Convert.ToInt32(row[0]), Convert.ToInt32(row[2]));
+                                    }
+                                }
+                            }
+
+                        }
+                        conn.Close();
+                    }
+
+                    var provinceFilter = (from t in dtProvince.AsEnumerable()
+                                          where t.Field<int>("geo_id") == Convert.ToInt32(geoId)
+                                          select t).ToList();
+                    foreach (var row in provinceFilter)
+                    {
+                        dtSource.Rows.Add(row[1], row[0]);
+                    }
+                    cboProvince.DataSource = dtSource;
+                    cboProvince.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        protected void FillAmphurCombo(string provinceId)
+        {
+            try
+            {
+                dtAmphur = new DataTable();
+                dtAmphur.Columns.Add("data_text", typeof(string));
+                dtAmphur.Columns.Add("data_value", typeof(int));
+                dtAmphur.Columns.Add("province_id", typeof(int));
+
+                if (!string.IsNullOrEmpty(provinceId))
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(int));
+                    dtSource.Columns.Add("data_text", typeof(string));
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        conn.Open();
+                        using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, DataListUtil.DropdownStoreProcedureName.Thailand_Amphur))
+                        {
+                            if (dsResult != null)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    if (Convert.ToString(row["province_id"]) == provinceId)
+                                    {
+                                        dtAmphur.Rows.Add(row[1], Convert.ToInt32(row[0]), Convert.ToInt32(row[2]));
+                                    }
+                                }
+                            }
+
+                        }
+                        conn.Close();
+                    }
+
+                    var amphurFilter = (from t in dtAmphur.AsEnumerable()
+                                        where t.Field<int>("province_id") == Convert.ToInt32(provinceId)
+                                        select t).ToList();
+                    foreach (var row in amphurFilter)
+                    {
+                        dtSource.Rows.Add(row[1], row[0]);
+                    }
+                    cboAmphur.DataSource = dtSource;
+                    cboAmphur.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+        protected void FillDistrictCombo(string amphurId)
+        {
+            try
+            {
+                dtDistrict = new DataTable();
+                dtDistrict.Columns.Add("data_text", typeof(string));
+                dtDistrict.Columns.Add("data_value", typeof(int));
+                dtDistrict.Columns.Add("amphur_id", typeof(int));
+
+                if (!string.IsNullOrEmpty(amphurId))
+                {
+                    var dtSource = new DataTable();
+                    dtSource.Columns.Add("data_value", typeof(int));
+                    dtSource.Columns.Add("data_text", typeof(string));
+
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        conn.Open();
+                        using (DataSet dsResult = SqlHelper.ExecuteDataset(SPlanetUtil.GetConnectionString(), CommandType.StoredProcedure, DataListUtil.DropdownStoreProcedureName.Thailand_District))
+                        {
+                            if (dsResult != null)
+                            {
+                                foreach (var row in dsResult.Tables[0].AsEnumerable())
+                                {
+                                    if (Convert.ToString(row["amphur_id"]) == amphurId)
+                                    {
+                                        dtDistrict.Rows.Add(row[1], Convert.ToInt32(row[0]), Convert.ToInt32(row[2]));
+                                    }
+                                }
+                            }
+
+                        }
+                        conn.Close();
+                    }
+
+                    var districtFilter = (from t in dtDistrict.AsEnumerable()
+                                          where t.Field<int>("amphur_id") == Convert.ToInt32(amphurId)
+                                          select t).ToList();
+                    foreach (var row in districtFilter)
+                    {
+                        dtSource.Rows.Add(row[1], row[0]);
+                    }
+                    cboDistrict.DataSource = dtSource;
+                    cboDistrict.DataBind();
+                }
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string InsertSupplierBranch(SupplierBranchList[] supplierBranchAddData)
+        {
+            var row = (from t in supplierBranchAddData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_supplier_branch_add", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@supplier_code", SqlDbType.VarChar, 20).Value = row.supplier_code;
+                            cmd.Parameters.Add("@branch_no", SqlDbType.VarChar, 5).Value = row.branch_no;
+                            cmd.Parameters.Add("@branch_name_tha", SqlDbType.VarChar, 100).Value = row.branch_name_tha;
+                            cmd.Parameters.Add("@branch_name_eng", SqlDbType.VarChar, 100).Value = row.branch_name_eng;
+                            cmd.Parameters.Add("@address_tha", SqlDbType.VarChar, 200).Value = row.address_tha;
+                            cmd.Parameters.Add("@address_eng", SqlDbType.VarChar, 200).Value = row.address_eng;
+                            cmd.Parameters.Add("@geo_id", SqlDbType.Int).Value = row.geo_id;
+                            cmd.Parameters.Add("@province_id", SqlDbType.Int).Value = row.province_id;
+                            cmd.Parameters.Add("@amphur_id", SqlDbType.Int).Value = row.amphur_id;
+                            cmd.Parameters.Add("@district_id", SqlDbType.Int).Value = row.district_id;
+                            cmd.Parameters.Add("@zipcode", SqlDbType.VarChar, 10).Value = row.zipcode;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Int).Value = 1;
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Int).Value = 0;
+                            cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static SupplierBranchList GetEditSupplierBranchData(string id)
+        {
+            var supplierBranchData = new SupplierBranchList();
+            var dsDataSupplierBranch = new DataSet();
+            var dsDataProvince = new DataSet();
+            var dsDataAmphur = new DataSet();
+            var dsDataDistrict = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                        };
+                    conn.Open();
+                    dsDataSupplierBranch = SqlHelper.ExecuteDataset(conn, "sp_supplier_branch_list", arrParm.ToArray());
+                    conn.Close();
+
+                    var geo_id = Convert.IsDBNull(dsDataSupplierBranch.Tables[0].Rows[0]["geo_id"]) ? 0 : Convert.ToInt32(dsDataSupplierBranch.Tables[0].Rows[0]["geo_id"]);
+                    if (geo_id > 0)
+                    {
+                        List<SqlParameter> arrProvince = new List<SqlParameter>
+                        {
+                            new SqlParameter("@geo_id", SqlDbType.Int) { Value = Convert.ToInt32(geo_id) }
+                        };
+                        conn.Open();
+                        dsDataProvince = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_2_province", arrProvince.ToArray());
+                        conn.Close();
+                    }
+
+                    var province_id = Convert.IsDBNull(dsDataSupplierBranch.Tables[0].Rows[0]["province_id"]) ? 0 : Convert.ToInt32(dsDataSupplierBranch.Tables[0].Rows[0]["province_id"]);
+                    if (province_id > 0)
+                    {
+                        List<SqlParameter> arrAmphur = new List<SqlParameter>
+                        {
+                            new SqlParameter("@province_id", SqlDbType.Int) { Value = Convert.ToInt32(province_id) }
+                        };
+                        conn.Open();
+                        dsDataAmphur = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_3_amphur", arrAmphur.ToArray());
+                        conn.Close();
+                    }
+
+                    var amphur_id = Convert.IsDBNull(dsDataSupplierBranch.Tables[0].Rows[0]["amphur_id"]) ? 0 : Convert.ToInt32(dsDataSupplierBranch.Tables[0].Rows[0]["amphur_id"]);
+                    if (amphur_id > 0)
+                    {
+                        List<SqlParameter> arrDistrict = new List<SqlParameter>
+                        {
+                            new SqlParameter("@amphur_id", SqlDbType.Int) { Value = Convert.ToInt32(amphur_id) }
+                        };
+                        conn.Open();
+                        dsDataDistrict = SqlHelper.ExecuteDataset(conn, "sp_dropdrown_tb_thailand_4_district", arrDistrict.ToArray());
+                        conn.Close();
+                    }
+                }
+
+                if (dsDataSupplierBranch.Tables.Count > 0)
+                {
+                    var row = dsDataSupplierBranch.Tables[0].Rows[0];
+
+                    supplierBranchData.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    supplierBranchData.supplier_code = Convert.IsDBNull(row["supplier_code"]) ? null : Convert.ToString(row["supplier_code"]);
+                    supplierBranchData.branch_no = Convert.IsDBNull(row["branch_no"]) ? null : Convert.ToString(row["branch_no"]);
+                    supplierBranchData.branch_name_tha = Convert.IsDBNull(row["branch_name_tha"]) ? null : Convert.ToString(row["branch_name_tha"]);
+                    supplierBranchData.branch_name_eng = Convert.IsDBNull(row["branch_name_eng"]) ? null : Convert.ToString(row["branch_name_eng"]);
+                    supplierBranchData.address_tha = Convert.IsDBNull(row["address_tha"]) ? null : Convert.ToString(row["address_tha"]);
+                    supplierBranchData.address_eng = Convert.IsDBNull(row["address_eng"]) ? null : Convert.ToString(row["address_eng"]);
+                    supplierBranchData.geo_id = Convert.IsDBNull(row["geo_id"]) ? 0 : Convert.ToInt32(row["geo_id"]);
+                    supplierBranchData.province_id = Convert.IsDBNull(row["province_id"]) ? 0 : Convert.ToInt32(row["province_id"]);
+                    supplierBranchData.amphur_id = Convert.IsDBNull(row["amphur_id"]) ? 0 : Convert.ToInt32(row["amphur_id"]);
+                    supplierBranchData.district_id = Convert.IsDBNull(row["district_id"]) ? 0 : Convert.ToInt32(row["district_id"]);
+                    supplierBranchData.zipcode = Convert.IsDBNull(row["zipcode"]) ? null : Convert.ToString(row["zipcode"]);
+
+                }
+
+                supplierBranchData.provinceList = new List<ProvinceClass>();
+                if (dsDataProvince.Tables.Count > 0)
+                {
+                    foreach (var rowProvince in dsDataProvince.Tables[0].AsEnumerable())
+                    {
+                        supplierBranchData.provinceList.Add(new ProvinceClass()
+                        {
+                            id = Convert.IsDBNull(rowProvince["data_value"]) ? 0 : Convert.ToInt32(rowProvince["data_value"]),
+                            name = Convert.IsDBNull(rowProvince["data_text"]) ? null : Convert.ToString(rowProvince["data_text"])
+                        });
+                    }
+                }
+
+                supplierBranchData.amphurList = new List<AmphurClass>();
+                if (dsDataAmphur.Tables.Count > 0)
+                {
+                    foreach (var rowAmphur in dsDataAmphur.Tables[0].AsEnumerable())
+                    {
+                        supplierBranchData.amphurList.Add(new AmphurClass()
+                        {
+                            id = Convert.IsDBNull(rowAmphur["data_value"]) ? 0 : Convert.ToInt32(rowAmphur["data_value"]),
+                            name = Convert.IsDBNull(rowAmphur["data_text"]) ? null : Convert.ToString(rowAmphur["data_text"])
+                        });
+                    }
+                }
+
+                supplierBranchData.districtList = new List<DistrictClass>();
+                if (dsDataDistrict.Tables.Count > 0)
+                {
+                    foreach (var rowDistrict in dsDataDistrict.Tables[0].AsEnumerable())
+                    {
+                        supplierBranchData.districtList.Add(new DistrictClass()
+                        {
+                            id = Convert.IsDBNull(rowDistrict["data_value"]) ? 0 : Convert.ToInt32(rowDistrict["data_value"]),
+                            name = Convert.IsDBNull(rowDistrict["data_text"]) ? null : Convert.ToString(rowDistrict["data_text"])
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return supplierBranchData;
+        }
+
+        [WebMethod]
+        public static string UpdateSupplierBranch(SupplierBranchList[] supplierBranchUpdateData)
+        {
+            var row = (from t in supplierBranchUpdateData select t).FirstOrDefault();
+            if (row != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        using (SqlCommand cmd = new SqlCommand("sp_supplier_branch_edit", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(row.id);
+                            cmd.Parameters.Add("@supplier_code", SqlDbType.VarChar, 20).Value = row.supplier_code;
+                            cmd.Parameters.Add("@branch_no", SqlDbType.VarChar, 5).Value = row.branch_no;
+                            cmd.Parameters.Add("@branch_name_tha", SqlDbType.VarChar, 100).Value = row.branch_name_tha;
+                            cmd.Parameters.Add("@branch_name_eng", SqlDbType.VarChar, 100).Value = row.branch_name_eng;
+                            cmd.Parameters.Add("@address_tha", SqlDbType.VarChar, 200).Value = row.address_tha;
+                            cmd.Parameters.Add("@address_eng", SqlDbType.VarChar, 200).Value = row.address_eng;
+                            cmd.Parameters.Add("@geo_id", SqlDbType.Int).Value = row.geo_id;
+                            cmd.Parameters.Add("@province_id", SqlDbType.Int).Value = row.province_id;
+                            cmd.Parameters.Add("@amphur_id", SqlDbType.Int).Value = row.amphur_id;
+                            cmd.Parameters.Add("@district_id", SqlDbType.Int).Value = row.district_id;
+                            cmd.Parameters.Add("@zipcode", SqlDbType.VarChar, 10).Value = row.zipcode;
+                            cmd.Parameters.Add("@is_enable", SqlDbType.Int).Value = 1;
+                            cmd.Parameters.Add("@is_delete", SqlDbType.Int).Value = 0;
+                            cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                            conn.Open();
+                            cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+            }
+            return "success";
+        }
+
+        [WebMethod]
+        public static string DeleteSupplierBranch(string id)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    using (SqlCommand cmd = new SqlCommand("sp_supplier_branch_delete", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                        cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return "success";
+        }
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            try
+            {
+               
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 }
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_supplier_branch_list", arrParm.ToArray());
+                        ViewState["dsResult"] = dsResult;
+                    }
+                
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        }
+
+}

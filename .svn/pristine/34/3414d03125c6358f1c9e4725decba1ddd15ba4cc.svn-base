@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<items>
+  <item Text="Dashboard" NavigateUrl="#" />
+  <item Text="Inventory" NavigateUrl="#"  />
+  <item Text="Sales" NavigateUrl="#"  />
+  <item Text="Report" NavigateUrl="#"  />
+  <item Text="Master" NavigateUrl="#"  />
+</items>

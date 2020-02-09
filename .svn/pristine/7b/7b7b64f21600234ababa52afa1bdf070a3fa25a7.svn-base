@@ -1,0 +1,628 @@
+﻿using DevExpress.Web;
+using HicomIOS.ClassUtil;
+using Microsoft.ApplicationBlocks.Data;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace HicomIOS
+{
+    public partial class DeliveryOrder : MasterDetailPage
+    {
+        public int dataId = 0;
+        private DataSet dsDeliveryOrder = new DataSet();
+        public override string PageName { get { return "DeliveryOrder"; } }
+
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        public class IssueDetail
+        {
+            public int id { get; set; }
+            public int issue_stock_id { get; set; }
+            public int issue_stock_detail_id { get; set; }
+            public string issue_stock_no { get; set; }
+            public string product_no { get; set; }
+            public int product_id { get; set; }
+            public string product_name_tha { get; set; }
+            public int qty { get; set; }
+            public int so_qty { get; set; }
+            public string unit_tha { get; set; }
+            public string remark { get; set; }
+            public bool is_delete { get; set; }
+            public int sale_order_detail_id { get; set; }
+        }
+        public class IssueData
+        {
+            public int id { get; set; }
+            public DateTime delivery_date { get; set; }
+            public string display_delivery_date { get; set; }
+            public string project_name { get; set; }
+            public string customer_name { get; set; }
+            public string attention_name { get; set; }
+            public string tel { get; set; }
+            public string sale_name { get; set; }
+            public string quotation_no { get; set; }
+            public string quotation_id { get; set; }
+            public string address { get; set; }
+            public int customer_id { get; set; }
+
+        }
+        public class IssueDetailMFG
+        {
+            public int id { get; set; }
+            public string issue_stock_no { get; set; }
+            public int issue_stock_detail_id { get; set; }
+            public int product_id { get; set; }
+            public string mfg_no { get; set; }
+            public int qty { get; set; }
+            public bool is_deleted { get; set; }
+
+        }
+
+        public class DeliveryOrderDetail
+        {
+            public int id { get; set; }
+            public int product_id { get; set; }
+            public int delivery_order_id { get; set; }
+            public string delivery_order_no { get; set; }
+            public string product_no { get; set; }
+            public string product_name_tha { get; set; }
+            public string mfg_no { get; set; }
+            public string product_description { get; set; }
+            public bool is_deleted { get; set; }
+            public int issue_stock_detail_id { get; set; }
+            public string remark { get; set; }
+            public int issue_qty { get; set; }
+            public string product_unit { get; set; }
+        }
+
+        List<IssueDetail> issueDetailList
+        {
+            get
+            {
+                if (Session["SESSION_ISSUE_DETAIL_DELIVERY_ORDER"] == null)
+                    Session["SESSION_ISSUE_DETAIL_DELIVERY_ORDER"] = new List<IssueDetail>();
+                return (List<IssueDetail>)Session["SESSION_ISSUE_DETAIL_DELIVERY_ORDER"];
+            }
+            set
+            {
+                Session["SESSION_ISSUE_DETAIL_ISSUE"] = value;
+            }
+        }
+        List<IssueDetailMFG> issueMFGDetailList
+        {
+            get
+            {
+                if (Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] == null)
+                    Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = new List<IssueDetailMFG>();
+                return (List<IssueDetailMFG>)Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"];
+            }
+            set
+            {
+                Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = value;
+            }
+        }
+
+        List<IssueDetailMFG> selectedIssueMFGDetailList
+        {
+            get
+            {
+                if (Session["SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] == null)
+                    Session["SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = new List<IssueDetailMFG>();
+                return (List<IssueDetailMFG>)Session["SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER"];
+            }
+            set
+            {
+                Session["SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = value;
+            }
+        }
+        public override void OnFilterChanged()
+        {
+
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            dataId = Convert.ToInt32(Request.QueryString["dataId"]);
+            if (!IsPostBack)
+            {
+                ClearWorkingSession();
+                PrepareData();
+                LoadData();
+            }
+            else
+            {
+                BindGridIssueDetail();
+                BindGridIssueMFGDetail();
+            }
+        }
+        private void ClearWorkingSession()
+        {
+            Session.Remove("SESSION_ISSUE_DETAIL_DELIVERY_ORDER");
+            Session.Remove("SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER");
+            Session.Remove("SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER");
+        }
+        private void BindGridIssueDetail()
+        {
+            gridViewIssue.DataSource = issueDetailList;
+            gridViewIssue.DataBind();
+        }
+        private void BindGridIssueMFGDetail()
+        {
+            gridViewIssueMFG.DataSource = issueMFGDetailList;
+            gridViewIssueMFG.DataBind();
+        }
+
+        protected void PrepareData()
+        {
+            SPlanetUtil.BindASPxComboBox(ref cbbIssue, DataListUtil.DropdownStoreProcedureName.Delivery_Order_Issue_Stock);
+            //txtDeliveryOrderDate.Value = DateTime.UtcNow.ToString("dd/MM/yyyy");
+        }
+        protected void LoadData()
+        {
+            try
+            {
+                if (dataId != 0)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = dataId },
+
+                        };
+                        conn.Open();
+                        dsDeliveryOrder = SqlHelper.ExecuteDataset(conn, "sp_delivery_order_list_data", arrParm.ToArray());
+                        conn.Close();
+                    }
+                    if (dsDeliveryOrder.Tables.Count > 0)
+                    {
+                        #region Header
+                        var header = (from t in dsDeliveryOrder.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                        if (header != null)
+                        {
+                            var chkCondition = Convert.IsDBNull(header["condition"]) ? string.Empty : Convert.ToString(header["condition"]);
+                            var splitCondition = chkCondition.Split('|');
+                            if (splitCondition.Length > 0)
+                            {
+                                chkFondation.Checked = splitCondition[0] == "-" ? false : true;
+                                chkNoUnloading.Checked = splitCondition[1] == "-" ? false : true;
+                                chkInstallation.Checked = splitCondition[2] == "-" ? false : true;
+                                chkOther.Checked = splitCondition[3] == "-" ? false : true;
+                                txtAgreementOther.Attributes["style"] = splitCondition[3] == "-" ? "display:none" : "display : ''";
+                                txtAgreementOther.Value = splitCondition[3] == "-" ? string.Empty : splitCondition[3];
+                            }
+                            var eqipmentNo = Convert.IsDBNull(header["equipment"]) ? string.Empty : Convert.ToString(header["equipment"]);
+
+                            var splitEquipmentNo = eqipmentNo.Split(':');
+
+                            eqipmentNo = splitEquipmentNo.Length > 0 ? splitEquipmentNo[1] : "0";
+                            //txtAgreementOther.Value = Convert.IsDBNull(header["order_description"])
+                            txtDeadline.Value = Convert.IsDBNull(header["deadlines"]) ? string.Empty : Convert.ToString(Convert.ToDateTime(header["deadlines"]).ToString("dd/MM/yyyy"));
+                            txtDeliveryName.Value = Convert.IsDBNull(header["logistic_name"]) ? string.Empty : Convert.ToString(header["logistic_name"]);
+                            //txtDeliveryOrderDate.Value = Convert.IsDBNull(header["deadlines"]) ? string.Empty : Convert.ToString(Convert.ToDateTime(header["deadlines"]).ToString("dd/MM/yyyy"));
+                            txtDeliveryOrderNo.Value = Convert.IsDBNull(header["delivery_order_no"]) ? string.Empty : Convert.ToString(header["delivery_order_no"]);
+                            txtDeliveryPrice.Value = Convert.IsDBNull(header["logistic_price"]) ? string.Empty : Convert.ToString(header["logistic_price"]);
+                            txtEquipment.Value = eqipmentNo;
+                            txtIssueDate.Value = Convert.IsDBNull(header["delivery_date"]) ? string.Empty : Convert.ToString(Convert.ToDateTime(header["delivery_date"]).ToString("dd/MM/yyyy"));
+                            txtOrderDescription.Value = Convert.IsDBNull(header["order_description"]) ? string.Empty : Convert.ToString(header["order_description"]);
+                            txtOtherRef.Value = Convert.IsDBNull(header["other_ref"]) ? string.Empty : Convert.ToString(header["other_ref"]);
+
+                            lbAddresss.Value = Convert.IsDBNull(header["delivery_order_address"]) ? string.Empty : Convert.ToString(header["delivery_order_address"]);
+                            lbAttention.Value = Convert.IsDBNull(header["attention_name"]) ? string.Empty : Convert.ToString(header["attention_name"]);
+                            lbCustomerFirstName.Value = Convert.IsDBNull(header["customer_name"]) ? string.Empty : Convert.ToString(header["customer_name"]);
+                            lbProject.Value = Convert.IsDBNull(header["project"]) ? string.Empty : Convert.ToString(header["project"]);
+                            lbQuotationNo.Value = Convert.IsDBNull(header["quotation_no"]) ? string.Empty : Convert.ToString(header["quotation_no"]);
+                            //lbSaleName.Value = string.Empty;
+                            lbTelephoneNumber.Value = Convert.IsDBNull(header["tel_no"]) ? string.Empty : Convert.ToString(header["tel_no"]);
+                            cbbIssue.Value = Convert.IsDBNull(header["issue_stock_id"]) ? string.Empty : Convert.ToString(header["issue_stock_id"]);
+
+                            cbbIssue.ReadOnly = true;
+                        }
+                        #endregion
+
+                        #region Detail
+                        var detailData = (from t in dsDeliveryOrder.Tables[1].AsEnumerable() select t).ToList();
+                        if (detailData != null)
+                        {
+                            var deliveryDetailData = new List<DeliveryOrderDetail>();
+                            issueDetailList = new List<IssueDetail>();
+                            issueMFGDetailList = new List<IssueDetailMFG>();
+
+                            foreach (var row in detailData) // FROM DB
+                            {
+                                deliveryDetailData.Add(new DeliveryOrderDetail()
+                                {
+                                    id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                    delivery_order_id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                    delivery_order_no = Convert.IsDBNull(row["delivery_order_no"]) ? string.Empty : Convert.ToString(row["delivery_order_no"]),
+                                    issue_stock_detail_id = Convert.IsDBNull(row["issue_stock_detail_id"]) ? 0 : Convert.ToInt32(row["issue_stock_detail_id"]),
+                                    is_deleted = false,
+                                    mfg_no = Convert.IsDBNull(row["mfg_no"]) ? string.Empty : Convert.ToString(row["mfg_no"]),
+                                    product_description = Convert.IsDBNull(row["product_description"]) ? string.Empty : Convert.ToString(row["product_description"]),
+                                    product_name_tha = Convert.IsDBNull(row["product_name_tha"]) ? string.Empty : Convert.ToString(row["product_name_tha"]),
+                                    product_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                    issue_qty = Convert.IsDBNull(row["issue_qty"]) ? 0 : Convert.ToInt32(row["issue_qty"]),
+                                    remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                    product_unit = Convert.IsDBNull(row["product_unit"]) ? string.Empty : Convert.ToString(row["product_unit"]),
+                                });
+                            }
+                            // Data จาก DB ต้อง จับมาทำเป็น 2 Table (IssueDetail กับ IssueMFGDetail)
+                            foreach (var row in deliveryDetailData)  // Select Issue Detail ใหม่
+                            {
+                                var checkExist = (from t in issueDetailList
+                                                  where t.issue_stock_detail_id == row.issue_stock_detail_id
+                                                  select t).FirstOrDefault();
+                                if (checkExist == null)
+                                {
+                                    issueDetailList.Add(new IssueDetail()
+                                    {
+                                        id = row.issue_stock_detail_id,
+                                        issue_stock_detail_id = row.issue_stock_detail_id,
+                                        is_delete = false,
+                                        product_no = row.product_no,
+                                        qty = row.issue_qty,
+                                        remark = row.remark,
+                                        unit_tha = row.product_unit,
+                                    });
+                                }
+                            }
+                            foreach (var row in (from t in deliveryDetailData
+                                                 select new
+                                                 {
+                                                     mfg_no = t.mfg_no,
+                                                     issue_stock_detail_id = t.issue_stock_detail_id,
+                                                     id = t.id,
+                                                     product_no = t.product_no
+                                                 }).Distinct().ToList())
+                            {
+                                issueMFGDetailList.Add(new IssueDetailMFG()
+                                {
+                                    id = row.id,
+                                    issue_stock_detail_id = row.issue_stock_detail_id,
+                                    mfg_no = row.mfg_no
+                                });
+                            }
+
+                        }
+                        #endregion
+                    }
+
+                    gridViewIssue.DataSource = issueDetailList;
+                    gridViewIssue.DataBind();
+
+                    gridViewIssueMFG.DataSource = issueMFGDetailList;
+                    gridViewIssueMFG.DataBind();
+                }
+                else
+                {
+                    txtAgreementOther.Attributes["style"] = "display:none";
+                    btnReportClient.Visible = false;
+                    btnSave.Visible = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        protected void btnSaveDraft_Click(object sender, EventArgs e)
+        {
+            SaveData("FL");
+        }
+
+        protected void btnConfirm_Click(object sender, EventArgs e)
+        {
+            SaveData("CF");
+        }
+        private void SaveData(string status)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                int newID = DataListUtil.emptyEntryID;
+                conn.Open();
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var customer_condition = string.Empty;
+                        var deliveryNo = string.Empty;
+                        if (chkFondation.Checked)
+                        {
+                            customer_condition += chkFondation.Value + "|";
+                        }
+                        else
+                        {
+                            customer_condition += "-|";
+                        }
+                        if (chkNoUnloading.Checked)
+                        {
+                            customer_condition += chkNoUnloading.Value + "|";
+                        }
+                        else
+                        {
+                            customer_condition += "-|";
+                        }
+                        if (chkInstallation.Checked)
+                        {
+                            customer_condition += chkInstallation.Value + "|";
+                        }
+                        else
+                        {
+                            customer_condition += "-|";
+                        }
+                        if (chkOther.Checked)
+                        {
+                            customer_condition += txtAgreementOther.Value + "|";
+                        }
+                        else
+                        {
+                            customer_condition += "-|";
+                        }
+                        if (customer_condition.Length > 0)
+                        {
+                            customer_condition = customer_condition.Remove(customer_condition.Length - 1);
+                        }
+
+                        var deliveryOrderDetail = new List<DeliveryOrderDetail>();
+
+                        foreach (var row in issueMFGDetailList)
+                        {
+                            var dataProduct = (from t in issueDetailList where t.issue_stock_detail_id == row.issue_stock_detail_id select t).FirstOrDefault();
+                            // เลือก Field จาก Issue Detail
+                            if (dataProduct != null)
+                            {
+                                deliveryOrderDetail.Add(new DeliveryOrderDetail()
+                                {
+                                    id = (deliveryOrderDetail.Count + 1) * -1,
+                                    mfg_no = row.mfg_no,
+                                    product_id = row.product_id,
+                                    product_name_tha = dataProduct.product_name_tha,
+                                    product_no = dataProduct.product_no,
+                                    issue_stock_detail_id = dataProduct.issue_stock_detail_id
+                                });
+                            }
+                        }
+                        //throw new Exception("x");
+
+                        if (dataId == 0) // Insert Mode
+                        {
+                            #region Delivery Order Header
+                            //Delivery Order Header
+                            using (SqlCommand cmd = new SqlCommand("sp_delivery_order_header_add", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@sale_id", SqlDbType.Int).Value = 0;//FL = Follow , CF = Confirm
+                                cmd.Parameters.Add("@delivery_date", SqlDbType.Date).Value = DateTime.ParseExact(txtIssueDate.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture);//Convert.ToDateTime(txtDateBill.Value);
+                                cmd.Parameters.Add("@issue_stock_no", SqlDbType.VarChar, 20).Value = cbbIssue.Text;
+                                cmd.Parameters.Add("@deadlines", SqlDbType.Date).Value = DateTime.ParseExact(txtDeadline.Value, "dd/MM/yyyy", CultureInfo.InvariantCulture);//Convert.ToDateTime(txtDateBill.Value);
+                                cmd.Parameters.Add("@customer_name", SqlDbType.VarChar, 100).Value = lbCustomerFirstName.Value;
+                                cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = hdCustomerId.Value;
+                                cmd.Parameters.Add("@attention_name", SqlDbType.VarChar, 100).Value = lbAttention.Value;
+                                cmd.Parameters.Add("@project", SqlDbType.VarChar, 200).Value = lbProject.Value;
+                                cmd.Parameters.Add("@delivery_order_address", SqlDbType.VarChar, 200).Value = lbAddresss.Value;
+                                cmd.Parameters.Add("@tel_no", SqlDbType.VarChar, 20).Value = lbTelephoneNumber.Value;
+                                cmd.Parameters.Add("@quotation_no", SqlDbType.VarChar, 20).Value = lbQuotationNo.Value;
+                                cmd.Parameters.Add("@logistic_name", SqlDbType.VarChar, 50).Value = txtDeliveryName.Value;
+                                cmd.Parameters.Add("@logistic_price", SqlDbType.Decimal).Value = string.IsNullOrEmpty(txtDeliveryPrice.Value) ? 0 : Convert.ToDecimal(txtDeliveryPrice.Value);
+                                cmd.Parameters.Add("@equipment", SqlDbType.VarChar, 50).Value = string.IsNullOrEmpty(txtEquipment.Value) ? string.Empty :
+                                                                                                  "มีรถ Forklift ขนาด : " + txtEquipment.Value.Trim();
+                                cmd.Parameters.Add("@condition", SqlDbType.VarChar, 100).Value = customer_condition;
+                                cmd.Parameters.Add("@order_description", SqlDbType.VarChar, 300).Value = txtOrderDescription.Value;
+                                cmd.Parameters.Add("@other_ref", SqlDbType.VarChar, 100).Value = txtOtherRef.Value;
+                                cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                newID = Convert.ToInt32(cmd.ExecuteScalar());
+                            }
+                            #endregion Delivery Order  Header
+
+                            //throw new Exception("ex");
+                            List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = newID },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" }
+                        };
+            
+                            var lastDataInsert = SqlHelper.ExecuteDataset(tran, "sp_delivery_order_header_list", arrParm.ToArray());
+                        
+
+                            if (lastDataInsert != null)
+                            {
+                                deliveryNo = (from t in lastDataInsert.Tables[0].AsEnumerable()
+                                              select t.Field<string>("delivery_order_no")).FirstOrDefault();
+                            }
+
+                            #region Delivery Order Detail
+                            foreach (var row in deliveryOrderDetail)
+                            {
+                                using (SqlCommand cmd = new SqlCommand("sp_delivery_order_detail_add", conn, tran))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    //cmd.Parameters.Add("@delivery_order_id", SqlDbType.Int).Value = newID;//FL = Follow , CF = Confirm
+                                    cmd.Parameters.Add("@delivery_order_no", SqlDbType.VarChar, 20).Value = deliveryNo;
+                                    cmd.Parameters.Add("@issue_stock_detail_id", SqlDbType.Int).Value = row.issue_stock_detail_id;
+                                    cmd.Parameters.Add("@product_no", SqlDbType.VarChar, 20).Value = row.product_no;
+                                    cmd.Parameters.Add("@product_name_tha", SqlDbType.VarChar, 200).Value = row.product_name_tha;
+                                    cmd.Parameters.Add("@mfg_no", SqlDbType.VarChar, 100).Value = row.mfg_no;
+                                    cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.product_id;
+                                    //cmd.Parameters.Add("@product_description", SqlDbType.VarChar, 100).Value = row.product_description;
+                                    cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                    cmd.ExecuteNonQuery();
+                                }
+                            }
+                            #endregion Delivery Order Detail
+                        }
+                        else
+                        {
+                            newID = dataId;
+
+                            #region Delivery Order Header
+                            //Delivery Order Header
+                            using (SqlCommand cmd = new SqlCommand("sp_delivery_order_header_edit", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = dataId;//FL = Follow , CF = Confirm
+                                cmd.Parameters.Add("@logistic_name", SqlDbType.VarChar, 50).Value = txtDeliveryName.Value;
+                                cmd.Parameters.Add("@logistic_price", SqlDbType.Decimal).Value = string.IsNullOrEmpty(txtDeliveryPrice.Value) ? 0 : Convert.ToDecimal(txtDeliveryPrice.Value);
+                                cmd.Parameters.Add("@equipment", SqlDbType.VarChar, 50).Value = string.IsNullOrEmpty(txtEquipment.Value) ? string.Empty :
+                                                                                                  "มีรถ Forklift ขนาด : " + txtEquipment.Value.Trim();
+                                cmd.Parameters.Add("@condition", SqlDbType.VarChar, 100).Value = customer_condition;
+                                cmd.Parameters.Add("@order_description", SqlDbType.VarChar, 300).Value = txtOrderDescription.Value;
+                                cmd.Parameters.Add("@other_ref", SqlDbType.VarChar, 100).Value = txtOtherRef.Value;
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                cmd.ExecuteNonQuery();
+                            }
+                            #endregion Delivery Order  Header
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        Page.ClientScript.RegisterStartupScript(this.GetType(), "AlertMessage", "alertMessage('เกิดผิดพลาดในการบันทึกข้อมูล','E')", true);
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+                            Response.Redirect("DeliveryOrder.aspx?dataId=" + newID);
+                        }
+                    }
+                }
+
+            }
+        }
+        protected void gridViewIssue_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridViewIssue.DataSource = issueDetailList;
+            gridViewIssue.DataBind();
+        }
+
+        protected void gridViewIssueMFG_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            gridViewIssueMFG.DataSource = issueMFGDetailList;
+            gridViewIssueMFG.DataBind();
+        }
+        [WebMethod]
+        public static IssueData GetIssueData(string id)
+        {
+            var data = new IssueData();
+            var dsResult = new DataSet();
+            var issueDetail = new List<IssueDetail>();
+            var issueMFGDetail = new List<IssueDetailMFG>();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = id },
+
+                        };
+                conn.Open();
+                dsResult = SqlHelper.ExecuteDataset(conn, "sp_issue_stock_list_data", arrParm.ToArray());
+                conn.Close();
+            }
+            if (dsResult.Tables.Count > 0)
+            {
+                var row = dsResult.Tables[0].AsEnumerable().FirstOrDefault();
+                {
+                    data.attention_name = Convert.IsDBNull(row["attention_name"]) ? string.Empty : Convert.ToString(row["attention_name"]);
+                    data.id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]);
+                    data.customer_name = Convert.IsDBNull(row["customer_name"]) ? string.Empty : Convert.ToString(row["customer_name"]);
+                    data.customer_id = Convert.IsDBNull(row["customer_id"]) ? 0 : Convert.ToInt32(row["customer_id"]);
+                    data.delivery_date = Convert.IsDBNull(row["issue_stock_date"]) ? DateTime.Now : Convert.ToDateTime(row["issue_stock_date"]);
+                    data.project_name = Convert.IsDBNull(row["project"]) ? string.Empty : Convert.ToString(row["project"]);
+                    data.quotation_no = Convert.IsDBNull(row["quotation_no"]) ? string.Empty : Convert.ToString(row["quotation_no"]);
+                    //data.sale_name = Convert.IsDBNull(row["sale_name"]) ? string.Empty : Convert.ToString(row["sale_name"]);
+                    data.tel = Convert.IsDBNull(row["attention_tel"]) ? string.Empty : Convert.ToString(row["attention_tel"]);
+                    data.display_delivery_date = Convert.IsDBNull(row["issue_stock_date"]) ? string.Empty : Convert.ToString(Convert.ToDateTime(row["issue_stock_date"]).ToString("dd/MM/yyy"));
+                    data.address = Convert.IsDBNull(row["customer_address"]) ? string.Empty : Convert.ToString(row["customer_address"]);
+                }
+
+                var detail = dsResult.Tables[1].AsEnumerable().ToList();
+                foreach (var rowDetail in detail)
+                {
+                    issueDetail.Add(new IssueDetail()
+                    {
+                        id = Convert.IsDBNull(rowDetail["id"]) ? 0 : Convert.ToInt32(rowDetail["id"]),
+                        issue_stock_detail_id = Convert.IsDBNull(rowDetail["id"]) ? 0 : Convert.ToInt32(rowDetail["id"]),
+                        issue_stock_id = Convert.IsDBNull(rowDetail["issue_stock_id"]) ? 0 : Convert.ToInt32(rowDetail["issue_stock_id"]),
+                        issue_stock_no = Convert.IsDBNull(rowDetail["issue_stock_no"]) ? string.Empty : Convert.ToString(rowDetail["issue_stock_no"]),
+                        is_delete = false,
+                        product_id = Convert.IsDBNull(rowDetail["product_id"]) ? 0 : Convert.ToInt32(rowDetail["product_id"]),
+                        product_name_tha = Convert.IsDBNull(rowDetail["product_name_tha"]) ? string.Empty : Convert.ToString(rowDetail["product_name_tha"]),
+                        product_no = Convert.IsDBNull(rowDetail["product_no"]) ? string.Empty : Convert.ToString(rowDetail["product_no"]),
+                        qty = Convert.IsDBNull(rowDetail["qty"]) ? 0 : Convert.ToInt32(rowDetail["qty"]),
+                        remark = Convert.IsDBNull(rowDetail["remark"]) ? string.Empty : Convert.ToString(rowDetail["remark"]),
+                        sale_order_detail_id = Convert.IsDBNull(rowDetail["sale_order_detail_id"]) ? 0 : Convert.ToInt32(rowDetail["sale_order_detail_id"]),
+                        so_qty = Convert.IsDBNull(rowDetail["so_qty"]) ? 0 : Convert.ToInt32(rowDetail["so_qty"]),
+                        unit_tha = Convert.IsDBNull(rowDetail["product_unit"]) ? string.Empty : Convert.ToString(rowDetail["product_unit"]),
+                    });
+                }
+                var mfgDetail = dsResult.Tables[2].AsEnumerable().ToList();
+                foreach (var rowMFGDetail in mfgDetail)
+                {
+                    issueMFGDetail.Add(new IssueDetailMFG()
+                    {
+                        id = Convert.IsDBNull(rowMFGDetail["id"]) ? 0 : Convert.ToInt32(rowMFGDetail["id"]),
+                        issue_stock_detail_id = Convert.IsDBNull(rowMFGDetail["issue_stock_detail_id"]) ? 0 : Convert.ToInt32(rowMFGDetail["issue_stock_detail_id"]),
+                        mfg_no = Convert.IsDBNull(rowMFGDetail["mfg_no"]) ? string.Empty : Convert.ToString(rowMFGDetail["mfg_no"]),
+                        product_id = Convert.IsDBNull(rowMFGDetail["product_id"]) ? 0 : Convert.ToInt32(rowMFGDetail["product_id"]),
+
+                    });
+                }
+
+            }
+            HttpContext.Current.Session["SESSION_ISSUE_DETAIL_DELIVERY_ORDER"] = issueDetail;
+            HttpContext.Current.Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = issueMFGDetail;
+            return data;
+        }
+
+        #region Issue MFG Detail
+        [WebMethod]
+        public static IssueDetail GetMFGDetail(string id)
+        {
+            var issueMFGDetail = (List<IssueDetailMFG>)HttpContext.Current.Session["SESSION_ISSUE_DETAIL_MFG_DELIVERY_ORDER"];
+            var issueDetail = (List<IssueDetail>)HttpContext.Current.Session["SESSION_ISSUE_DETAIL_DELIVERY_ORDER"];
+            var selectedIssueMFG = new List<IssueDetailMFG>();
+
+            if (issueMFGDetail != null)
+            {
+                foreach (var row in (from t in issueMFGDetail
+                                     where t.issue_stock_detail_id == Convert.ToInt32(id)
+                                     select t).ToList())
+                {
+                    selectedIssueMFG.Add(row);
+                }
+            }
+            var productDetail = (from t in issueDetail
+                                 where t.issue_stock_detail_id == Convert.ToInt32(id)
+                                 select t).FirstOrDefault();
+            HttpContext.Current.Session["SESSION_SELECTED_ISSUE_DETAIL_MFG_DELIVERY_ORDER"] = selectedIssueMFG;
+
+            return productDetail;
+        }
+        #endregion Issue MFG Detail
+
+    }
+}

@@ -1,0 +1,332 @@
+﻿using System;
+using System.Web.UI;
+//Custom using namespace
+using DevExpress.Web;
+using Microsoft.ApplicationBlocks.Data;
+using System.Data;
+using System.Data.SqlClient;
+using System.Collections.Generic;
+using HicomIOS.ClassUtil;
+using System.Collections;
+using System.Linq;
+using System.Web;
+using System.Web.Services;
+
+namespace HicomIOS.Master
+{
+    public partial class IssueList : MasterDetailPage
+    {
+        private DataSet dsResult;
+        public class IssueHeaderList
+        {
+            public string issue_stock_no { get; set; }
+        }
+        public class IssueDetail
+        {
+            public int id { get; set; }
+            public int customer_id { get; set; }
+            
+            public int issue_stock_id { get; set; }
+            public string issue_stock_no { get; set; }
+            public string product_no { get; set; }
+            public int product_id { get; set; }
+            public string product_name_tha { get; set; }
+            public int qty { get; set; }
+            public int so_qty { get; set; }
+            public string unit_tha { get; set; }
+            public string remark { get; set; }
+            public bool is_delete { get; set; }
+            public int sale_order_detail_id { get; set; }
+            public string product_type { get; set; }
+            public int old_qty { get; set; }
+        }
+        public override string PageName { get { return "Issue List"; } }
+        public override FilterBag FilterBag { get { return SPlanetUtil.ObjectFilter; } }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            // setting height gridView
+            gridView.Settings.VerticalScrollableHeight = Convert.ToInt32(BasePage.SizeScreen);
+
+            //Bind Data into GridView
+            if (!Page.IsPostBack)
+            {
+                // Get Permission and if no permission, will redirect to another page.
+                if (!Permission.GetPermission())
+                    Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
+                BindGrid(true);
+            }
+            else
+            {
+                dsResult = (DataSet)Session["SESSION_ISSUE_LIST"];
+                BindGrid(false);
+            }
+        }
+
+        #region "Inherited Event of Filter Control"
+        public override void OnFilterChanged()
+        {
+            BindGrid();
+        }
+
+        public override void RefreshEntry()     //Popup Menu Select Refresh Data
+        {
+            BindGrid(true);
+        }
+        public override IEnumerable<FilterControlColumn> GetFilterColumns()
+        {
+            var result = new ArrayList();
+            return result.OfType<FilterControlColumn>();
+        }
+        #endregion
+        protected void BindGrid(bool isForceRefreshData = false)
+        {
+            try
+            {
+                if (!Page.IsPostBack || isForceRefreshData)
+                {
+                    using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                    {
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = "" },
+                            new SqlParameter("@service_type", SqlDbType.VarChar, 100) { Value = ConstantClass.SESSION_DEPARTMENT_SERVICE_TYPE },
+                        };
+                        conn.Open();
+                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_issue_header_list", arrParm.ToArray());
+                        conn.Close();
+                        Session["SESSION_ISSUE_LIST"] = dsResult;
+                    }
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+
+        [WebMethod]
+        public static string DeleteIssue(string id)
+        {
+            string returnData = "success";
+            var issueDetailList = new List<IssueDetail>();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                conn.Open();
+                using (SqlTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        DataSet dsIssueData;
+
+                        //Create array of Parameters
+                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = Convert.ToInt32(id) }
+                        };
+
+                        dsIssueData = SqlHelper.ExecuteDataset(tran, "sp_issue_stock_list_data", arrParm.ToArray());
+
+                        var issue_no = string.Empty;
+                        var status = string.Empty;
+                        if (dsIssueData.Tables.Count > 0)
+                        {
+                            var data = dsIssueData.Tables[0].AsEnumerable().FirstOrDefault();
+                            if (data != null)
+                            {
+                                status = Convert.IsDBNull(data["issue_stock_status"]) ? string.Empty : Convert.ToString(data["issue_stock_status"]);
+                            }
+
+                            var dataDetail = dsIssueData.Tables[1].AsEnumerable().ToList();
+                            if (dataDetail != null)
+                            {
+                                issueDetailList = new List<IssueDetail>();
+                                foreach (var row in dataDetail)
+                                {
+                                    issueDetailList.Add(new IssueDetail()
+                                    {
+                                        id = Convert.IsDBNull(row["id"]) ? 0 : Convert.ToInt32(row["id"]),
+                                        issue_stock_id = Convert.IsDBNull(row["issue_stock_id"]) ? 0 : Convert.ToInt32(row["issue_stock_id"]),
+                                        issue_stock_no = Convert.IsDBNull(row["issue_stock_no"]) ? string.Empty : Convert.ToString(row["issue_stock_no"]),
+                                        is_delete = Convert.IsDBNull(row["is_delete"]) ? false : Convert.ToBoolean(row["is_delete"]),
+                                        product_id = Convert.IsDBNull(row["product_id"]) ? 0 : Convert.ToInt32(row["product_id"]),
+                                        product_name_tha = Convert.IsDBNull(row["product_name_tha"]) ? string.Empty : Convert.ToString(row["product_name_tha"]),
+                                        product_no = Convert.IsDBNull(row["product_no"]) ? string.Empty : Convert.ToString(row["product_no"]),
+                                        qty = Convert.IsDBNull(row["qty"]) ? 0 : Convert.ToInt32(row["qty"]),
+                                        remark = Convert.IsDBNull(row["remark"]) ? string.Empty : Convert.ToString(row["remark"]),
+                                        sale_order_detail_id = Convert.IsDBNull(row["sale_order_detail_id"]) ? 0 : Convert.ToInt32(row["sale_order_detail_id"]),
+                                       
+                                        so_qty = Convert.IsDBNull(row["so_qty"]) ? 0 : Convert.ToInt32(row["so_qty"]),
+                                        unit_tha = Convert.IsDBNull(row["product_unit"]) ? string.Empty : Convert.ToString(row["product_unit"]),
+                                        old_qty = Convert.IsDBNull(row["qty"]) ? 0 : Convert.ToInt32(row["qty"]), // FOR EDIT
+                                        product_type = Convert.IsDBNull(row["product_type"]) ? string.Empty : Convert.ToString(row["product_type"]),
+                                    });
+                                }
+                            }
+                            if (issueDetailList.Count > 0)
+                            {
+                                issue_no = issueDetailList[0].issue_stock_no;
+                            }
+                            using (SqlCommand cmd = new SqlCommand("sp_issue_header_delete", conn, tran))
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@id", SqlDbType.Int).Value = Convert.ToInt32(id);
+                                cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.ExecuteNonQuery();
+
+                            }
+
+                            #region Transection
+                            if (status == "FL")
+                            {
+                                using (SqlCommand cmd = new SqlCommand("sp_issue_stock_detail_clear_reserved", conn, tran))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    cmd.Parameters.Add("@issue_stock_id", SqlDbType.Int).Value = id;
+                                    cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+
+                                    cmd.ExecuteNonQuery();
+
+                                }
+                            }
+                            else
+                            {
+                                var transNo = string.Empty;
+                                using (SqlCommand cmd = new SqlCommand("sp_gen_transection_no", conn, tran))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+
+                                    transNo = Convert.ToString(cmd.ExecuteScalar());
+
+                                }
+                                string stock_type = string.Empty;
+
+                                foreach (var row in issueDetailList)
+                                {
+
+                                    using (SqlCommand cmd = new SqlCommand("sp_stock_movement_add", conn, tran))
+                                    {
+                                        cmd.CommandType = CommandType.StoredProcedure;
+                                        cmd.Parameters.Add("@transection_no", SqlDbType.VarChar, 20).Value = transNo;
+
+                                        cmd.Parameters.Add("@product_type", SqlDbType.VarChar, 1).Value = row.product_type;
+                                        cmd.Parameters.Add("@product_id", SqlDbType.Int).Value = row.product_id;
+
+                                        cmd.Parameters.Add("@transection_type", SqlDbType.VarChar, 50).Value = "ISSUE";
+                                        cmd.Parameters.Add("@movement_type", SqlDbType.VarChar, 3).Value = "IN";
+                                        cmd.Parameters.Add("@checking_type", SqlDbType.NVarChar, 1).Value = "W";
+                                        cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty * -1;// คืนค่า
+                                        cmd.Parameters.Add("@stock_balance", SqlDbType.Int).Value = 0; // คำนวนจาก Store
+                                        cmd.Parameters.Add("@remark", SqlDbType.VarChar, 500).Value = "คืนค่าจาก ISSUE";//row.remark;
+                                        cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                        cmd.Parameters.Add("@ref_doc_id", SqlDbType.Int).Value = id; // คำนวนจาก Store
+                                        cmd.Parameters.Add("@ref_doc_no", SqlDbType.VarChar, 20).Value = issue_no;
+                                        cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = Convert.ToInt32(data["customer_id"]);
+                                        cmd.Parameters.Add("@supplier_id", SqlDbType.Int).Value = 0;
+                                        cmd.ExecuteNonQuery();
+
+                                    }
+                                }
+                            }
+                            #endregion
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        tran.Dispose();
+                        conn.Close();
+                        //throw ex;
+                        return ex.Message.ToString();
+                    }
+                    finally
+                    {
+                        if (!conn.State.Equals(ConnectionState.Closed))
+                        {
+
+                            tran.Commit();
+                            tran.Dispose();
+                            conn.Close();
+                        }
+                    }
+
+                    return returnData;
+                }
+            }
+        }
+
+        [WebMethod]
+        public static IssueHeaderList GetIssueData(string id)
+        {
+            var data = new IssueHeaderList();
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value =Convert.ToInt32(id) },
+                        };
+                conn.Open();
+                var dsIssueData = SqlHelper.ExecuteDataset(conn, "sp_issue_stock_header_list", arrParm.ToArray());
+                conn.Close();
+
+                if (dsIssueData.Tables.Count > 0)
+                {
+                    if (dsIssueData.Tables[0].Rows.Count > 0)
+                    {
+                        var row = (from t in dsIssueData.Tables[0].AsEnumerable() select t).FirstOrDefault();
+                        if (row != null)
+                        {
+
+                            data.issue_stock_no = Convert.IsDBNull(row["issue_stock_no"]) ? string.Empty : Convert.ToString(row["issue_stock_no"]);
+
+                        }
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        protected void gridView_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
+        {
+            var dsResult = new DataSet();
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                            new SqlParameter("@search_name", SqlDbType.VarChar, 200) { Value = e.Parameters.ToString() },
+                            new SqlParameter("@service_type", SqlDbType.VarChar, 100) { Value = ConstantClass.SESSION_DEPARTMENT_SERVICE_TYPE },
+                        };
+                    conn.Open();
+                    dsResult = SqlHelper.ExecuteDataset(conn, "sp_issue_header_list", arrParm.ToArray());
+                    conn.Close();
+                    Session["SESSION_ISSUE_LIST"] = dsResult;
+                }
+
+                //Bind data into GridView
+                gridView.DataSource = dsResult;
+                gridView.FilterExpression = FilterBag.GetExpression(false);
+                gridView.DataBind();
+            }
+            catch (Exception ex)
+            {
+                string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
+                ScriptManager.RegisterStartupScript(this, GetType(), "myalert", "alert('" + strErrorMsg + "');", true);
+            }
+        }
+    }
+}
