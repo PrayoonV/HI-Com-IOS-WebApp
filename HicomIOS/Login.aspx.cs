@@ -19,7 +19,7 @@ namespace HicomIOS.Master
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+           
         }
         void Application_Start(object sender, EventArgs e)
         {
@@ -103,10 +103,13 @@ namespace HicomIOS.Master
         {
             string status = "success";
 
-            HttpContext.Current.Session.Clear();
-            HttpContext.Current.Session.Abandon();
+            //HttpContext.Current.Session.Clear();
+            //HttpContext.Current.Session.Abandon();
 
-            return status;
+            
+            CheckLogin("HI00008", "123456");
+            
+                return status;
         }
     }
 }

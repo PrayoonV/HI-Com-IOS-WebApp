@@ -15,7 +15,8 @@ namespace HicomIOS.Report
         {
             InitializeComponent();
         }
-   
+
+        
 
     }
 }

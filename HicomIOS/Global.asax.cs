@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
 using DevExpress.Web;
+using DevExpress.Data;
 using HicomIOS.ClassUtil;
 using DevExpress.XtraReports.Security;
 
@@ -16,6 +17,10 @@ namespace HicomIOS
         {
             DevExpress.Web.ASPxWebControl.CallbackError += new EventHandler(Application_Error);
             ScriptPermissionManager.GlobalInstance = new ScriptPermissionManager(ExecutionMode.Unrestricted);
+
+            DevExpress.XtraReports.Web.WebDocumentViewer.Native.WebDocumentViewerBootstrapper.SessionState = System.Web.SessionState.SessionStateBehavior.Disabled;
+            DevExpress.Utils.UrlAccessSecurityLevelSetting.SecurityLevel = DevExpress.Utils.UrlAccessSecurityLevel.Unrestricted;
+
         }
 
         void Application_End(object sender, EventArgs e)

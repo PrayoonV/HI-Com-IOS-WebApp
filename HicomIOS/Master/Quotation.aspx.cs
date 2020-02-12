@@ -1173,12 +1173,12 @@ namespace HicomIOS.Master
                         dvGridProduct.Attributes["style"] = "display:''";
                         dvGridService.Attributes["style"] = "display:none";
                         dvIsService.Attributes["style"] = "display:none";
-                        dvIsAnnualService_Discount.Attributes["style"] = "display:none";
+//                        dvIsAnnualService_Discount.Attributes["style"] = "display:none";
                         dvIsProductDescription.Attributes["style"] = "display:none";
                         gridQuotationDetail.Columns[4].Visible = false;
                         gridQuotationDetail.Columns[5].Visible = false;
                         gridQuotationDetail.Columns[6].Visible = true;
-                        tabOtherDetail.Attributes["style"] = "display:none";
+                        tabOtherDetail.Attributes["style"] = "display:''";
 
                         //dvIsService.Style.Add("display", "none");
                     }
@@ -1404,6 +1404,7 @@ namespace HicomIOS.Master
 
                 if (!cbDiscountByItem.Checked)
                 {
+                    //txtDiscountByItem.Attributes["disabled"] = "disabled";
                     cbbDiscountByItem.Attributes["disabled"] = "disabled";
                 }
                 if (!cbDiscountBottomBill1.Checked)
@@ -1454,6 +1455,7 @@ namespace HicomIOS.Master
 
                 if (!cbDiscountByItem.Checked)
                 {
+                    txtDiscountByItem.Attributes["disabled"] = "disabled";
                     cbbDiscountByItem.Attributes["disabled"] = "disabled";
                 }
                 if (!cbDiscountBottomBill1.Checked)
@@ -1652,7 +1654,7 @@ namespace HicomIOS.Master
                 }
                 else if (cbbQuotationType.Value == "A")
                 {
-                    gridQuotationDetail.DataSource = (from t in quotationDetailList where t.is_deleted == false select t).ToList();
+                    gridQuotationDetail.DataSource = (from t in quotationDetailList where t.is_deleted == false select t).OrderBy(b => b.sort_no).ToList();
                     gridQuotationDetail.FilterExpression = FilterBag.GetExpression(false);
                     gridQuotationDetail.DataBind();
                 }
@@ -5418,12 +5420,12 @@ namespace HicomIOS.Master
                             dvGridProduct.Attributes["style"] = "display:''";
                             dvGridService.Attributes["style"] = "display:none";
                             dvIsService.Attributes["style"] = "display:none";
-                            dvIsAnnualService_Discount.Attributes["style"] = "display:none";
+                            dvIsAnnualService_Discount.Attributes["style"] = "display:''";
                             dvIsProductDescription.Attributes["style"] = "display:none";
                             gridQuotationDetail.Columns[4].Visible = false;
                             gridQuotationDetail.Columns[5].Visible = false;
                             gridQuotationDetail.Columns[6].Visible = true;
-                            tabOtherDetail.Attributes["style"] = "display:none";
+                            tabOtherDetail.Attributes["style"] = "display:''";
 
                             //dvIsService.Style.Add("display", "none");
                         }
@@ -5985,12 +5987,12 @@ namespace HicomIOS.Master
                             dvGridProduct.Attributes["style"] = "display:''";
                             dvGridService.Attributes["style"] = "display:none";
                             dvIsService.Attributes["style"] = "display:none";
-                            dvIsAnnualService_Discount.Attributes["style"] = "display:none";
+                            dvIsAnnualService_Discount.Attributes["style"] = "display:''";
                             dvIsProductDescription.Attributes["style"] = "display:none";
                             gridQuotationDetail.Columns[4].Visible = false;
                             gridQuotationDetail.Columns[5].Visible = false;
                             gridQuotationDetail.Columns[6].Visible = true;
-                            tabOtherDetail.Attributes["style"] = "display:none";
+                            tabOtherDetail.Attributes["style"] = "display:''";
 
                             //dvIsService.Style.Add("display", "none");
                         }
@@ -6244,8 +6246,11 @@ namespace HicomIOS.Master
                 {
                     foreach (var row in quotationDetail)
                     {
-                        row.discount_amount = Convert.ToDecimal(discount_item_qty);
-                        row.discount_total = (row.qty * row.unit_price) - row.discount_amount;
+                        if ((row.qty * row.unit_price) > 0)
+                        {
+                            row.discount_amount = Convert.ToDecimal(discount_item_qty);
+                            row.discount_total = (row.qty * row.unit_price) - row.discount_amount;
+                        }
                     }
                 }
             }
