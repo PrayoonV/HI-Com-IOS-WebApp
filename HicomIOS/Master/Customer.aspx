@@ -546,7 +546,7 @@
                             <div class="row">
                                 <div class="form-group col-xs-12 no-padding">
                                     <div class="col-xs-2 text-left">
-                                        <button type="button" class="btn-addItem" onclick="AddMFG()">
+                                        <button type="button" class="btn-addItem" onclick="AddMFG()" style="display:none;">
                                             <i class="fa fa-plus-circle" aria-hidden="true"></i>&nbsp;เพิ่ม MFG
                                         </button>
                                     </div>

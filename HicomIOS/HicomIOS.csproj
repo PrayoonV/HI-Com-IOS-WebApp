@@ -1876,9 +1876,11 @@
     </Compile>
     <Compile Include="Report\Quotation_Approve_Qu.cs">
       <SubType>Component</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Report\Quotation_Approve_Qu.Designer.cs">
       <DependentUpon>Quotation_Approve_Qu.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Include="Report\Quotation_Footer.cs">
       <SubType>Component</SubType>
@@ -2104,6 +2106,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Report\Quotation_Approve_Qu.resx">
       <DependentUpon>Quotation_Approve_Qu.cs</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\Quotation_Footer.resx">
       <DependentUpon>Quotation_Footer.cs</DependentUpon>

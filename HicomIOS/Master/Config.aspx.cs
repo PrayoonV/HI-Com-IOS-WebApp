@@ -60,7 +60,7 @@ namespace HicomIOS.Master
                 }
                 else
                 {
-                   
+                    LoadData(false);
                 }
             }
             catch (Exception ex)
@@ -69,28 +69,34 @@ namespace HicomIOS.Master
             }
         }
 
-        protected void LoadData()
+        protected void LoadData(bool isForceRefreshData = false)
         {
             var dsResult = new DataSet();
             try
             {
                 using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
                 {
-                    using (SqlCommand cmd = new SqlCommand("sp_config_list", conn))
+                    if (!Page.IsPostBack || isForceRefreshData)
                     {
-                        //Create array of Parameters
-                        List<SqlParameter> arrParm = new List<SqlParameter>
+                        using (SqlCommand cmd = new SqlCommand("sp_config_list", conn))
+                        {
+                            //Create array of Parameters
+                            List<SqlParameter> arrParm = new List<SqlParameter>
                                 {
                                     new SqlParameter("@config_document", SqlDbType.Char,2) { Value =""},
                                     new SqlParameter("@config_type", SqlDbType.Char,1) { Value =""},
                                     new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
                                 };
-                        conn.Open();
-                        dsResult = SqlHelper.ExecuteDataset(conn, "sp_config_list_doc", arrParm.ToArray());
-                        conn.Close();
-                        ViewState["dsResult"] = dsResult;
+                            conn.Open();
+                            dsResult = SqlHelper.ExecuteDataset(conn, "sp_config_list_doc", arrParm.ToArray());
+                            conn.Close();
+                            ViewState["dsResult"] = dsResult;
+                        }
                     }
-
+                    else
+                    {
+                        dsResult = (DataSet)ViewState["dsResult"];
+                    }
                     //Bind data into GridView
                     gridView.DataSource = dsResult;
                     gridView.FilterExpression = FilterBag.GetExpression(false);

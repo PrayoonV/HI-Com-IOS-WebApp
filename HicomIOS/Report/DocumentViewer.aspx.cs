@@ -86,10 +86,21 @@ namespace HicomIOS.Report
             DocumentViewerControl.SettingsReportViewer.TableLayout = isTableLayout;
             
             DocumentViewerControl.Report.RequestParameters = false;
-
             //DocumentViewerControl.Report.par
             //DocumentViewerControl.Report.Parameters.
         }
 
+    }
+
+    public class Global : System.Web.HttpApplication
+    {
+
+        protected void Application_Start(object sender, EventArgs e)
+        {
+            // Set the resource directory
+            string contentPath = Server.MapPath("");
+            AppDomain.CurrentDomain.SetData("DXResourceDirectory", contentPath);
+        }
+        // ...
     }
 }

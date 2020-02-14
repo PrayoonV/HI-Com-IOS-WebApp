@@ -338,15 +338,16 @@
             // BottomMargin
             // 
             this.BottomMargin.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrSubreport2,
             this.xrSubreport4});
-            this.BottomMargin.HeightF = 50F;
+            this.BottomMargin.HeightF = 300F;
             this.BottomMargin.Name = "BottomMargin";
             this.BottomMargin.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
             this.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
             // 
             // xrSubreport4
             // 
-            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(116.1951F, 0F);
+            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(113.376F, 78.125F);
             this.xrSubreport4.Name = "xrSubreport4";
             this.xrSubreport4.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_footer", this.param_quotation_no));
             this.xrSubreport4.ReportSource = new HicomIOS.Report.Quotation_Footer();
@@ -1040,7 +1041,6 @@
             // ReportFooter
             // 
             this.ReportFooter.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
-            this.xrSubreport2,
             this.xrSubreport1,
             this.xrLabel34});
             this.ReportFooter.HeightF = 111.9886F;
@@ -1049,7 +1049,7 @@
             // 
             // xrSubreport2
             // 
-            this.xrSubreport2.LocationFloat = new DevExpress.Utils.PointFloat(41.83553F, 58.53634F);
+            this.xrSubreport2.LocationFloat = new DevExpress.Utils.PointFloat(41.86115F, 25.71443F);
             this.xrSubreport2.Name = "xrSubreport2";
             this.xrSubreport2.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.param_quotation_no));
             this.xrSubreport2.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
@@ -1746,7 +1746,7 @@
             this.formattingRule2,
             this.formattingRule3,
             this.formattingRule4});
-            this.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 50);
+            this.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 300);
             this.PageHeight = 1169;
             this.PageWidth = 827;
             this.PaperKind = System.Drawing.Printing.PaperKind.A4;

@@ -246,6 +246,7 @@ namespace HicomIOS.Master
                             txtStore.Value = Convert.IsDBNull(header["adjust_store"]) ? string.Empty : Convert.ToString(header["adjust_store"]);
                             txtSubject.Value = Convert.IsDBNull(header["adjust_subject"]) ? string.Empty : Convert.ToString(header["adjust_subject"]);
                             txtRemark2.Value = Convert.IsDBNull(header["adjust_remark"]) ? string.Empty : Convert.ToString(header["adjust_remark"]);
+                            txtProject.Value = Convert.IsDBNull(header["adjust_project"]) ? string.Empty : Convert.ToString(header["adjust_project"]);
 
                             var quotation_no = Convert.IsDBNull(header["quotation_no"]) ? string.Empty : Convert.ToString(header["quotation_no"]);
                             var quotation_id = Convert.IsDBNull(header["quotation_id"]) ? string.Empty : Convert.ToString(header["quotation_id"]);
@@ -366,6 +367,7 @@ namespace HicomIOS.Master
                                 cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = cbbCustomer.Value;
                                 cmd.Parameters.Add("@po_no", SqlDbType.VarChar, 200).Value = txtPO.Value;
                                 cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.Parameters.Add("@adjust_project", SqlDbType.VarChar).Value = txtProject.Value;
 
                                 newID = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -477,6 +479,7 @@ namespace HicomIOS.Master
                                     cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = cbbCustomer.Value;
                                     cmd.Parameters.Add("@po_no", SqlDbType.VarChar, 200).Value = txtPO.Value;
                                     cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                    cmd.Parameters.Add("@adjust_project", SqlDbType.VarChar).Value = txtProject.Value;
 
                                     cmd.ExecuteNonQuery();
 
@@ -500,6 +503,7 @@ namespace HicomIOS.Master
                                     cmd.Parameters.Add("@customer_id", SqlDbType.Int).Value = cbbCustomer.Value;
                                     cmd.Parameters.Add("@po_no", SqlDbType.VarChar, 200).Value = txtPO.Value;
                                     cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                    cmd.Parameters.Add("@adjust_project", SqlDbType.VarChar).Value = txtProject.Value;
 
                                     cmd.ExecuteNonQuery();
 

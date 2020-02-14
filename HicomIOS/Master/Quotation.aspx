@@ -4541,6 +4541,22 @@
                                 </div>
                             </div>
                         </div>
+                         <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-2 text-right label-rigth">หมายเหตุ 10 :</label>
+                                <div class="col-xs-6 no-padding">
+                                    <input type="text" class="form-control" id="txtRemark10" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                         <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-2 text-right label-rigth">หมายเหตุ 11 :</label>
+                                <div class="col-xs-6 no-padding">
+                                    <input type="text" class="form-control" id="txtRemark11" runat="server" />
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-xs-12">
                             <div class="row form-group">
                                 <label class="col-xs-2 text-right label-rigth">หมายเหตุอื่นๆ :</label>

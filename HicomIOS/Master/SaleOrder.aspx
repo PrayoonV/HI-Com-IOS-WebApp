@@ -10,9 +10,11 @@
         .txt-no {
             background-color: #e4effa !important;
         }
-         .btn-danger{
-                height: 25px!important;
-            }
+
+        .btn-danger {
+            height: 25px !important;
+        }
+
         #checkInAdvance {
             display: none;
         }
@@ -50,7 +52,8 @@
         #div-content {
             height: 577px;
         }
-         .swal-modal {
+
+        .swal-modal {
             width: 420px !important;
             /*height: 250px !important;*/
         }
@@ -75,7 +78,7 @@
             cbbQuotation.Focus();
 
             $("#Splitter_0").parent().hide();
-            
+
             $("#txtDateQuatationNo").datepicker({
                 dateFormat: 'dd/mm/yy'
             });
@@ -94,7 +97,7 @@
             //$("#dtDateBill").datepicker({
             //    dateFormat: 'dd/mm/yy'
             //});
-           
+
             $('#modal_quotation').on('shown.bs.modal', function (e) {
                 $('#txtSearchText').val("");
                 $('#chkSelectAllQuotation').prop('checked', false);
@@ -380,7 +383,7 @@
                 ,
                 failure: function (response) {
                     console.log(response);
-                    
+
                 }
             });
             $.LoadingOverlay("hide");
@@ -575,28 +578,28 @@
                 buttons: true,
                 dangerMode: true,
             })
-              .then((willDelete) => {
-                  if (willDelete) {
-                      $.ajax({
-                          type: "POST",
-                          url: "Saleorder.aspx/DeleteSaleOrderDetail",
-                          data: '{id:"' + id + '"}',
-                          contentType: "application/json; charset=utf-8",
-                          dataType: "json",
-                          success: function (data) {
-                              swal("ลบข้อมูลสำเร็จ!", {
-                                  icon: "success"
-                              })
-                              .then((value) => {
-                                  $('#hdSelectedSaleOrderDetailId').val(0);
-                                  gridViewDetailList.PerformCallback();
-                                  gridViewDetailSaleOrder.PerformCallback();
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "Saleorder.aspx/DeleteSaleOrderDetail",
+                            data: '{id:"' + id + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        $('#hdSelectedSaleOrderDetailId').val(0);
+                                        gridViewDetailList.PerformCallback();
+                                        gridViewDetailSaleOrder.PerformCallback();
 
-                              });
-                          }
-                      });
-                  }
-              });
+                                    });
+                            }
+                        });
+                    }
+                });
         }
 
 
@@ -609,7 +612,7 @@
             var discountType = $('#cbbDiscountByItem').val();
             //var minUnitPrice = $('#hdMinUnitPrice').val();
             //if (parseInt(unit_price) < parseInt(minUnitPrice)) {
-           
+
             //    return;
             //}
             $.ajax({
@@ -631,13 +634,13 @@
                     $('#txtDiscountAmountItem').val(0);
                     $('#txtDiscountPercentItem').val(0);
                     $('#hdMinUnitPrice').val(0);
-                   
+
                     $('#modal_sale_order_detail').modal('hide');
                     calDiscount();
                     gridViewDetailSaleOrder.PerformCallback()
                 },
                 failure: function (response) {
-                    
+
                 }
             });
         }
@@ -655,7 +658,7 @@
                 dataType: "json",
                 success: onCalcurateSuccess,
                 failure: function (response) {
-                   
+
                 }
             });
         }
@@ -690,7 +693,7 @@
 
                     if (parseInt($("#txtDiscountBottomBill1").val()) > totalWithDiscountDetail) {
                         swal("ส่วนลดท้ายบิล 1 เกินราคาที่กำหนด");
-                        
+
                         $("#txtDiscountBottomBill1").val(0);
                         grandTotal = totalWithDiscountDetail;
                         return;
@@ -703,7 +706,7 @@
                 if ($("#cbbDiscountBottomBill2").val() == "P") {
                     if (parseInt($("#txtDiscountBottomBill2").val()) > 100) {
                         swal("เปอร์เซ็นส่วนลดท้ายบิล 2 ไม่สามารถเกิน 100 %");
-                        
+
                         $("#txtDiscountBottomBill2").val(0);
                         grandTotal = (totalWithDiscountDetail - sumBottomDiscount1);
                         return;
@@ -716,7 +719,7 @@
                 }
                 else if ($("#cbbDiscountBottomBill2").val() == "A") {
                     if (parseInt($("#txtDiscountBottomBill2").val()) > totalWithDiscountDetail) {
-                        
+
                         swal("ส่วนลดท้ายบิล 2 เกินราคาที่กำหนด");
                         $("#txtDiscountBottomBill2").val(0);
                         grandTotal = (totalWithDiscountDetail - sumBottomDiscount1);
@@ -778,7 +781,7 @@
                 dataType: "json",
                 success: onAddNoticeSuccess,
                 failure: function (response) {
-                  
+
                 }
             });
             $.LoadingOverlay("hide");
@@ -788,7 +791,7 @@
             $.LoadingOverlay("show", {
                 zIndex: 9999
             });
-            
+
             var key = e;
             $('#hdSelectedNoticeId').val(key);
             $.ajax({
@@ -807,7 +810,7 @@
 
         function deleteNotice(e) {
 
-           
+
             var id = e;
             swal({
                 title: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
@@ -815,28 +818,28 @@
                 buttons: true,
                 dangerMode: true,
             })
-               .then((willDelete) => {
-                   if (willDelete) {
-                       $.ajax({
-                           type: "POST",
-                           url: "SaleOrder.aspx/DeleteNotice",
-                           data: '{id:"' + id + '"}',
-                           contentType: "application/json; charset=utf-8",
-                           dataType: "json",
-                           success: function (data) {
-                               swal("ลบข้อมูลสำเร็จ!", {
-                                   icon: "success"
-                               })
-                               .then((value) => {
-                                   gridViewNotice.PerformCallback();
-                                   $("#txtSubjectNotice").val("");
-                                   $('#txtDescriptionNotice').val("");
-                                   $("#txtDateTimeNotice").val("");
-                               });
-                           }
-                       });
-                   }
-               });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "SaleOrder.aspx/DeleteNotice",
+                            data: '{id:"' + id + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridViewNotice.PerformCallback();
+                                        $("#txtSubjectNotice").val("");
+                                        $('#txtDescriptionNotice').val("");
+                                        $("#txtDateTimeNotice").val("");
+                                    });
+                            }
+                        });
+                    }
+                });
 
         }
 
@@ -888,7 +891,7 @@
                         $("#txtPeriodNo").val(0);
                         $("#txtCheckPeriodAmount").val(0);
                         $("#txtpercent").val(0);
-                        
+
                         $('#cboTermOfPayment').val("");
 
                         $('#popupAddPOSaleOrder').modal('show');
@@ -899,7 +902,7 @@
 
                 },
                 failure: function (response) {
-                   
+
                 }
             });
 
@@ -914,13 +917,13 @@
             var po_no = $('#txtPONo').val();
             var po_date = ($("#txtPODate").val());
             var payment_type = $('#cboTermOfPayment').val();
-            var payment_val = ""; 
+            var payment_val = "";
             var diff_deposit = "";
             if (payment_type == "") {
 
                 swal("กรุณาเลือกเงือนไขการชำระเงิน");
                 $.LoadingOverlay("hide");
-                returnห
+                return
 
             }
             if (payment_type == 4) {
@@ -944,13 +947,25 @@
             var credit_day = $('#txtCreditDay').val();
             var period_no = $("#txtPeriodNo").val();
             var period_amount = $("#txtCheckPeriodAmount").val();
+
+            if (period_amount != undefined) {
+                var res = period_amount.split(".");
+                if (res != undefined && res.length > 1)
+                    if (res[1].length > 2) {
+                        swal("กรุณากรอกค่างวดสูงสุดไม่เกิน 2 ตำแหน่ง");
+                        $.LoadingOverlay("hide");
+                        return
+                    }
+
+            }
+
             var key = $('#hdSelectedPOId').val();
             $.ajax({
                 type: "POST",
                 url: "SaleOrder.aspx/AddPO",
                 data: '{id: "' + key + '" ,po_no: "' + po_no + '", po_date: "' + po_date + '"' +
-                                ', payment_type : "' + payment_type + '" , payment_val : "' + payment_val + '" , invoice_no : "' + invoice_no + '"' +
-                               ', invoice_date : "' + invoice_date + '" , temp_no_delivery : "' + tempNoDelivery + '" , delivery_date : "' + delivery_date + '" , credit_day : "' + credit_day + '", period_no : "' + period_no + '", period_amount : "' + period_amount + '", diff_deposit : "' + diff_deposit + '" }',
+                    ', payment_type : "' + payment_type + '" , payment_val : "' + payment_val + '" , invoice_no : "' + invoice_no + '"' +
+                    ', invoice_date : "' + invoice_date + '" , temp_no_delivery : "' + tempNoDelivery + '" , delivery_date : "' + delivery_date + '" , credit_day : "' + credit_day + '", period_no : "' + period_no + '", period_amount : "' + period_amount + '", diff_deposit : "' + diff_deposit + '" }',
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
@@ -958,7 +973,7 @@
                     gridViewPO.PerformCallback();
                 },
                 failure: function (response) {
-                    
+
                 }
             });
             $.LoadingOverlay("hide");
@@ -1069,30 +1084,30 @@
                 buttons: true,
                 dangerMode: true,
             })
-               .then((willDelete) => {
-                   if (willDelete) {
-                       $.ajax({
-                           type: "POST",
-                           url: "SaleOrder.aspx/DeletePODetail",
-                           data: '{id: "' + id + '"}',
-                           contentType: "application/json; charset=utf-8",
-                           dataType: "json",
-                           success: function (data) {
-                               swal("ลบข้อมูลสำเร็จ!", {
-                                   icon: "success"
-                               })
-                               .then((value) => {
-                                   gridViewPO.PerformCallback();
-                               });
-                           },
-                           failure: function (response) {
-                               swal("การลบข้อมูลผิดพลาด!", {
-                                   icon: "error"
-                               });
-                           }
-                       });
-                   }
-               });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "SaleOrder.aspx/DeletePODetail",
+                            data: '{id: "' + id + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridViewPO.PerformCallback();
+                                    });
+                            },
+                            failure: function (response) {
+                                swal("การลบข้อมูลผิดพลาด!", {
+                                    icon: "error"
+                                });
+                            }
+                        });
+                    }
+                });
         }
 
         /* PO DETAIL FUNCTION */
@@ -1107,15 +1122,15 @@
         }
         function searchSeletedGrid(e) {
             if (e == 13) {
-            
+
 
                 var txtSearch = $("#txtSearchText").val();
-               
+
                 gridViewDetailList.PerformCallback("Search|" + txtSearch.toString());
 
-               
+
                 $('#modal_quotation').modal('show');
-                
+
             }
         }
         function addTax() {
@@ -1161,17 +1176,17 @@
                         swal("บันทึกข้อมูลสำเร็จ!", {
                             icon: "success"
                         })
-                        .then((value) => {
-                            $('#btnConfirm').click();
-                        });
+                            .then((value) => {
+                                $('#btnConfirm').click();
+                            });
                     }
                     else {
-                        
+
                         swal(response.d);
                     }
                 },
                 failure: function (response) {
-                   
+
                 }
             });
 
@@ -1196,7 +1211,7 @@
             //        }
             //    },
             //    failure: function (response) {
-                  
+
             //    }
             //});
         }
@@ -1217,7 +1232,7 @@
                     $.LoadingOverlay("hide");
                 },
                 failure: function (response) {
-                    
+
                 }
             });
         }
@@ -1250,13 +1265,13 @@
                     if (response.d != "") {
                         window.location.href = "AnnualService.aspx?dataId=" + Id;
                     } else {
-                        swal("ไม่พบข้อมูล MFG",{
-                            icon:"error"
+                        swal("ไม่พบข้อมูล MFG", {
+                            icon: "error"
                         });
                     }
                 }
             });
-            
+
         }
         function confirmCancel() {
             var saleOrderNo = $("#txtSaleOrder").val();
@@ -1266,28 +1281,28 @@
                 buttons: true,
                 dangerMode: true,
             })
-              .then((willDelete) => {
-                  if (willDelete) {
-                      $.ajax({
-                          type: "POST",
-                          url: "Saleorder.aspx/CancelSaleOrderDetail",
-                          data: '{saleOrderNo:"' + saleOrderNo + '"}',
-                          contentType: "application/json; charset=utf-8",
-                          dataType: "json",
-                          success: function (data) {
-                              swal("ยกเลิกใบสั่งขายสำเร็จ!", {
-                                  icon: "success"
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "Saleorder.aspx/CancelSaleOrderDetail",
+                            data: '{saleOrderNo:"' + saleOrderNo + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (data) {
+                                swal("ยกเลิกใบสั่งขายสำเร็จ!", {
+                                    icon: "success"
 
-                              })
-                              .then((value) => {
-                                  window.location.href = "SaleorderList.aspx";
-                                  
+                                })
+                                    .then((value) => {
+                                        window.location.href = "SaleorderList.aspx";
 
-                              });
-                          }
-                      });
-                  }
-              });
+
+                                    });
+                            }
+                        });
+                    }
+                });
         }
 
         function addNewItem() {
@@ -1305,7 +1320,7 @@
             <button type="button" runat="server" id="btnSave" onclick="confirmSave()" class="btn-addItem">
                 <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Confirm
             </button>
-             <button type="button" runat="server" id="btnCancel" onclick="confirmCancel()" class="btn-danger">
+            <button type="button" runat="server" id="btnCancel" onclick="confirmCancel()" class="btn-danger">
                 <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Cancel
             </button>
             <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem">
@@ -1317,8 +1332,8 @@
             <button type="button" runat="server" id="btnBack" onclick="backPage()" class="btn-addItem">
                 <i class="fa fa-list-ol" aria-hidden="true"></i>&nbsp;List Sale Order
             </button>
-            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnSaveDraft" UseSubmitBehavior="false"  Style="visibility: hidden" Text="Save" OnClick="btnSaveDraft_Click"></dx:ASPxButton>
-            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnConfirm" UseSubmitBehavior="false"  Style="visibility: hidden" Text="Confirm" OnClick="btnConfirm_Click"></dx:ASPxButton>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnSaveDraft" UseSubmitBehavior="false" Style="visibility: hidden" Text="Save" OnClick="btnSaveDraft_Click"></dx:ASPxButton>
+            <dx:ASPxButton runat="server" CssClass="btn-addItem" ID="btnConfirm" UseSubmitBehavior="false" Style="visibility: hidden" Text="Confirm" OnClick="btnConfirm_Click"></dx:ASPxButton>
         </div>
         <div class="row">
             <fieldset>
@@ -1383,32 +1398,32 @@
                                 <input type="text" class="form-control" id="txtDateQuatationNo" disabled="disabled" readonly="" runat="server" style="width: 85px;" />
                             </div>
                         </div>
-                       
-                            <div class="row form-group">
-                                <div class="col-xs-5 label-rigth">
-                                    <strong>หมายเหตุจัดส่ง</strong>
-                                </div>
+
+                        <div class="row form-group">
+                            <div class="col-xs-5 label-rigth">
+                                <strong>หมายเหตุจัดส่ง</strong>
                             </div>
-                            <div class="col-xs-12 text-left no-padding">
-                                <div class="form-inline shipping-step">
-                                    <label class="radio-inline">
-                                        <input type="radio" runat="server" value="1" id="rdoRemarkBillDelivery" name="remark">&nbsp;เปิดบิลพร้อมส่งของ
-                                    </label>
-                                </div>
-                                <div class="form-inline shipping-step">
-                                    <label class="radio-inline">
-                                        <input type="radio" runat="server" value="2" id="rdoRemarkSubmitted" name="remark">&nbsp;ส่งของแล้ว
-                                    </label>
-                                </div>
-                                <div class="form-inline shipping-step">
-                                    <label class="radio-inline">
-                                        <input type="radio" runat="server" value="3" id="rdoRemarkOthers" name="remark">อื่นๆ 
-                                    </label>
-                                    <input type="text" class="form-control" id="txtRemarkOther" disabled="disabled" runat="server" />
-                                    &nbsp;
-                                </div>
+                        </div>
+                        <div class="col-xs-12 text-left no-padding">
+                            <div class="form-inline shipping-step">
+                                <label class="radio-inline">
+                                    <input type="radio" runat="server" value="1" id="rdoRemarkBillDelivery" name="remark">&nbsp;เปิดบิลพร้อมส่งของ
+                                </label>
                             </div>
-                        
+                            <div class="form-inline shipping-step">
+                                <label class="radio-inline">
+                                    <input type="radio" runat="server" value="2" id="rdoRemarkSubmitted" name="remark">&nbsp;ส่งของแล้ว
+                                </label>
+                            </div>
+                            <div class="form-inline shipping-step">
+                                <label class="radio-inline">
+                                    <input type="radio" runat="server" value="3" id="rdoRemarkOthers" name="remark">อื่นๆ 
+                                </label>
+                                <input type="text" class="form-control" id="txtRemarkOther" disabled="disabled" runat="server" />
+                                &nbsp;
+                            </div>
+                        </div>
+
                         <div class="row form-group">
                             <div class="col-xs-12 label-rigth">
                                 <strong>วิธีจัดส่งเอกสารใบกำกับภาษี(เลือกได้มากกว่า 1 ข้อ)</strong>
@@ -1644,14 +1659,14 @@
                                         <%--<dx:GridViewDataTextColumn FieldName="display_payment_type" Caption="Payment Type" VisibleIndex="6" />--%>
                                         <dx:GridViewDataTextColumn Caption="Payment Detail" FieldName="percent_price" CellStyle-HorizontalAlign="Left" Width="250px" VisibleIndex="6">
                                             <DataItemTemplate>
-                                                <asp:Label id="lblDetail" runat="server"></asp:Label>
+                                                <asp:Label ID="lblDetail" runat="server"></asp:Label>
                                             </DataItemTemplate>
                                         </dx:GridViewDataTextColumn>
                                         <%--<dx:GridViewDataTextColumn FieldName="percent_price" Caption="Payment Detail" VisibleIndex="6" />--%>
                                         <dx:GridViewDataTextColumn FieldName="invoice_no" Caption="Invoice No" VisibleIndex="6" />
                                         <dx:GridViewDataTextColumn FieldName="display_invoice_date" Caption="Invoice Date" VisibleIndex="6" />
                                         <dx:GridViewDataTextColumn FieldName="display_delivery_date" Caption="Delivery Date" VisibleIndex="6" />
-                                        
+
                                     </Columns>
                                     <SettingsBehavior AllowFocusedRow="true" EnableCustomizationWindow="true" AllowClientEventsOnLoad="false" />
                                     <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="170" />
@@ -1756,13 +1771,13 @@
                                                     <div class="col-xs-1 no-padding">
                                                         <input type="text" class="form-control numberic" id="txtPeriodNo" runat="server" style="margin-top: -4px;" />
                                                     </div>
-                                                     <label class="col-xs-2 text-right label-rigth hidden">เปอร์เซ็น</label>
-                                                    <div class="col-xs-1 no-padding hidden">
+                                                    <label class="col-xs-2 text-right label-rigth hidden">เปอร์เซ็น</label>
+                                                    <div class="col-xs-2 no-padding hidden">
                                                         <input type="text" class="form-control numberic" id="txtpercent" runat="server" style="margin-top: -4px;" />
                                                     </div>
 
                                                     <label class="col-xs-2 text-right label-rigth">งวดละ (บาท)</label>
-                                                    <div class="col-xs-1 no-padding">
+                                                    <div class="col-xs-2 no-padding">
                                                         <input type="text" class="form-control numberic" id="txtCheckPeriodAmount" runat="server" style="margin-top: -4px;" />
                                                     </div>
                                                 </div>
@@ -1938,7 +1953,6 @@
                                                 </a>|
                                                 <a id="btnDelete" class="btn btn-mini" onclick="deleteNotice(<%# Eval("id")%>)" title="Delete">
                                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
-
                                             </DataItemTemplate>
                                         </dx:GridViewDataTextColumn>
                                         <dx:GridViewDataTextColumn FieldName="id" Caption="ID" ReadOnly="True" Visible="false" Width="50px" VisibleIndex="5" />
@@ -2062,12 +2076,12 @@
                                         <dx:GridViewDataTextColumn FieldName="quotation_description" Caption="Product Name" VisibleIndex="5" Width="170px" />
                                         <%--<dx:GridViewDataTextColumn FieldName="unit_code" Caption="Unit Code" VisibleIndex="7" Width="70px" />--%>
                                         <dx:GridViewDataTextColumn FieldName="qu_qty" Caption="Qty" VisibleIndex="6" Width="50px" />
-                                        <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false" FieldName="unit_price" 
+                                        <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false" FieldName="unit_price"
                                             Caption="Unit Price" VisibleIndex="7" Width="70px">
                                             <PropertiesSpinEdit DisplayFormatString="n" DisplayFormatInEditMode="true" MinValue="0" MaxValue="99999999">
                                             </PropertiesSpinEdit>
                                         </dx:GridViewDataSpinEditColumn>
-                                        <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false" FieldName="total_amount" 
+                                        <dx:GridViewDataSpinEditColumn Settings-ShowEditorInBatchEditMode="false" FieldName="total_amount"
                                             Caption="Total Amount" VisibleIndex="8" Width="100px">
                                             <PropertiesSpinEdit DisplayFormatString="n" DisplayFormatInEditMode="true" MinValue="0" MaxValue="99999999">
                                             </PropertiesSpinEdit>
@@ -2158,6 +2172,6 @@
         <asp:HiddenField runat="server" ID="hdQuotationItemDiscount" />
         <asp:HiddenField runat="server" ID="hdSaleOrderStatus" />
     </div>
-    
-    
+
+
 </asp:Content>

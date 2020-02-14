@@ -258,15 +258,16 @@
             // BottomMargin
             // 
             this.BottomMargin.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrSubreport1,
             this.xrSubreport4});
-            this.BottomMargin.HeightF = 50F;
+            this.BottomMargin.HeightF = 300F;
             this.BottomMargin.Name = "BottomMargin";
             this.BottomMargin.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
             this.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
             // 
             // xrSubreport4
             // 
-            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(136.1756F, 0F);
+            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(136.1757F, 91.66666F);
             this.xrSubreport4.Name = "xrSubreport4";
             this.xrSubreport4.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_footer", this.parameter_Delivery_Note));
             this.xrSubreport4.ReportSource = new HicomIOS.Report.Quotation_Footer();
@@ -838,16 +839,14 @@
             // 
             // ReportFooter
             // 
-            this.ReportFooter.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
-            this.xrSubreport1});
-            this.ReportFooter.HeightF = 65.625F;
+            this.ReportFooter.HeightF = 0F;
             this.ReportFooter.Name = "ReportFooter";
             this.ReportFooter.SubBands.AddRange(new DevExpress.XtraReports.UI.SubBand[] {
             this.SubBand2});
             // 
             // xrSubreport1
             // 
-            this.xrSubreport1.LocationFloat = new DevExpress.Utils.PointFloat(3.861816F, 0F);
+            this.xrSubreport1.LocationFloat = new DevExpress.Utils.PointFloat(24.5463F, 9.999974F);
             this.xrSubreport1.Name = "xrSubreport1";
             this.xrSubreport1.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.parameter_Delivery_Note));
             this.xrSubreport1.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
@@ -1185,7 +1184,7 @@
             this.FormattingRuleSheet.AddRange(new DevExpress.XtraReports.UI.FormattingRule[] {
             this.formattingRule1,
             this.formattingRule2});
-            this.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 50);
+            this.Margins = new System.Drawing.Printing.Margins(50, 50, 50, 300);
             this.PageHeight = 1169;
             this.PageWidth = 827;
             this.PaperKind = System.Drawing.Printing.PaperKind.A4;

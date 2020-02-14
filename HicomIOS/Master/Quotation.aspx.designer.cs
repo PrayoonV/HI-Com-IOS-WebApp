@@ -1408,6 +1408,24 @@ namespace HicomIOS.Master {
         protected global::System.Web.UI.HtmlControls.HtmlInputText txtRemark9;
         
         /// <summary>
+        /// txtRemark10 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtRemark10;
+        
+        /// <summary>
+        /// txtRemark11 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtRemark11;
+        
+        /// <summary>
         /// txtRemarkOther control.
         /// </summary>
         /// <remarks>

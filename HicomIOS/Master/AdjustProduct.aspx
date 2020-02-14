@@ -617,7 +617,7 @@
                         var data = response.d;
                         $('#txtSubject').val(data.quotation_subject);
                         $('#txtProject').val(data.project_name);
-                        $('#dvProject').removeClass('hidden');
+                        //$('#dvProject').removeClass('hidden');
                         $('#txtPO').val(data.po_no);
                         cbbCustomer.SetValue(data.customer_id);
                     },
@@ -630,7 +630,7 @@
 
                 $.LoadingOverlay("hide");
             } else {
-                $('#dvProject').addClass('hidden');
+                //$('#dvProject').addClass('hidden');
             }
         }
 
@@ -1027,12 +1027,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row hidden" id="dvProject">
+                    <div class="row " id="dvProject">
                         <div class="col-xs-5 no-padding">
                             <div class="row form-group">
                                 <label class="col-xs-3 text-right label-rigth">Project :</label>
                                 <div class="col-xs-9 no-padding">
-                                    <input type="text" class="form-control" id="txtProject" validate-data runat="server" disabled="disabled" />
+                                    <input type="text" class="form-control" id="txtProject" validate-data runat="server"  />
                                 </div>
                             </div>
                         </div>
@@ -1162,6 +1162,20 @@
                                     <SpinButtons ShowIncrementButtons="false">
                                     </SpinButtons>
                                 </dx:ASPxSpinEdit>
+
+                            </DataItemTemplate>
+                        </dx:GridViewDataTextColumn>
+                         <dx:GridViewDataTextColumn Caption="Remark" FieldName="remark" CellStyle-HorizontalAlign="Center" Width="100px">
+                            <CellStyle VerticalAlign="Middle"></CellStyle>
+                            <DataItemTemplate>
+                                <dx:ASPxTextBox runat="server" ID="txtRemark" DetailId='<%# Eval("id")%>' AllowMouseWheel="false"
+                                    Width="100%" Height="100%" AllowUserInput="true">
+                                    <ClientSideEvents ValueChanged="function(s, e) { 
+                                                                        changedRemark(s, e); 
+                                                                    }"
+                                        />
+                                    
+                                </dx:ASPxTextBox>
 
                             </DataItemTemplate>
                         </dx:GridViewDataTextColumn>
