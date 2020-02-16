@@ -55,6 +55,8 @@ namespace HicomIOS.Master
             public int product_id { get; set; }
 
             public string quotation_no { get; set; }
+            public string project_name { get; set; }
+            
             public string quotation_type { get; set; }
             public string issue_stock_no { get; set; }
             public string sales_order_no { get; set; }
@@ -226,6 +228,7 @@ namespace HicomIOS.Master
 
                         lbPONo.Value = Convert.IsDBNull(headerData["ref_po_no"]) ? string.Empty : Convert.ToString(headerData["ref_po_no"]);
                         lbPODate.Value = Convert.IsDBNull(headerData["ref_po_date"]) ? string.Empty : Convert.ToDateTime(headerData["ref_po_date"]).ToString("dd/MM/yyyy");
+                        lbProject.Value = Convert.IsDBNull(headerData["delivery_project"]) ? string.Empty : Convert.ToString(headerData["delivery_project"]);
                     }//
                     var status = Convert.ToString(headerData["delivery_status"]);
                     hdDocStatus.Value = status;
@@ -475,6 +478,7 @@ namespace HicomIOS.Master
                     dataReturn.fax = Convert.IsDBNull(row["fax"]) ? string.Empty : Convert.ToString(row["fax"]);
                     dataReturn.issue_stock_no = Convert.IsDBNull(row["issue_stock_no"]) ? string.Empty : Convert.ToString(row["issue_stock_no"]);
                     dataReturn.quotation_no = Convert.IsDBNull(row["quotation_no"]) ? string.Empty : Convert.ToString(row["quotation_no"]);
+                    dataReturn.project_name = Convert.IsDBNull(row["project_name"]) ? string.Empty : Convert.ToString(row["project_name"]);
                     dataReturn.quotation_type = Convert.IsDBNull(row["quotation_type"]) ? string.Empty : Convert.ToString(row["quotation_type"]);
                     dataReturn.sales_order_no = Convert.IsDBNull(row["sale_order_no"]) ? string.Empty : Convert.ToString(row["sale_order_no"]);
                     dataReturn.quotation_date = Convert.IsDBNull(row["quotation_date"]) ? string.Empty : Convert.ToDateTime(row["quotation_date"]).ToString("dd/MM/yyyy");
@@ -804,6 +808,7 @@ namespace HicomIOS.Master
                                 cmd.Parameters.Add("@saleorder_date", SqlDbType.Date).Value = saleorder_date;
                                 cmd.Parameters.Add("@delivery_date", SqlDbType.VarChar, 20).Value = lbDeliveryDate.Value == "" ? DateTime.UtcNow.ToString("dd/MM/yyyy") : lbDeliveryDate.Value;
                                 cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.Parameters.Add("@delivery_project", SqlDbType.VarChar,200).Value = lbProject.Value;
 
                                 newID = Convert.ToInt32(cmd.ExecuteScalar());
      
@@ -895,6 +900,7 @@ namespace HicomIOS.Master
                                 cmd.Parameters.Add("@saleorder_date", SqlDbType.Date).Value = saleorder_date;
                                 cmd.Parameters.Add("@delivery_date", SqlDbType.VarChar,20).Value = lbDeliveryDate.Value == "" ? DateTime.UtcNow.ToString("dd/MM/yyyy") : lbDeliveryDate.Value ;
                                 cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
+                                cmd.Parameters.Add("@delivery_project", SqlDbType.VarChar, 200).Value = lbProject.Value;
 
 
                                 cmd.ExecuteNonQuery();

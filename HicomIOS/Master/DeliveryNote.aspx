@@ -1,9 +1,9 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Main.master" AutoEventWireup="true" CodeBehind="DeliveryNote.aspx.cs" Inherits="HicomIOS.Master.DeliveryNote" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-   <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
+    <link rel="stylesheet" href="../Lib/css/jquery-ui.css">
     <style>
-         .no-padding {
+        .no-padding {
             padding: 0px;
         }
 
@@ -33,9 +33,11 @@
             font-size: 11px;
             height: 22px;
         }
-           .txt-no {
+
+        .txt-no {
             background-color: #e4effa !important;
         }
+
         #div-content {
             padding: 10px 30px;
             background-color: #ffffff;
@@ -53,9 +55,11 @@
             margin-bottom: 10px;
             padding: 0 10px;
         }
+
         .txt-no {
-          background-color: #e4effa !important;
+            background-color: #e4effa !important;
         }
+
         legend {
             width: auto;
             display: block;
@@ -70,10 +74,12 @@
             color: inherit;
             font-weight: bold;
         }
-         .swal-modal {
+
+        .swal-modal {
             width: 420px !important;
             /*height: 230px !important;*/
         }
+
         .btn-addItem {
             height: 25px;
             padding: 3px 15px;
@@ -102,9 +108,9 @@
     <script type="text/javascript">
         $(document).ready(function () {
             $("#Splitter_0").parent().hide();
-           $("#lbDeliveryDate").datepicker({
-               dateFormat: 'dd/mm/yy'
-           });
+            $("#lbDeliveryDate").datepicker({
+                dateFormat: 'dd/mm/yy'
+            });
 
         });
         function deleteDeliveryNote(s, e) {
@@ -116,28 +122,28 @@
                 buttons: true,
                 dangerMode: true,
             })
-              .then((willDelete) => {
-                  if (willDelete) {
-                      $.ajax({
-                          type: "POST",
-                          url: "DeliveryNote.aspx/DeleteDeliveryNote",
-                          data: "{id:'" + id_delivery + "'}",
-                          contentType: "application/json; charset=utf-8",
-                          dataType: "json",
-                          success: function (response) {
-                              swal("ลบข้อมูลสำเร็จ!", {
-                                  icon: "success"
-                              })
-                               .then((value) => {
-                                   gridViewDeliveryNote.PerformCallback();
-                               });
-                          },
-                          failure: function (response) {
-                              alert(response.d);
-                          }
-                      });
-                  }
-              });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "DeliveryNote.aspx/DeleteDeliveryNote",
+                            data: "{id:'" + id_delivery + "'}",
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridViewDeliveryNote.PerformCallback();
+                                    });
+                            },
+                            failure: function (response) {
+                                alert(response.d);
+                            }
+                        });
+                    }
+                });
         }
 
         function changedIssueSelect() {
@@ -164,8 +170,9 @@
             $('#lbAttentionName').val(response.d.attention_name);
             $('#customer_id').val(response.d.customer_id);
             $('#delivery_no').val(response.d.delivery_no);
-
-            $('#lbAddress').val(response.d.address_bill_tha);
+            
+            $('#lbProject').val(response.d.project_name);
+            //$('#lbAddress').val(response.d.address_bill_tha);
             $('#lbtel').val(response.d.tel);
             $('#lbfax').val(response.d.fax);
             $('#lbQuotationNo').val(response.d.quotation_no);
@@ -176,7 +183,7 @@
             $('#lbSalesOrderDate').val(response.d.sales_order_date);
             $('#lbPONo').val(response.d.ref_po_no);
             $('#lbPODate').val(response.d.ref_po_date);
-            
+
             $('#lbIssueStockDate').val(response.d.issue_stock_date);
             $('#hideSelectedIssueDetailId').val(response.d.quotation_type);
             $('#detailIssue').val(response.d.issue_stock_no);
@@ -252,29 +259,29 @@
                 buttons: true,
                 dangerMode: true,
             })
-          .then((willDelete) => {
-              if (willDelete) {
-                  $.ajax({
-                      type: "POST",
-                      url: "DeliveryNote.aspx/DeleteIssueDetail",
-                      data: '{id:"' + key + '"}',
-                      contentType: "application/json; charset=utf-8",
-                      dataType: "json",
-                      success: function (response) {
-                          swal("ลบข้อมูลสำเร็จ!", {
-                              icon: "success"
-                          })
-                           .then((value) => {
-                               gridViewDeliveryNote.PerformCallback();
-                               gridViewDetailDeliveryNoteList.PerformCallback();
-                           });
-                      },
-                      failure: function (response) {
-                          alert(response.d);
-                      }
-                  });
-              }
-          });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "DeliveryNote.aspx/DeleteIssueDetail",
+                            data: '{id:"' + key + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+                                        gridViewDeliveryNote.PerformCallback();
+                                        gridViewDetailDeliveryNoteList.PerformCallback();
+                                    });
+                            },
+                            failure: function (response) {
+                                alert(response.d);
+                            }
+                        });
+                    }
+                });
         }
 
         function saveDraft() {
@@ -294,7 +301,7 @@
             });
         }
         function confirmSave() {
-            
+
             var delivery_no = $('#delivery_no').val();
             if (cboIssueNo.GetValue() == null) {
                 alert("กรุณาเลือกเลขที่ใบเบิกสินค้า");
@@ -311,10 +318,10 @@
                     swal("บันทึกข้อมูลสำเร็จ!", {
                         icon: "success"
                     })
-                    .then((value) => {
-                        $('#btnConfirm').click();
-                    });
-              
+                        .then((value) => {
+                            $('#btnConfirm').click();
+                        });
+
                 },
             });
         }
@@ -342,7 +349,7 @@
         function submitDeliveryNoteEdit() {
             var qty = $('#txtIssueQty').val();
             var remark = $('#txtRemark').val();
-            
+
             var oldQty = $('#hdOldQty').val();
             if (parseInt(qty) > parseInt(oldQty)) {
                 alert("Qty เกินจำนวน");
@@ -378,31 +385,31 @@
                 buttons: true,
                 dangerMode: true,
             })
-              .then((willDelete) => {
-                  if (willDelete) {
-                      $.ajax({
-                          type: "POST",
-                          url: "DeliveryNote.aspx/DeleteDeliveryDetail",
-                          data: '{id: "' + key + '" }',
-                          contentType: "application/json; charset=utf-8",
-                          dataType: "json",
-                          success: function (response) {
-                              $('#hideSelectedIssueDetailId').val(0);
-                              swal("ลบข้อมูลสำเร็จ!", {
-                                  icon: "success"
-                              })
-                               .then((value) => {
-                                   
-                                   gridViewDetailDeliveryNoteList.PerformCallback();
-                                   gridViewDeliveryNote.PerformCallback();
-                               });
-                          },
-                          failure: function (response) {
-                              alert(response.d);
-                          }
-                      });
-                  }
-              });
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "POST",
+                            url: "DeliveryNote.aspx/DeleteDeliveryDetail",
+                            data: '{id: "' + key + '" }',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                $('#hideSelectedIssueDetailId').val(0);
+                                swal("ลบข้อมูลสำเร็จ!", {
+                                    icon: "success"
+                                })
+                                    .then((value) => {
+
+                                        gridViewDetailDeliveryNoteList.PerformCallback();
+                                        gridViewDeliveryNote.PerformCallback();
+                                    });
+                            },
+                            failure: function (response) {
+                                alert(response.d);
+                            }
+                        });
+                    }
+                });
         }
         function backPage() {
             window.location.href = "../Master/DeliveryNoteList.aspx";
@@ -442,7 +449,7 @@
                 }
             });
         }
-      
+
         function addNewItem() {
             window.location.href = "DeliveryNote.aspx";
         }
@@ -489,7 +496,7 @@
                             <div class="col-xs-9 no-padding">
                                 <input type="text" class="form-control" id="lbCustomerName" readonly="" runat="server" />
                             </div>
-                            
+
                         </div>
                     </div>
                     <div class="col-xs-4 no-padding">
@@ -505,9 +512,9 @@
                 <div class="col-xs-12 no-padding">
                     <div class="col-xs-4 no-padding">
                         <div class="row form-group">
-                            <label class="col-xs-3 text-right label-rigth">ที่อยู่ลูกค้า :</label>
+                            <label class="col-xs-3 text-right label-rigth">สถานที่ส่งของ :</label>
                             <div class="col-xs-9 no-padding">
-                                <input type="text" class="form-control" id="lbAddress" readonly="" runat="server" />
+                                <input type="text" class="form-control" id="lbAddress" runat="server" />
                             </div>
                         </div>
                     </div>
@@ -519,7 +526,7 @@
                             </div>
                         </div>
                     </div>
-                     <div class="col-xs-4 no-padding">
+                    <div class="col-xs-4 no-padding">
                         <div class="row form-group">
                             <label class="col-xs-3 text-right label-rigth">เบอร์โทร :</label>
                             <div class="col-xs-9 no-padding">
@@ -530,7 +537,7 @@
                 </div>
 
                 <div class="col-xs-12 no-padding">
-                     <div class="col-xs-4 no-padding">
+                    <div class="col-xs-4 no-padding">
                         <div class="row form-group">
                             <label class="col-xs-3 text-right label-rigth">เลขที่ใบเสนอราคา :</label>
                             <div class="col-xs-9 no-padding">
@@ -546,8 +553,8 @@
                             </div>
                         </div>
                     </div>
-                    
-                   <div class="col-xs-4 no-padding">
+
+                    <div class="col-xs-4 no-padding">
                         <div class="row form-group">
                             <label class="col-xs-3 text-right label-rigth">วันที่ส่งสินค้า :</label>
                             <div class="col-xs-9 no-padding">
@@ -576,120 +583,130 @@
                             </div>
                         </div>
                     </div>
-                     <div class="col-xs-4 no-padding" hidden="hidden">
+                     <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">โครงการ :</label>
+                            <div class="col-xs-9 no-padding">
+                                <input type="text" class="form-control" id="lbProject" runat="server" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-xs-12 no-padding">
+                    <div class="col-xs-4 no-padding" hidden="hidden">
                         <div class="row form-group">
                             <input type="text" hidden="hidden" class="form-control" id="customer_id" readonly="" runat="server" />
                         </div>
                     </div>
                 </div>
             </fieldset>
-        </div>
+    </div>
 
-        <div class="row">
-            <div class="col-xs-6 no-padding">
-                <div class="row form-group">
-                    <button type="button" id="detailIssue" runat="server" onclick="BtndetailIssue()" class="btn-info" style="height: 30px;">
-                        <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;เลือกใบส่งสินค้าชั่วคราว
-                    </button>
-                </div>
+    <div class="row">
+        <div class="col-xs-6 no-padding">
+            <div class="row form-group">
+                <button type="button" id="detailIssue" runat="server" onclick="BtndetailIssue()" class="btn-info" style="height: 30px;">
+                    <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;เลือกใบส่งสินค้าชั่วคราว
+                </button>
             </div>
-            <dx:ASPxGridView ID="gridViewDeliveryNote" ClientInstanceName="gridViewDeliveryNote" runat="server" Settings-VerticalScrollBarMode="Visible"
-                Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
-                OnCustomCallback="gridViewDeliveryNote_CustomCallback"
-                KeyFieldName="id" Width="100%">
-                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
-                <Paddings Padding="0px" />
-                <Border BorderWidth="0px" />
-                <BorderBottom BorderWidth="1px" />
-                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
-                    PageSizeItemSettings-Visible="false">
-                    <PageSizeItemSettings Items="10, 20, 50" />
-                </SettingsPager>
-                <Columns>
-                    <dx:GridViewDataTextColumn Caption="#" FieldName="id" CellStyle-HorizontalAlign="Center" Width="100px">
-                        <DataItemTemplate>
+        </div>
+        <dx:ASPxGridView ID="gridViewDeliveryNote" ClientInstanceName="gridViewDeliveryNote" runat="server" Settings-VerticalScrollBarMode="Visible"
+            Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+            OnCustomCallback="gridViewDeliveryNote_CustomCallback"
+            KeyFieldName="id" Width="100%">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="false">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <Columns>
+                <dx:GridViewDataTextColumn Caption="#" FieldName="id" CellStyle-HorizontalAlign="Center" Width="100px">
+                    <DataItemTemplate>
 
-                            <a id="btnEdit" class="btn btn-mini" onclick="editDeliveryNoteDetail(this, <%# Eval("id")%>)" title="<%# Eval("product_no")%>">
-                                <i class="fa fa-pencil" aria-hidden="true"></i>
-                            </a>
-                            |
+                        <a id="btnEdit" class="btn btn-mini" onclick="editDeliveryNoteDetail(this, <%# Eval("id")%>)" title="<%# Eval("product_no")%>">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </a>
+                        |
                              <a id="btnDelete" class="btn btn-mini" onclick="deleteDeliveryDetail(<%# Eval("id")%>)" title="Delete">
                                  <i class="fa fa-trash-o" aria-hidden="true"></i>
                              </a>
-                        </DataItemTemplate>
-                    </dx:GridViewDataTextColumn>
-                    <dx:GridViewDataColumn FieldName="product_no" Width="120px" Caption="Product No" />
-                    <dx:GridViewDataColumn FieldName="product_name_tha" Caption="Product Name" />
-                    <dx:GridViewDataColumn FieldName="qty" Caption="Qty" Width="80px" />
-                    <dx:GridViewDataColumn FieldName="unit_code" Caption="Unit" Width="100px" />
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataColumn FieldName="product_no" Width="120px" Caption="Product No" />
+                <dx:GridViewDataColumn FieldName="product_name_tha" Caption="Product Name" />
+                <dx:GridViewDataColumn FieldName="qty" Caption="Qty" Width="80px" />
+                <dx:GridViewDataColumn FieldName="unit_code" Caption="Unit" Width="100px" />
 
-                </Columns>
-            </dx:ASPxGridView>
-        </div>
-        <!-- Modal content-->
-        <div class="modal fade" id="MOdalDeliveryNote" role="dialog" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        รายการ
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                             <div class="col-xs-4 text-left">
-                                <input id="chkSelectAllDetailDeliveryNoteList" type="checkbox" class="" onclick="selectAllDetailDeliveryNoteList()" />&nbsp;เลือกทั้งหมด
-                            </div>
+            </Columns>
+        </dx:ASPxGridView>
+    </div>
+    <!-- Modal content-->
+    <div class="modal fade" id="MOdalDeliveryNote" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    รายการ
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-4 text-left">
+                            <input id="chkSelectAllDetailDeliveryNoteList" type="checkbox" class="" onclick="selectAllDetailDeliveryNoteList()" />&nbsp;เลือกทั้งหมด
+                        </div>
 
-                            <div class="col-xs-8" style="float: right; margin-bottom: 5px;">
-                                <input type="text" id="txtSearchText" class="form-control searchBoxData" placeholder="กรอกคำค้นหา..." runat="server"
-                                    onkeypress="searchSeletedGrid(event.keyCode)" />
-                                <button type="button" class="btn-addItem" id="btnSearchText" onclick="searchSeletedGrid(13);">
-                                    <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
-                                </button>
-                            </div>
-                            <div class="col-xs-12">
-                                <dx:ASPxGridView ID="gridViewDetailDeliveryNoteList" ClientInstanceName="gridViewDetailDeliveryNoteList" runat="server" Settings-VerticalScrollBarMode="Visible"
-                                    Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
-                                    OnHtmlDataCellPrepared="gridViewDetailDeliveryNoteList_HtmlDataCellPrepared"
-                                    OnCustomCallback="gridViewDetailDeliveryNoteList_CustomCallback"
-                                    KeyFieldName="id" Width="100%">
-                                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
-                                    <Paddings Padding="0px" />
-                                    <Border BorderWidth="0px" />
-                                    <BorderBottom BorderWidth="1px" />
-                                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
-                                        PageSizeItemSettings-Visible="false">
-                                        <PageSizeItemSettings Items="10, 20, 50" />
-                                    </SettingsPager>
-                                    <Columns>
-                                        <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="30px">
-                                            <DataItemTemplate>
+                        <div class="col-xs-8" style="float: right; margin-bottom: 5px;">
+                            <input type="text" id="txtSearchText" class="form-control searchBoxData" placeholder="กรอกคำค้นหา..." runat="server"
+                                onkeypress="searchSeletedGrid(event.keyCode)" />
+                            <button type="button" class="btn-addItem" id="btnSearchText" onclick="searchSeletedGrid(13);">
+                                <i class="fa fa-search" aria-hidden="true"></i>&nbsp;ค้นหา
+                            </button>
+                        </div>
+                        <div class="col-xs-12">
+                            <dx:ASPxGridView ID="gridViewDetailDeliveryNoteList" ClientInstanceName="gridViewDetailDeliveryNoteList" runat="server" Settings-VerticalScrollBarMode="Visible"
+                                Settings-VerticalScrollableHeight="400" EnableCallBacks="true"
+                                OnHtmlDataCellPrepared="gridViewDetailDeliveryNoteList_HtmlDataCellPrepared"
+                                OnCustomCallback="gridViewDetailDeliveryNoteList_CustomCallback"
+                                KeyFieldName="id" Width="100%">
+                                <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+                                <Paddings Padding="0px" />
+                                <Border BorderWidth="0px" />
+                                <BorderBottom BorderWidth="1px" />
+                                <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                                    PageSizeItemSettings-Visible="false">
+                                    <PageSizeItemSettings Items="10, 20, 50" />
+                                </SettingsPager>
+                                <Columns>
+                                    <dx:GridViewDataTextColumn Caption="#" FieldName="is_selected" Width="30px">
+                                        <DataItemTemplate>
 
-                                                <dx:ASPxCheckBox ID="chkIssueDetail" runat="server" ValueType="System.Boolean"
-                                                    TextField="Name" ValueField="is_selected" ClientInstanceName="chkIssueDetail"
-                                                    IssueDetailId='<%# Eval("id")%>'>
-                                                    <ClientSideEvents ValueChanged="function(s, e) { 
+                                            <dx:ASPxCheckBox ID="chkIssueDetail" runat="server" ValueType="System.Boolean"
+                                                TextField="Name" ValueField="is_selected" ClientInstanceName="chkIssueDetail"
+                                                IssueDetailId='<%# Eval("id")%>'>
+                                                <ClientSideEvents ValueChanged="function(s, e) { 
                                                                         chkissue(s, e); 
                                                                     }" />
-                                                </dx:ASPxCheckBox>
-                                            </DataItemTemplate>
-                                        </dx:GridViewDataTextColumn>
-                                        <dx:GridViewDataTextColumn FieldName="product_no" Caption="Product No" VisibleIndex="4" Width="70px" />
-                                        <dx:GridViewDataTextColumn FieldName="product_name_tha" Caption="Product Name" VisibleIndex="5" Width="170px" />
-                                        <dx:GridViewDataTextColumn FieldName="unit_tha" Caption="Unit" VisibleIndex="7" Width="70px" />
-                                        <dx:GridViewDataTextColumn FieldName="issue_qty" Caption="Qty" VisibleIndex="6" Width="50px" />
+                                            </dx:ASPxCheckBox>
+                                        </DataItemTemplate>
+                                    </dx:GridViewDataTextColumn>
+                                    <dx:GridViewDataTextColumn FieldName="product_no" Caption="Product No" VisibleIndex="4" Width="70px" />
+                                    <dx:GridViewDataTextColumn FieldName="product_name_tha" Caption="Product Name" VisibleIndex="5" Width="170px" />
+                                    <dx:GridViewDataTextColumn FieldName="unit_tha" Caption="Unit" VisibleIndex="7" Width="70px" />
+                                    <dx:GridViewDataTextColumn FieldName="issue_qty" Caption="Qty" VisibleIndex="6" Width="50px" />
 
-                                        <dx:GridViewDataTextColumn FieldName="selling_price" Caption="Price" VisibleIndex="7" Width="100px" />
-                                    </Columns>
-                                </dx:ASPxGridView>
-                            </div>
+                                    <dx:GridViewDataTextColumn FieldName="selling_price" Caption="Price" VisibleIndex="7" Width="100px" />
+                                </Columns>
+                            </dx:ASPxGridView>
+                        </div>
 
-                            <div class="col-xs-12">
-                                <div class="row form-group">
-                                    <label class="col-xs-3 text-right label-rigth"></label>
-                                    <div class="col-xs-9 no-padding text-right" style="margin-top: 15px;">
-                                        <button type="button" runat="server" id="Button1" onclick="submitIssueDetail()" class="btn-app btn-addItem">ยืนยัน</button>
-                                        <button type="button" runat="server" id="Button2" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
-                                    </div>
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth"></label>
+                                <div class="col-xs-9 no-padding text-right" style="margin-top: 15px;">
+                                    <button type="button" runat="server" id="Button1" onclick="submitIssueDetail()" class="btn-app btn-addItem">ยืนยัน</button>
+                                    <button type="button" runat="server" id="Button2" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
                                 </div>
                             </div>
                         </div>
@@ -697,65 +714,66 @@
                 </div>
             </div>
         </div>
-        <!-- Modal edit-->
+    </div>
+    <!-- Modal edit-->
 
-        <div class="modal fade" id="modal_edit_delivery_note" role="dialog" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        Edit Sale Order Detail
+    <div class="modal fade" id="modal_edit_delivery_note" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    Edit Sale Order Detail
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Product No:</label>
+                                <div class="col-xs-7 no-padding">
+                                    <input type="text" class="form-control" readonly="" id="txtProductNo" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Product Name :</label>
+                                <div class="col-xs-7 no-padding">
+                                    <input type="text" class="form-control" readonly="" id="txtProductName" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Qty :</label>
+                                <div class="col-xs-7 no-padding">
+                                    <input type="text" class="form-control numberic" id="txtIssueQty" runat="server" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12">
+                            <div class="row form-group">
+                                <label class="col-xs-3 text-right label-rigth">Remark :</label>
+                                <div class="col-xs-7 no-padding">
+                                    <input type="text" class="form-control" id="txtRemark" runat="server" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="row form-group">
-                                    <label class="col-xs-3 text-right label-rigth">Product No:</label>
-                                    <div class="col-xs-7 no-padding">
-                                        <input type="text" class="form-control" readonly="" id="txtProductNo" runat="server" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xs-12">
-                                <div class="row form-group">
-                                    <label class="col-xs-3 text-right label-rigth">Product Name :</label>
-                                    <div class="col-xs-7 no-padding">
-                                        <input type="text" class="form-control" readonly="" id="txtProductName" runat="server" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xs-12">
-                                <div class="row form-group">
-                                    <label class="col-xs-3 text-right label-rigth">Qty :</label>
-                                    <div class="col-xs-7 no-padding">
-                                        <input type="text" class="form-control numberic" id="txtIssueQty" runat="server" />
-                                    </div>
-                                </div>
-                            </div>
-                             <div class="col-xs-12">
-                                <div class="row form-group">
-                                    <label class="col-xs-3 text-right label-rigth">Remark :</label>
-                                    <div class="col-xs-7 no-padding">
-                                        <input type="text" class="form-control"  id="txtRemark" runat="server" />
-                                    </div>
-                                </div>
-                            </div>
+                    <asp:HiddenField runat="server" ID="hdOldQty" />
+                    <div class="row form-group">
+                        <label class="col-xs-3 text-right label-rigth"></label>
+                        <div class="col-xs-7 no-padding text-right">
+                            <button type="button" runat="server" id="Button3" onclick="submitDeliveryNoteEdit()" class="btn-app btn-addItem">ยืนยัน</button>
+                            <button type="button" runat="server" id="Button4" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
                         </div>
-                        <asp:HiddenField runat="server" ID="hdOldQty" />
-                        <div class="row form-group">
-                            <label class="col-xs-3 text-right label-rigth"></label>
-                            <div class="col-xs-7 no-padding text-right">
-                                <button type="button" runat="server" id="Button3" onclick="submitDeliveryNoteEdit()" class="btn-app btn-addItem">ยืนยัน</button>
-                                <button type="button" runat="server" id="Button4" class="btn-app btn-addItem" data-dismiss="modal">ยกเลิก</button>
-                            </div>
 
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Modal edit-->
-        <asp:HiddenField runat="server" ID="hideSelectedIssueDetailId" />
-        <asp:HiddenField runat="server" ID="hdQuotationType" />
-        <asp:HiddenField runat="server" ID="hdDocStatus" />
+    </div>
+    <!-- Modal edit-->
+    <asp:HiddenField runat="server" ID="hideSelectedIssueDetailId" />
+    <asp:HiddenField runat="server" ID="hdQuotationType" />
+    <asp:HiddenField runat="server" ID="hdDocStatus" />
     </div>
 </asp:Content>

@@ -193,6 +193,15 @@ namespace HicomIOS.Master {
         protected global::System.Web.UI.HtmlControls.HtmlInputText lbPODate;
         
         /// <summary>
+        /// lbProject control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText lbProject;
+        
+        /// <summary>
         /// customer_id control.
         /// </summary>
         /// <remarks>
