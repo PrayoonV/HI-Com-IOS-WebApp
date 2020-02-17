@@ -22,7 +22,7 @@
             //};
             $(".numberic").keydown(function (e) {
                 // Allow: backspace, delete, tab, escape, enter and .
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190,111,191]) !== -1 ||
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190, 111, 191]) !== -1 ||
                     // Allow: Ctrl+A, Command+A
                     (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
                     // Allow: home, end, left, right, down, up
@@ -63,7 +63,7 @@
             $("[name='is_enable']").bootstrapSwitch();
         }
         function onConfirmClick() {
-             $.LoadingOverlay("show", {
+            $.LoadingOverlay("show", {
                 zIndex: 9999
             });
             var hdBtn = $('#hdConfirmBtnID').val();
@@ -71,7 +71,7 @@
             if (btnConfirm != null) {
                 btnConfirm.click();
             }
-             $.LoadingOverlay("hide");
+            $.LoadingOverlay("hide");
         }
         function onSendApproveClick() {
             $.LoadingOverlay("show", {
@@ -92,31 +92,31 @@
         }
 
         //function number_format(number, decimals, decPoint, thousandsSep) {
-            /*decimals = Math.abs(decimals) || 0;
-            number = parseFloat(number);
+        /*decimals = Math.abs(decimals) || 0;
+        number = parseFloat(number);
 
-            if (!decPoint || !thousandsSep) {
-                decPoint = '.';
-                thousandsSep = ',';
+        if (!decPoint || !thousandsSep) {
+            decPoint = '.';
+            thousandsSep = ',';
+        }
+
+        var roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
+        var numbersString = decimals ? (roundedNumber.slice(0, decimals * -1) || 0) : roundedNumber;
+        var decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
+        var formattedNumber = "";
+
+        while (numbersString.length > 3) {
+            formattedNumber += thousandsSep + numbersString.slice(-3)
+            numbersString = numbersString.slice(0, -3);
+        }
+
+        if (decimals && decimalsString.length === 1) {
+            while (decimalsString.length < decimals) {
+                decimalsString = decimalsString + decimalsString;
             }
+        }
 
-            var roundedNumber = Math.round(Math.abs(number) * ('1e' + decimals)) + '';
-            var numbersString = decimals ? (roundedNumber.slice(0, decimals * -1) || 0) : roundedNumber;
-            var decimalsString = decimals ? roundedNumber.slice(decimals * -1) : '';
-            var formattedNumber = "";
-
-            while (numbersString.length > 3) {
-                formattedNumber += thousandsSep + numbersString.slice(-3)
-                numbersString = numbersString.slice(0, -3);
-            }
-
-            if (decimals && decimalsString.length === 1) {
-                while (decimalsString.length < decimals) {
-                    decimalsString = decimalsString + decimalsString;
-                }
-            }
-
-            return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? (decPoint + decimalsString) : '');*/
+        return (number < 0 ? '-' : '') + numbersString + formattedNumber + (decimalsString ? (decPoint + decimalsString) : '');*/
         function number_format(number, decimals, dec_point, thousands_point) {
             if (number == null || !isFinite(number)) {
                 throw new TypeError("number is not valid");

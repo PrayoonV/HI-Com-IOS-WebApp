@@ -15,11 +15,11 @@
         #Splitter_1_CC {
             overflow-y: scroll;
         }
+
         .userlogin .dropdown-toggle::after {
             content: none;
         }
     </style>
-    <%--<script src="../Content/sweetalert/sweetalert.js"></script>--%>
     <script src="../Content/sweetalert/sweetalert.js"></script>
     <script type="text/javascript">
         $('#gridCellApprove').css({
@@ -176,25 +176,24 @@
                         </select>
                     </div>
                 </div>
-                <div class="card-body">    
-                      <ul class="nav nav-tabs"> 
+                <div class="card-body">
+                    <ul class="nav nav-tabs">
                         <li><a data-toggle="tab" id="ApproveTabQU" runat="server" href="#ApproveContentTabQU">Quotation</a></li>
-                       <li><a data-toggle="tab" id="ApproveTabSO" runat="server" href="#ApproveContentTabSO">Sale Order</a></li> 
-                        <li><a data-toggle="tab" id="ApproveTabIS" runat="server" href="#ApproveContentTabIS">Issue</a></li> 
-                        <li><a data-toggle="tab" id="ApproveTabDN" runat="server" href="#ApproveContentTabDN">Delivery Note</a></li> 
-                        <li><a data-toggle="tab" id="ApproveTabPR" runat="server" href="#ApproveContentTabRP">Purchase Request</a></li> 
+                        <li><a data-toggle="tab" id="ApproveTabSO" runat="server" href="#ApproveContentTabSO">Sale Order</a></li>
+                        <li><a data-toggle="tab" id="ApproveTabIS" runat="server" href="#ApproveContentTabIS">Issue</a></li>
+                        <li><a data-toggle="tab" id="ApproveTabDN" runat="server" href="#ApproveContentTabDN">Delivery Note</a></li>
+                        <li><a data-toggle="tab" id="ApproveTabPR" runat="server" href="#ApproveContentTabRP">Purchase Request</a></li>
                         <li><a data-toggle="tab" id="ApproveTabRE" runat="server" href="#ApproveContentTabRE">Return</a></li>
-                        <li><a data-toggle="tab" id="ApproveTabBR" runat="server" href="#ApproveContentTabBR">Borrow</a></li> 
-                      </ul>
+                        <li><a data-toggle="tab" id="ApproveTabBR" runat="server" href="#ApproveContentTabBR">Borrow</a></li>
+                    </ul>
                 </div>
-       
 
-                  <div class="tab-content" id="gridCellApprove">
+
+                <div class="tab-content" id="gridCellApprove">
                     <div id="ApproveContentTabQU" runat="server" class="tab-pane fade">
-                      <dx:ASPxGridView ID="gridViewQU" runat="server" AutoGenerateColumns="False"
+                        <dx:ASPxGridView ID="gridViewQU" runat="server" AutoGenerateColumns="False"
                             Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                           OnCustomCallback="gridViewQU_CustomCallback"
-                           >
+                            OnCustomCallback="gridViewQU_CustomCallback">
                             <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                             <Paddings Padding="0px" />
                             <Border BorderWidth="0px" />
@@ -203,10 +202,10 @@
                                 PageSizeItemSettings-Visible="true">
                                 <PageSizeItemSettings Items="10, 20, 50" />
                             </SettingsPager>
-                            <Columns> 
+                            <Columns>
                                 <dx:GridViewDataTextColumn Caption="Status Approve" FieldName="is_approve" CellStyle-HorizontalAlign="Center" Width="55px">
                                     <DataItemTemplate>
-                                          <%--<button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
+                                        <%--<button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
                                             data-toggle="button" aria-pressed="true" onclick="changeStatusApprove(<%# Eval("id")%>,'QU')">
                                             <div class="handle"></div>
                                         </button>--%>
@@ -215,13 +214,13 @@
                                             <div class="handle"></div>
                                         </button>
                                     </DataItemTemplate>
-                                </dx:GridViewDataTextColumn> 
-                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="quotation_subject" Caption="Employee Code" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="project_name" Caption="Employee Code" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="company_name_tha" Caption="Comapany Name" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="sales_name" Caption="Sale Name" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="created_date" Caption="Created Date" Width="50px" />  
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="quotation_subject" Caption="Employee Code" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="project_name" Caption="Employee Code" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="company_name_tha" Caption="Comapany Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="sales_name" Caption="Sale Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="created_date" Caption="Created Date" Width="50px" />
                             </Columns>
                             <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                             <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
@@ -229,12 +228,11 @@
                                 CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
                         </dx:ASPxGridView>
                     </div>
-                   
-                   <div id="ApproveContentTabSO" runat="server" class="tab-pane fade">
-                      <dx:ASPxGridView ID="gridViewSO" runat="server" AutoGenerateColumns="False"
+
+                    <div id="ApproveContentTabSO" runat="server" class="tab-pane fade">
+                        <dx:ASPxGridView ID="gridViewSO" runat="server" AutoGenerateColumns="False"
                             Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                           OnCustomCallback="gridViewSO_CustomCallback"
-                           >
+                            OnCustomCallback="gridViewSO_CustomCallback">
                             <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                             <Paddings Padding="0px" />
                             <Border BorderWidth="0px" />
@@ -243,22 +241,22 @@
                                 PageSizeItemSettings-Visible="true">
                                 <PageSizeItemSettings Items="10, 20, 50" />
                             </SettingsPager>
-                            <Columns> 
+                            <Columns>
                                 <dx:GridViewDataTextColumn Caption="Status Approve" FieldName="is_approve" CellStyle-HorizontalAlign="Center" Width="55px">
                                     <DataItemTemplate>
-                                          <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
+                                        <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
                                             data-toggle="button" aria-pressed="true" onclick="changeStatusApprove(<%# Eval("id")%>,'SO')">
                                             <div class="handle"></div>
                                         </button>
                                     </DataItemTemplate>
-                                </dx:GridViewDataTextColumn> 
-                                <dx:GridViewDataTextColumn FieldName="sale_order_no" Caption="Sale Order No" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation no" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />    
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="sale_order_no" Caption="Sale Order No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation no" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />
                                 <dx:GridViewDataTextColumn FieldName="total_amount" Caption="Total Amount" Width="30px" CellStyle-HorizontalAlign="Center">
                                     <PropertiesTextEdit DisplayFormatString="#,###"></PropertiesTextEdit>
                                 </dx:GridViewDataTextColumn>
-                                <dx:GridViewDataTextColumn FieldName="sale_order_date" Caption="Sale Order Date" Width="50px" />  
+                                <dx:GridViewDataTextColumn FieldName="sale_order_date" Caption="Sale Order Date" Width="50px" />
                             </Columns>
                             <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                             <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
@@ -266,11 +264,10 @@
                                 CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
                         </dx:ASPxGridView>
                     </div>
-                     <div id="ApproveContentTabIS" runat="server" class="tab-pane fade">
-                      <dx:ASPxGridView ID="gridViewIS" runat="server" AutoGenerateColumns="False"
+                    <div id="ApproveContentTabIS" runat="server" class="tab-pane fade">
+                        <dx:ASPxGridView ID="gridViewIS" runat="server" AutoGenerateColumns="False"
                             Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                           OnCustomCallback="gridViewIS_CustomCallback"
-                           >
+                            OnCustomCallback="gridViewIS_CustomCallback">
                             <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                             <Paddings Padding="0px" />
                             <Border BorderWidth="0px" />
@@ -279,21 +276,21 @@
                                 PageSizeItemSettings-Visible="true">
                                 <PageSizeItemSettings Items="10, 20, 50" />
                             </SettingsPager>
-                            <Columns> 
+                            <Columns>
                                 <dx:GridViewDataTextColumn Caption="Status Approve" FieldName="is_approve" CellStyle-HorizontalAlign="Center" Width="55px">
                                     <DataItemTemplate>
-                                          <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
+                                        <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
                                             data-toggle="button" aria-pressed="true" onclick="changeStatusApprove(<%# Eval("id")%>,'IS')">
                                             <div class="handle"></div>
                                         </button>
                                     </DataItemTemplate>
-                                </dx:GridViewDataTextColumn> 
-                                <dx:GridViewDataTextColumn FieldName="issue_stock_no" Caption="Issue No" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="issue_stock_status_display" Caption="Employee Code" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="issue_stock_status_display" Caption="Status Issue" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="issue_stock_date" Caption="Issue Date" Width="50px" />  
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="issue_stock_no" Caption="Issue No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="issue_stock_status_display" Caption="Employee Code" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="issue_stock_status_display" Caption="Status Issue" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="issue_stock_date" Caption="Issue Date" Width="50px" />
                             </Columns>
                             <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                             <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
@@ -301,11 +298,10 @@
                                 CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
                         </dx:ASPxGridView>
                     </div>
-                     <div id="ApproveContentTabDN" runat="server" class="tab-pane fade">
-                      <dx:ASPxGridView ID="gridViewDN" runat="server" AutoGenerateColumns="False"
+                    <div id="ApproveContentTabDN" runat="server" class="tab-pane fade">
+                        <dx:ASPxGridView ID="gridViewDN" runat="server" AutoGenerateColumns="False"
                             Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                           OnCustomCallback="gridViewDN_CustomCallback"
-                           >
+                            OnCustomCallback="gridViewDN_CustomCallback">
                             <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                             <Paddings Padding="0px" />
                             <Border BorderWidth="0px" />
@@ -314,33 +310,32 @@
                                 PageSizeItemSettings-Visible="true">
                                 <PageSizeItemSettings Items="10, 20, 50" />
                             </SettingsPager>
-                            <Columns> 
+                            <Columns>
                                 <dx:GridViewDataTextColumn Caption="Status Approve" FieldName="is_approve" CellStyle-HorizontalAlign="Center" Width="55px">
                                     <DataItemTemplate>
-                                          <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
+                                        <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
                                             data-toggle="button" aria-pressed="true" onclick="changeStatusApprove(<%# Eval("id")%>,'IS')">
                                             <div class="handle"></div>
                                         </button>
                                     </DataItemTemplate>
-                                </dx:GridViewDataTextColumn> 
-                                <dx:GridViewDataTextColumn FieldName="delivery_no" Caption="Delivery No" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="issue_no" Caption="Issue No" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="delivery_status_display" Caption="Delivery Satatus" Width="50px" /> 
-                                <dx:GridViewDataTextColumn FieldName="created_date" Caption="Issue Date" Width="50px" />  
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="delivery_no" Caption="Delivery No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="issue_no" Caption="Issue No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="quotation_no" Caption="Quotation No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="delivery_status_display" Caption="Delivery Satatus" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="created_date" Caption="Issue Date" Width="50px" />
                             </Columns>
                             <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                             <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
                             <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
                                 CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
-                        </dx:ASPxGridView> 
+                        </dx:ASPxGridView>
                     </div>
                     <div id="ApproveContentTabPR" runat="server" class="tab-pane fade">
-                      <dx:ASPxGridView ID="gridViewPR" runat="server" AutoGenerateColumns="False"
+                        <dx:ASPxGridView ID="gridViewPR" runat="server" AutoGenerateColumns="False"
                             Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                           OnCustomCallback="gridViewPR_CustomCallback"
-                           >
+                            OnCustomCallback="gridViewPR_CustomCallback">
                             <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                             <Paddings Padding="0px" />
                             <Border BorderWidth="0px" />
@@ -349,33 +344,33 @@
                                 PageSizeItemSettings-Visible="true">
                                 <PageSizeItemSettings Items="10, 20, 50" />
                             </SettingsPager>
-                            <Columns> 
+                            <Columns>
                                 <dx:GridViewDataTextColumn Caption="Status Approve" FieldName="is_approve" CellStyle-HorizontalAlign="Center" Width="55px">
                                     <DataItemTemplate>
-                                          <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
+                                        <button type="button" id="item_<%# Eval("id")%>" class="btn btn-left btn-toggle"
                                             data-toggle="button" aria-pressed="true" onclick="changeStatusApprove(<%# Eval("id")%>,'SO')">
                                             <div class="handle"></div>
                                         </button>
                                     </DataItemTemplate>
-                                </dx:GridViewDataTextColumn> 
-                                <dx:GridViewDataTextColumn FieldName="purchase_request_no" Caption="Purchase Request No" Width="50px" />  
-                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />    
-                                <dx:GridViewDataTextColumn FieldName="supplier_name_tha" Caption="Supplier Name" Width="50px" />    
-                                <dx:GridViewDataTextColumn FieldName="purchase_request_type_display" Caption="Purchase Request Status" Width="50px" />   
+                                </dx:GridViewDataTextColumn>
+                                <dx:GridViewDataTextColumn FieldName="purchase_request_no" Caption="Purchase Request No" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="supplier_name_tha" Caption="Supplier Name" Width="50px" />
+                                <dx:GridViewDataTextColumn FieldName="purchase_request_type_display" Caption="Purchase Request Status" Width="50px" />
                             </Columns>
                             <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                             <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
                             <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
                                 CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
-                        </dx:ASPxGridView> 
+                        </dx:ASPxGridView>
                     </div>
                     <div id="ApproveContentTabRE" runat="server" class="tab-pane fade">
-                      <h3>ApproveContentTabRE</h3> 
+                        <h3>ApproveContentTabRE</h3>
                     </div>
                     <div id="ApproveContentTabBR" runat="server" class="tab-pane fade">
-                      <h3>ApproveContentTabBR</h3> 
-                    </div> 
-                  </div>
+                        <h3>ApproveContentTabBR</h3>
+                    </div>
+                </div>
             </div>
 
             <!-- Area Chart Product-->
@@ -482,7 +477,6 @@
     <script src="Content/Dashboard/vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="Content/Dashboard/vendor/chart.js/Chart.js"></script>
     <script src="Content/Dashboard/js/sb-admin.js"></script>
-    <%--<script src="Content/Dashboard/js/sb-admin-charts.js"></script>--%>
     <script>
         $(document).ready(function () {
             $("#Splitter_0").parent().remove();
@@ -524,7 +518,7 @@
                     fnSummaryAnnualAN(currentYear);
                 }
             });
-            
+
 
             gridViewQU.SetHeight(500);
             gridViewSO.SetHeight(50);
@@ -948,7 +942,7 @@
         }
 
         function changeStatusApprove(id, e) {
-            var refer_name = e; 
+            var refer_name = e;
             /*$.ajax({
                 type: 'POST',
                 url: "Default.aspx/ChangeStatus",
