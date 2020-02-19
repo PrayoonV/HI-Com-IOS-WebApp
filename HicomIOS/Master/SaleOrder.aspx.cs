@@ -1446,6 +1446,7 @@ namespace HicomIOS.Master
             }
             HttpContext.Current.Session["SESSION_SALE_ORDER_DETAIL"] = saleOrderDetail;
             HttpContext.Current.Session["SESSION_QUATATION_DETAIL_SALE_ORDER"] = quotationData;
+
             return saleOrderDetail;
         }
         [WebMethod]

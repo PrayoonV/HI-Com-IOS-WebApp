@@ -41,6 +41,8 @@ namespace HicomIOS.Master
             public string starttingdateTo { get; set; }
             public string scheduleFrom { get; set; }
             public string scheduleTo { get; set; }
+            public string customerid { get; set; }
+            public string project_search { get; set; }
 
 
             public string expiredateFrom { get; set; }
@@ -78,6 +80,24 @@ namespace HicomIOS.Master
         {
             if (!Page.IsPostBack)
             {
+                using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+                {
+                    //Create array of Parameters
+                    List<SqlParameter> arrParm = new List<SqlParameter>
+                        {
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
+                            new SqlParameter("@id", SqlDbType.Int) { Value = 0 },
+                        };
+                    conn.Open();
+                    var dsResult = SqlHelper.ExecuteDataset(conn, "sp_customer_list", arrParm.ToArray());
+
+                    conn.Close();
+                    cbbCustomer.DataSource = dsResult;
+                    cbbCustomer.TextField = "code_name";
+                    cbbCustomer.ValueField = "id";
+                    cbbCustomer.DataBind();
+
+                }
                 // Get Permission and if no permission, will redirect to another page.
                 if (!Permission.GetPermission())
                     Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
@@ -113,6 +133,8 @@ namespace HicomIOS.Master
                         new SqlParameter("@expire_date_to", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(datalist.expiredateTo) ? (Object)DBNull.Value : DateTime.ParseExact(datalist.expiredateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
                         new SqlParameter("@schedule_date_from", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(datalist.scheduleFrom) ? (Object)DBNull.Value : DateTime.ParseExact(datalist.scheduleFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
                         new SqlParameter("@schedule_date_to", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(datalist.scheduleTo) ? (Object)DBNull.Value : DateTime.ParseExact(datalist.scheduleTo, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
+                        new SqlParameter("@customer_id", SqlDbType.Int) { Value = (string.IsNullOrEmpty(datalist.customerid) ? (Object)DBNull.Value : Convert.ToInt32(datalist.customerid)) },
+                        new SqlParameter("@projecT_s", SqlDbType.VarChar,200) { Value = (string.IsNullOrEmpty(datalist.project_search) ? (Object)DBNull.Value : datalist.project_search) },
 
                     };
                         conn.Open();
@@ -225,7 +247,8 @@ namespace HicomIOS.Master
                         new SqlParameter("@expire_date_to", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(data.expiredateTo) ? (Object)DBNull.Value : DateTime.ParseExact(data.expiredateTo, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
                         new SqlParameter("@schedule_date_from", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(data.scheduleFrom) ? (Object)DBNull.Value : DateTime.ParseExact(data.scheduleFrom, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
                         new SqlParameter("@schedule_date_to", SqlDbType.DateTime) { Value = (string.IsNullOrEmpty(data.scheduleTo) ? (Object)DBNull.Value : DateTime.ParseExact(data.scheduleTo, "dd/MM/yyyy", CultureInfo.InvariantCulture)) },
-
+                        new SqlParameter("@customer_id", SqlDbType.Int) { Value = (string.IsNullOrEmpty(data.customerid) ? (Object)DBNull.Value : Convert.ToInt32(data.customerid)) },
+                        new SqlParameter("@projecT_s", SqlDbType.VarChar,200) { Value = (string.IsNullOrEmpty(data.project_search) ? (Object)DBNull.Value : data.project_search) },
                     };
                     conn.Open();
                     dsResult = SqlHelper.ExecuteDataset(conn, "sp_annual_service_list", arrParm.ToArray());

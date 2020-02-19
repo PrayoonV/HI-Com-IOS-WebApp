@@ -76,7 +76,7 @@
             });
 
             var h = window.innerHeight;
-            gridViewCustomerMFG.SetHeight(h - 75);
+            gridViewCustomerMFG.SetHeight(h-250);
 
             var height = $('#Splitter_1').height();
             $('#Splitter_1').height(height + 40);
@@ -1019,6 +1019,11 @@
             });
         }
     </script>
+     <script type="text/javascript">
+        $('#gridViewCustomerMFG').css({
+            'height': '550px;'
+        });
+    </script>
     <div id="div-content">
         <div class="row">
             <fieldset>
@@ -1083,10 +1088,9 @@
         </div>
         <div class="row">
             <div class="col-xs-12" runat="server" id="dvGridProduct">
-                <dx:ASPxGridView ID="gridViewCustomerMFG" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridViewCustomerMFG"
+         <dx:ASPxGridView ID="gridViewCustomerMFG" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridViewCustomerMFG"
                     Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                    EnableRowsCache="false"
-                    SettingsBehavior-AllowSort="false"
+                    
                     OnCustomCallback="gridViewCustomerMFG_CustomCallback">
                     <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                     <Paddings Padding="0px" />
@@ -1111,13 +1115,14 @@
                             </DataItemTemplate>
                         </dx:GridViewDataTextColumn>
                     </Columns>
-                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="0" />
                     <SettingsPopup>
                         <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
                     </SettingsPopup>
                     <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
                         CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
                 </dx:ASPxGridView>
+               
             </div>
         </div>
     </div>
@@ -1714,7 +1719,7 @@
                                             <PageSizeItemSettings Items="10, 20, 50" />
                                         </SettingsPager>
                                         <Columns>
-                                            <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="70">
+                                            <dx:GridViewDataTextColumn Caption="Manage" FieldName="id" CellStyle-HorizontalAlign="Center" Width="20">
                                                 <DataItemTemplate>
                                                     <a class="btn btn-mini" onclick="editFile(<%# Eval("id")%>)" title="Edit">
                                                         <i class="fa fa-pencil" aria-hidden="true"></i>
@@ -1724,14 +1729,16 @@
                                                     </a>
                                                 </DataItemTemplate>
                                             </dx:GridViewDataTextColumn>
-                                            <dx:GridViewDataTextColumn FieldName="running_no" Caption="Running No" Settings-AllowSort="True" CellStyle-HorizontalAlign="Left" Width="100" />
-                                            <dx:GridViewDataTextColumn FieldName="description" Caption="รายละเอียด" CellStyle-HorizontalAlign="Left" Width="200" />
+                                            <dx:GridViewDataTextColumn FieldName="running_no" Caption="Running No" Settings-AllowSort="True" CellStyle-HorizontalAlign="Left" Width="50" />
+                                            <dx:GridViewDataTextColumn FieldName="description" Caption="รายละเอียด" CellStyle-HorizontalAlign="Left" Width="100" />
+                                            <dx:GridViewDataTextColumn FieldName="mfg_number" Caption="MFG Number" CellStyle-HorizontalAlign="Left" Width="50" />
+                                            <dx:GridViewDataTextColumn FieldName="model_number" Caption="Model Number" CellStyle-HorizontalAlign="Left" Width="50" />
                                             <dx:GridViewDataTextColumn FieldName="type" Caption="ประเภท" Settings-AllowSort="True" CellStyle-HorizontalAlign="Left" Width="100">
                                                 <DataItemTemplate>
                                                     <dx:ASPxLabel ID="lblType" runat="server" />
                                                 </DataItemTemplate>
                                             </dx:GridViewDataTextColumn>
-                                            <dx:GridViewDataTextColumn FieldName="file_name" Caption="ชื่อไฟล์" Settings-AllowSort="True" CellStyle-HorizontalAlign="Left" Width="200">
+                                            <dx:GridViewDataTextColumn FieldName="file_name" Caption="ชื่อไฟล์" Settings-AllowSort="True" CellStyle-HorizontalAlign="Left" Width="150">
                                                 <DataItemTemplate>
                                                     <a class="btn btn-mini" href="<%# "../Doc_pdf/" + Eval("file_name")%>" target="_blank" title="<%# Eval("file_name")%>">
                                                         <%# Eval("file_name")%>

@@ -253,6 +253,9 @@ namespace HicomIOS.Master
                         List<SqlParameter> arrParm = new List<SqlParameter>
                         {
                             new SqlParameter("@customer_id", SqlDbType.Int) { Value = Convert.ToInt32(dataId) },
+                            new SqlParameter("@project", SqlDbType.VarChar) { Value = string.Empty },
+                            new SqlParameter("@model", SqlDbType.VarChar) { Value = string.Empty},
+                            new SqlParameter("@mfg_no", SqlDbType.VarChar) { Value = string.Empty },
                         };
                         conn.Open();
                         data = SqlHelper.ExecuteDataset(conn, "sp_annual_service_customer_mfg_list", arrParm.ToArray());
@@ -1346,7 +1349,7 @@ namespace HicomIOS.Master
 
                                             foreach (var data in row)
                                             {
-                                                if (data.id > 0)
+                                                if (data.id > 0 && !data.is_deleted)
                                                 {
                                                     using (SqlCommand cmd = new SqlCommand("sp_annual_service_schedule_edit", conn, tran))
                                                     {

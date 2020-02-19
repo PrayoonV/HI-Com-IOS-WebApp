@@ -32,19 +32,20 @@
         .swal-button {
             padding: 5px 15px;
         }
+
         .display-none {
-        display:none;
-        }
-        .display-block {
-        display:block;
+            display: none;
         }
 
-        .noclick       {
-  pointer-events:none; 
-    opacity:0.6;  
-}
+        .display-block {
+            display: block;
+        }
+
+        .noclick {
+            pointer-events: none;
+            opacity: 0.6;
+        }
     </style>
-    <%--<script src="../Content/sweetalert/sweetalert.js"></script>--%>
     <script src="../Content/sweetalert/sweetalert.js"></script>
     <script type="text/javascript">
         $('#gridCell').css({
@@ -78,8 +79,8 @@
                         <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editItem(this, <%# Eval("id")%>, <%# Container.VisibleIndex %>)" title="<%# Eval("product_no")%>">
                             <i class="fa fa-pencil" aria-hidden="true"></i>
                         </a>
-                       
-                       <%-- | <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>, '<%# Eval("product_no")%>')" title="Delete">
+
+                        <%-- | <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>, '<%# Eval("product_no")%>')" title="Delete">
                             <i class="fa fa-trash-o" aria-hidden="true"></i>
                         </a>--%>
                     </DataItemTemplate>
@@ -224,7 +225,7 @@
                                         </dx:ASPxComboBox>
                                     </div>
                                 </div>
-                                 <div class="form-group col-xs-6 no-padding">
+                                <div class="form-group col-xs-6 no-padding">
                                     <label class="control-label col-xs-4 no-padding" for="txtQuantity">Quantity:</label>
                                     <div class="col-xs-8">
                                         <input type="text" class="form-control numberic" id="txtQuantity" runat="server" disabled="disabled" value="0" />
@@ -238,13 +239,13 @@
                                         <input type="text" class="form-control numberic" readonly="" id="txtQuantityReserve" runat="server" />
                                     </div>
                                 </div>
-                                  <div class="form-group col-xs-6 no-padding">
+                                <div class="form-group col-xs-6 no-padding">
                                     <label class="control-label col-xs-4 no-padding" for="txtQuantityBalance">Total:</label>
                                     <div class="col-xs-8">
                                         <input type="text" class="form-control numberic" id="txtQuantityBalance" runat="server" />
                                     </div>
                                 </div>
-                              
+
                             </div>
                             <div class="row">
 
@@ -254,13 +255,13 @@
                                         <input type="text" class="form-control numberic" id="txtMinSellingPrice" runat="server" />
                                     </div>
                                 </div>
-                                  <div class="form-group col-xs-6 no-padding">
+                                <div class="form-group col-xs-6 no-padding">
                                     <label class="control-label col-xs-4 no-padding" for="txtSellingPrice">Selling Price :</label>
                                     <div class="col-xs-8">
                                         <input type="text" class="form-control numberic" id="txtSellingPrice" runat="server" />
                                     </div>
                                 </div>
-                              
+
                             </div>
                             <div class="row">
                                 <div class="form-group col-xs-6 no-padding">
@@ -269,7 +270,7 @@
                                         <input type="text" class="form-control" id="txtPressure" runat="server" />
                                     </div>
                                 </div>
-                                 <div class="form-group col-xs-6 no-padding">
+                                <div class="form-group col-xs-6 no-padding">
                                     <label class="control-label col-xs-4 no-padding" for="txtHz">Hz :</label>
                                     <div class="col-xs-8">
                                         <input type="text" class="form-control numberic" id="txtHz" runat="server" />
@@ -283,7 +284,7 @@
                                         <input type="text" class="form-control" id="txtPowerSupply" runat="server" />
                                     </div>
                                 </div>
-                                 <div class="form-group col-xs-6 no-padding">
+                                <div class="form-group col-xs-6 no-padding">
                                     <label class="control-label col-xs-4 no-padding" for="txtPhase">Phase:</label>
                                     <div class="col-xs-8">
                                         <input type="text" class="form-control numberic" id="txtPhase" runat="server" />
@@ -433,7 +434,7 @@
                                                     </dx:GridViewDataTextColumn>
                                                     <%--<dx:GridViewDataTextColumn FieldName="supplier_no" Caption="No" Width="80px" />--%>
                                                     <dx:GridViewDataTextColumn FieldName="supplier_name" Caption="Supplier Name" CellStyle-HorizontalAlign="Left" Width="659" />
-                                                       <dx:GridViewDataTextColumn FieldName="isactive" Caption="Status" CellStyle-HorizontalAlign="Left" Width="100" />
+                                                    <dx:GridViewDataTextColumn FieldName="isactive" Caption="Status" CellStyle-HorizontalAlign="Left" Width="100" />
                                                 </Columns>
                                                 <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
 
@@ -451,7 +452,7 @@
                                 <div style="padding: 0 10px;">
                                     <fieldset>
                                         <legend style="text-align: left; margin-bottom: 5px;">MFG</legend>
-                                        <div class="form-group col-xs-12 no-padding" style="display:none;">
+                                        <div class="form-group col-xs-12 no-padding" style="display: none;">
                                             <label class="control-label col-xs-2" for="cboSupplier">MFG No</label>
                                             <div class="col-xs-3  no-padding-right">
                                                 <input type="text" class="form-control" id="txtMFGNo" runat="server" />
@@ -499,9 +500,9 @@
                                                             <a href="PurchaseRequest.aspx?dataId=<%# Eval("purchase_request_id")%>" target="_blank" title="<%# Eval("purchase_request_no")%>"><%# Eval("purchase_request_no")%></a>
                                                         </DataItemTemplate>
                                                     </dx:GridViewDataTextColumn>
-                                                     <dx:GridViewDataTextColumn FieldName="display_issue_date" Caption="Issue Date" CellStyle-HorizontalAlign="Left" Width="90">
+                                                    <dx:GridViewDataTextColumn FieldName="display_issue_date" Caption="Issue Date" CellStyle-HorizontalAlign="Left" Width="90">
                                                     </dx:GridViewDataTextColumn>
-                                                    
+
                                                     <dx:GridViewDataTextColumn FieldName="issue_no" Caption="Reference Document(OUT)" CellStyle-HorizontalAlign="Left" Width="170">
                                                         <DataItemTemplate>
                                                             <a href="Issue.aspx?dataId=<%# Eval("issue_id")%>" target="_blank" title="<%# Eval("issue_no")%>"><%# Eval("issue_no")%></a>
@@ -690,7 +691,7 @@
                 dataType: 'json',
                 success: function (result) {
                     $("#txtProductNameTHA").focus();
-                    
+
                     if (result.d["product_no"] != undefined && result.d["product_no"] != "") {
                         $('#txtProductNo').addClass("noclick");
                     }
@@ -701,11 +702,11 @@
                     //$('#txtSerialNo').val(result.d["serial_no"]);
 
 
-                     if (result.d["is_edit"] != undefined && result.d["is_edit"] == "1") {
+                    if (result.d["is_edit"] != undefined && result.d["is_edit"] == "1") {
                         cboUnitType.SetEnabled(false);
                     }
                     else {
-                          cboUnitType.SetEnabled(true);  
+                        cboUnitType.SetEnabled(true);
                     }
 
                     console.log("cat_id : " + result.d["cat_id"]);
@@ -748,7 +749,7 @@
                     //$('#txtProductNo').val(result.d["stock_count_type"]);
                     $('#txtQuantity').val(result.d["quantity"]);
                     $('#txtQuantityReserve').val(result.d["quantity_reserve"]);
-                    var total =  parseFloat(result.d["quantity"]) - parseFloat(result.d["quantity_reserve"]);
+                    var total = parseFloat(result.d["quantity"]) - parseFloat(result.d["quantity_reserve"]);
                     $('#txtQuantityBalance').val(total);
                     var color = "#555";
                     if (result.d["quantity_balance"] < 0) {
@@ -779,12 +780,12 @@
                     supplierGrid.PerformCallback();
                     gridMFG.PerformCallback();
 
-                    
-                    
+
+
                     $("#modal_form .modal-title").html("แก้ไขสินค้า : " + element.title);
 
                     $("#modal_form").modal("show");
-                    
+
                 }
             });
         }
@@ -832,7 +833,7 @@
                 dataType: 'json',
                 success: function (result) {
 
-                        $('#txtProductNo').val(result.d["product_no"]);
+                    $('#txtProductNo').val(result.d["product_no"]);
                     //$('#txtSerialNo').val(result.d["serial_no"]);
 
                     console.log("cat_id : " + result.d["cat_id"]);
@@ -1236,8 +1237,8 @@
                     var data = response.d;
                     $('#txtEditMFGMFGNo').val(data.mfg_no);
                     $('#txtEditMFGReceiveDate').val(data.display_receive_date);
-                     $('#divmfgdate').addClass("display-none");
-                        $('#txtEditMFGReceiveDate').addClass("noclick");
+                    $('#divmfgdate').addClass("display-none");
+                    $('#txtEditMFGReceiveDate').addClass("noclick");
                     //
                     $('#modal_edit_mfg').modal("show");
 
@@ -1267,7 +1268,7 @@
                 dataType: "json",
                 success: function (response) {
 
-                     if (response.d == "success") {
+                    if (response.d == "success") {
                         window.location.reload();
                     }
                     else {
@@ -1291,7 +1292,7 @@
                 }
             });
 
-            
+
         }
 
         function changeStatusItem(id, e) {

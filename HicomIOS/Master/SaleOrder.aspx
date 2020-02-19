@@ -592,6 +592,7 @@
                                 })
                                     .then((value) => {
                                         $('#hdSelectedSaleOrderDetailId').val(0);
+                                        calDiscount();
                                         gridViewDetailList.PerformCallback();
                                         gridViewDetailSaleOrder.PerformCallback();
 
@@ -624,6 +625,7 @@
                 success: function (response) {
                     var data = response.d;
                     $("#txtTotal").val(number_format(response.d.total_amount, 2));
+                    alert(number_format(response.d.total_amount, 2));
                     $("#txtSumDiscount1").val(number_format(response.d.discount1_total, 2));
                     $("#txtSumDiscount2").val(number_format(response.d.discount2_total, 2));
                     $("#txtGrandTotal").val(number_format(response.d.grand_total - response.d.vat_total, 2));
@@ -665,14 +667,18 @@
 
         function onCalcurateSuccess(response) {
             setTimeout(function () {
+                
                 var data = response.d;
                 var total = data.total;
+                
                 var discountDetail = data.discount_total;
                 var totalWithDiscountDetail = total - discountDetail;
+                
                 var sumBottomDiscount1 = 0;
                 var sumBottomDiscount2 = 0;
                 var grandTotal = 0;
-                $("#txtTotal").val(accounting.formatMoney(totalWithDiscountDetail));
+                //$("#txtTotal").val(accounting.formatMoney(totalWithDiscountDetail));
+                $("#txtTotal").val(number_format(totalWithDiscountDetail, 2));
                 $("#txtSumDiscount1").val(0);
                 $("#txtSumDiscount2").val(0);
                 var discountButoomBill1 = parseInt($("#txtDiscountBottomBill1").val() == "" ? 0 : $("#txtDiscountBottomBill1").val());

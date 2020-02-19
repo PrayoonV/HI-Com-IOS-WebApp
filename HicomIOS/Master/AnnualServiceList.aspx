@@ -30,17 +30,19 @@
         }
 
         .btn-view {
-             width: 15%;
-       margin-left: 2%;
+            width: 15%;
+            margin-left: 2%;
         }
 
         .has-error {
             border-color: #e40703 !important;
         }
-          .btn-labelEdit {
+
+        .btn-labelEdit {
             cursor: pointer;
         }
-         a:link {
+
+        a:link {
             text-decoration: none !important;
         }
 
@@ -50,9 +52,9 @@
 
         a:hover {
             text-decoration: underline !important;
-            
         }
-         .swal-modal {
+
+        .swal-modal {
             width: 420px !important;
             height: 250px !important;
         }
@@ -68,156 +70,177 @@
         .swal-button {
             padding: 5px 15px;
         }
-           .btn-linkview {
+
+        .btn-linkview {
             cursor: pointer;
             font-size: 15px;
             color: #5bc0de !important;
         }
-           
     </style>
-    <div id="div-content">
-        <div class="row">
-            <fieldset>
-                <legend>Annual Service List</legend>
-                <div class="col-xs-12 no-padding">
-                    <div class="col-xs-12 no-padding">
-                        <div class="row form-group">
-                            <label class="col-xs-4 text-right ">Test Run Date From :</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="datepickerFrom" />
-                            </div>
-                            <label class="col-xs-2 text-center">Test Run Date To</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="datepickerTo" />
-                            </div>
-                        </div>
+    <fieldset>
+        <legend>Annual Service List</legend>
+        <div class="col-xs-12 no-padding">
+            <div class="col-xs-12 no-padding">
+                <div class="row form-group">
+                    <label class="col-xs-4 text-right ">Test Run Date From :</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="datepickerFrom" />
+                    </div>
+                    <label class="col-xs-2 text-center">Test Run Date To</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="datepickerTo" />
                     </div>
                 </div>
-                <div class="col-xs-12 no-padding">
-                    <div class="col-xs-12 no-padding">
-                        <div class="row form-group">
-                            <label class="col-xs-4 text-right ">Starting Date From :</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="starttingdateFrom" />
-                            </div>
-                            <label class="col-xs-2 text-center">Expire Date To</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="starttingdateTo" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-12 no-padding hidden">
-                    <div class="col-xs-12 no-padding">
-                        <div class="row form-group">
-                            <label class="col-xs-4 text-right ">Expire Date From :</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="expiredateFrom" />
-                            </div>
-                            <label class="col-xs-2 text-center">Expire Date To </label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="expiredateTo" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-12 no-padding">
-                    <div class="col-xs-12 no-padding">
-                        <div class="row form-group">
-                            <label class="col-xs-4 text-right ">Schedule Date From :</label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="scheduleFrom" />
-                            </div>
-                            <label class="col-xs-2 text-center">Schedule Date To </label>
-                            <div class="col-xs-2 no-padding">
-                                <input class="form-control picker" runat="server" type="text" id="scheduleTo" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-xs-12 no-padding text-center">
-                    <div class="row form-group" >
-                        <div class="col-xs-6 no-padding">
-                            <button type="button"
-                                class="btn-info btn-view" style="height: 30px;float: right;"
-                                id="btnReportClient" onclick="view_Click()">
-                                <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
-                                    View
-                            </button>
-                        </div>
-                        <div class="col-xs-6 no-padding">
-                            <button type="button"
-                                class="btn-info btn-view" style="height: 30px;float: left;"
-                                id="btnClear" onclick="clear_Click()">
-                                <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
-                                    Clear
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-        <div class="row">
-            <button type="button"
-                class="btn-addItem btnexport"
-                id="btnExport" onclick="Export_Click()">
-                <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Export
-            </button>
-            <div class="col-xs-12" runat="server" id="dvAnnuualServiceList">
-                <dx:ASPxGridView ID="gridAnnualServiceList" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridAnnualServiceList"
-                    Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                    EnableRowsCache="false"
-                    SettingsBehavior-AllowSort="false"
-                    OnCustomCallback="gridAnnualServiceList_CustomCallback">
-                    <SettingsAdaptivity AdaptivityMode="HideDataCells" />
-                    <Paddings Padding="0px" />
-                    <Border BorderWidth="0px" />
-                    <BorderBottom BorderWidth="1px" />
-                    <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
-                        PageSizeItemSettings-Visible="true">
-                        <PageSizeItemSettings Items="10, 20, 50" />
-                    </SettingsPager>
-                    <Columns>
-                         <dx:GridViewDataTextColumn FieldName="id" CellStyle-HorizontalAlign="Center"  Caption="#" Width="50px" >
-                            <DataItemTemplate>
-                                 <a id="btnEdit" class="btn-linkview " onclick="viewItem(<%# Eval("id")%>)" title="View" >
-                                     <i class="fas fa-search"></i>
-                                </a>
-                                
-                            </DataItemTemplate>
-                        </dx:GridViewDataTextColumn>
-                        <dx:GridViewDataTextColumn FieldName="customer" Caption="Customer" >
-                            <DataItemTemplate>
-                                <a id="btnEdit" class="btn-labelEdit " onclick="editItem(<%# Eval("id")%>)" title="Edit">
-                                    <%# Eval("customer")%>
-                                </a>
-                            </DataItemTemplate>
-                        </dx:GridViewDataTextColumn>
-                        <dx:GridViewDataTextColumn FieldName="project" Caption="Project" />
-                        <dx:GridViewDataTextColumn FieldName="model" Caption="Model" />
-                         <dx:GridViewDataTextColumn FieldName="mfg" Caption="MFG" />
-                       
-                        
-                        <dx:GridViewDataTextColumn FieldName="start_date" Caption="Test Run Date" />
-                        <dx:GridViewDataTextColumn FieldName="starting_date" Caption="Starting Date"  />
-                        <dx:GridViewDataTextColumn FieldName="expire_date" Caption="Expire Date" />
-                        <dx:GridViewDataTextColumn FieldName="schedule_date" Caption="Schedule Date" />
-                       
-                        <dx:GridViewDataTextColumn FieldName="checking_location" Caption="Location" />
-                        <dx:GridViewDataTextColumn FieldName="checking_remark" Caption="Remark" />
-                    </Columns>
-                    <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
-                    <SettingsPopup>
-                        <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
-                    </SettingsPopup>
-                    <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
-                        CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
-                </dx:ASPxGridView>
             </div>
         </div>
+        <div class="col-xs-12 no-padding">
+            <div class="col-xs-12 no-padding">
+                <div class="row form-group">
+                    <label class="col-xs-4 text-right ">Starting Date From :</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="starttingdateFrom" />
+                    </div>
+                    <label class="col-xs-2 text-center">Expire Date To</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="starttingdateTo" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 no-padding hidden">
+            <div class="col-xs-12 no-padding">
+                <div class="row form-group">
+                    <label class="col-xs-4 text-right ">Expire Date From :</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="expiredateFrom" />
+                    </div>
+                    <label class="col-xs-2 text-center">Expire Date To </label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="expiredateTo" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 no-padding">
+            <div class="col-xs-12 no-padding">
+                <div class="row form-group">
+                    <label class="col-xs-4 text-right ">Schedule Date From :</label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="scheduleFrom" />
+                    </div>
+                    <label class="col-xs-2 text-center">Schedule Date To </label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control picker" runat="server" type="text" id="scheduleTo" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 no-padding">
+            <div class="col-xs-12 no-padding">
+                <div class="row form-group">
+                    <label class="col-xs-4 text-right label-rigth">Customer :</label>
+                    <div class="col-xs-2 no-padding">
+                        <dx:ASPxComboBox ID="cbbCustomer" CssClass="form-control"
+                            runat="server" ClientInstanceName="cbbCustomer" TextField="data_text"
+                            EnableCallbackMode="true"
+                            ValueField="data_value">
+                        </dx:ASPxComboBox>
+                    </div>
+                    <label class="col-xs-2 text-center">Project : </label>
+                    <div class="col-xs-2 no-padding">
+                        <input class="form-control" id="txtproject" runat="server" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 no-padding text-center">
+            <div class="row form-group">
+                <div class="col-xs-4 no-padding">
+                    <button type="button"
+                        class="btn-info btn-view" style="height: 30px; float: right;"
+                        id="btnReportClient" onclick="view_Click()">
+                        <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
+                                    View
+                    </button>
+                </div>
+                <div class="col-xs-4 no-padding">
+                    <button type="button"
+                        class="btn-info btn-view" style="height: 30px; float: left;"
+                        id="btnClear" onclick="clear_Click()">
+                        <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
+                                    Clear
+                    </button>
+
+                </div>
+                <div class="col-xs-4 no-padding">
+                    <button type="button"
+                        class="btn-addItem btnexport"
+                        id="btnExport" onclick="Export_Click()">
+                        <i class="fa fa-check" aria-hidden="true"></i>&nbsp;Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div id="dvAnnuualServiceList">
+        <dx:ASPxGridView ID="gridAnnualServiceList" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridAnnualServiceList"
+            Width="100%" KeyFieldName="id" EnableCallBacks="true"
+            EnableRowsCache="false"
+            SettingsBehavior-AllowSort="false"
+            OnCustomCallback="gridAnnualServiceList_CustomCallback">
+            <SettingsAdaptivity AdaptivityMode="HideDataCells" />
+            <Paddings Padding="0px" />
+            <Border BorderWidth="0px" />
+            <BorderBottom BorderWidth="1px" />
+            <SettingsPager Position="Bottom" PageSize="<%$ appSettings:GridViewPageSize %>" PageSizeItemSettings-Position="Right"
+                PageSizeItemSettings-Visible="true">
+                <PageSizeItemSettings Items="10, 20, 50" />
+            </SettingsPager>
+            <Columns>
+                <dx:GridViewDataTextColumn FieldName="id" CellStyle-HorizontalAlign="Center" Caption="#" Width="50px">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn-linkview " onclick="viewItem(<%# Eval("id")%>)" title="View">
+                            <i class="fas fa-search"></i>
+                        </a>
+
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="customer" Caption="Customer">
+                    <DataItemTemplate>
+                        <a id="btnEdit" class="btn-labelEdit " onclick="editItem(<%# Eval("id")%>)" title="Edit">
+                            <%# Eval("customer")%>
+                        </a>
+                    </DataItemTemplate>
+                </dx:GridViewDataTextColumn>
+                <dx:GridViewDataTextColumn FieldName="project" Caption="Project" />
+                <dx:GridViewDataTextColumn FieldName="model" Caption="Model" />
+                <dx:GridViewDataTextColumn FieldName="mfg" Caption="MFG" />
+
+
+                <dx:GridViewDataTextColumn FieldName="start_date" Caption="Test Run Date" />
+                <dx:GridViewDataTextColumn FieldName="starting_date" Caption="Starting Date" />
+                <dx:GridViewDataTextColumn FieldName="expire_date" Caption="Expire Date" />
+                <dx:GridViewDataTextColumn FieldName="schedule_date" Caption="Schedule Date" />
+
+                <dx:GridViewDataTextColumn FieldName="checking_location" Caption="Location" />
+                <dx:GridViewDataTextColumn FieldName="checking_remark" Caption="Remark" />
+            </Columns>
+            <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
+            <SettingsPopup>
+                <CustomizationWindow HorizontalAlign="LeftSides" VerticalAlign="Below" Width="220px" Height="300px" />
+            </SettingsPopup>
+            <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
+                CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
+        </dx:ASPxGridView>
     </div>
-    <%--<script src="../Content/sweetalert/sweetalert.js"></script>--%>
+
     <script src="../Content/sweetalert/sweetalert.js"></script>
+    <script type="text/javascript">
+        $('#dvAnnuualServiceList').css({
+            'height': '50px;'
+        });
+    </script>
     <script type="text/javascript">
         $(document).ready(function () {
             $("#Splitter_0").parent().hide();
@@ -271,20 +294,23 @@
             $('#expiredateTo').val("");
             $('#scheduleFrom').val("");
             $('#scheduleTo').val("");
-
+            cbbCustomer.SetValue("");
+            $('#txtproject').val("");
             
         }
 
         function view_Click() {
-            var datepickerFrom =      $('#datepickerFrom').val() == "" || $('#datepickerFrom').val() == null ? "" : $('#datepickerFrom').val();
-            var datepickerTo =       $('#datepickerTo').val() == "" || $('#datepickerTo').val() == null ? "" : $('#datepickerTo').val();
+            var datepickerFrom = $('#datepickerFrom').val() == "" || $('#datepickerFrom').val() == null ? "" : $('#datepickerFrom').val();
+            var datepickerTo = $('#datepickerTo').val() == "" || $('#datepickerTo').val() == null ? "" : $('#datepickerTo').val();
             var starttingdateFrom = $('#starttingdateFrom').val() == "" || $('#starttingdateFrom').val() == null ? "" : $('#starttingdateFrom').val();
             var starttingdateTo = $('#starttingdateTo').val() == "" || $('#starttingdateTo').val() == null ? "" : $('#starttingdateTo').val();
             var expiredateFrom = $('#expiredateFrom').val() == "" || $('#expiredateFrom').val() == null ? "" : $('#expiredateFrom').val();
-            var expiredateTo = $('#expiredateTo').val() == "" || $('#expiredateTo').val() == null ? "" : $('#expiredateTo').val();          
+            var expiredateTo = $('#expiredateTo').val() == "" || $('#expiredateTo').val() == null ? "" : $('#expiredateTo').val();
 
             var scheduleFrom = $('#scheduleFrom').val() == "" || $('#scheduleFrom').val() == null ? "" : $('#scheduleFrom').val();
-            var scheduleTo   = $('#scheduleTo').val() == "" || $('#scheduleTo').val() == null ? "" : $('#scheduleTo').val();
+            var scheduleTo = $('#scheduleTo').val() == "" || $('#scheduleTo').val() == null ? "" : $('#scheduleTo').val();
+            var customer_id = cbbCustomer.GetValue() == "" || cbbCustomer.GetValue() == null ? 0 : cbbCustomer.GetValue();
+            var project_search =  $('#txtproject').val() == "" || $('#txtproject').val() == null ? "" : $('#txtproject').val();
 
             var parametersAdd = {
                 masterData: [
@@ -295,8 +321,10 @@
                         starttingdateTo: starttingdateTo,
                         expiredateFrom: expiredateFrom,
                         expiredateTo: expiredateTo,
-                        scheduleFrom :scheduleFrom,
-                        scheduleTo   :scheduleTo  
+                        scheduleFrom: scheduleFrom,
+                        scheduleTo: scheduleTo,
+                        customerid: customer_id,
+                        project_search : project_search
                     }
                 ]
             };
@@ -326,6 +354,8 @@
 
             var scheduleFrom = $('#scheduleFrom').val() == "" || $('#scheduleFrom').val() == null ? "" : $('#scheduleFrom').val();
             var scheduleTo = $('#scheduleTo').val() == "" || $('#scheduleTo').val() == null ? "" : $('#scheduleTo').val();
+            var customer_id = cbbCustomer.GetValue() == "" || cbbCustomer.GetValue() == null ? 0 : cbbCustomer.GetValue();
+            var project_search = $('#txtproject').val() == "" || $('#txtproject').val() == null ? "" : $('#txtproject').val();
 
             var parametersExport = {
                 annualServiceListData: [
@@ -337,7 +367,9 @@
                         expiredateFrom: expiredateFrom,
                         expiredateTo: expiredateTo,
                         scheduleFrom: scheduleFrom,
-                        scheduleTo: scheduleTo
+                        scheduleTo: scheduleTo,
+                         customerid: customer_id,
+                        project_search : project_search
                     }
                 ]
             };
@@ -350,7 +382,7 @@
                 dataType: "json",
                 success: function (data) {
                     $.LoadingOverlay("hide");
-                   
+
                     window.open("../Common/DownloadFile.aspx?" + data.d, '_blank');
                 }
             });

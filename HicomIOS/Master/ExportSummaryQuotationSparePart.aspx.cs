@@ -166,7 +166,7 @@ namespace HicomIOS.Master
                         //Create array of Parameters
                         List<SqlParameter> arrParm = new List<SqlParameter>
                         {
-
+                            new SqlParameter("@search_name", SqlDbType.VarChar,200) { Value = "" },
                             new SqlParameter("@customer_id", SqlDbType.Int) { Value = 0 },
                         };
                         conn.Open();

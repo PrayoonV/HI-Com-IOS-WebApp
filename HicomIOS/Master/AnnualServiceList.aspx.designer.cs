@@ -85,13 +85,22 @@ namespace HicomIOS.Master {
         protected global::System.Web.UI.HtmlControls.HtmlInputText scheduleTo;
         
         /// <summary>
-        /// dvAnnuualServiceList control.
+        /// cbbCustomer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl dvAnnuualServiceList;
+        protected global::DevExpress.Web.ASPxComboBox cbbCustomer;
+        
+        /// <summary>
+        /// txtproject control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtproject;
         
         /// <summary>
         /// gridAnnualServiceList control.
