@@ -6258,8 +6258,15 @@ namespace HicomIOS.Master
                 {
                     foreach (var row in quotationDetail)
                     {
-                        row.discount_percentage = Convert.ToDecimal(discount_item_qty);
-                        row.discount_total = ((row.qty * row.unit_price) * row.discount_percentage) / 100;
+                        if ((row.qty * row.unit_price) > 0)
+                        {
+                            row.discount_percentage = Convert.ToDecimal(discount_item_qty);
+                            row.discount_total = ((row.qty * row.unit_price) * row.discount_percentage) / 100;
+                        }
+                        else
+                        {
+                            row.discount_percentage = row.discount_total = 0;
+                        }
                     }
                 }
                 if (discount_item_type == "A")
@@ -6270,6 +6277,10 @@ namespace HicomIOS.Master
                         {
                             row.discount_amount = Convert.ToDecimal(discount_item_qty);
                             row.discount_total = (row.qty * row.unit_price) - row.discount_amount;
+                        }
+                        else
+                        {
+                            row.discount_amount = row.discount_total = 0;
                         }
                     }
                 }

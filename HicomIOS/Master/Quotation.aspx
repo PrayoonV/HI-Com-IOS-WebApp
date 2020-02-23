@@ -152,6 +152,8 @@
                 && getParameterByName('revisionId') == null) {
                 setTimeout(changedQuotationType, 1000);
             }
+            else
+                setTimeout(changedQuotationTypehasid, 1000);
 
             $("#txtDateTimeFreebies").datepicker({
                 dateFormat: 'dd/mm/yy', "changeMonth": true, "changeYear": true
@@ -2205,7 +2207,7 @@
             $.LoadingOverlay("show", {
                 zIndex: 9999
             });
-
+            
             var quotationType = $('#cbbQuotationType').val();
 
             clearDataSetQuotationDetail();
@@ -2389,6 +2391,144 @@
                     //$('#cbDiscountByItem').prop('disabled', true);
                     //$("#cbbDiscountByItem").prop("disabled", false);
                     $("#btnAddQuotationDetail").html('เลือกรายการ');
+                    
+                }
+                $.LoadingOverlay("hide");
+            }, 200);
+
+
+        }
+        function changedQuotationTypehasid() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+           
+             var quotationType = $('#cbbQuotationType').val();
+            setTimeout(function () {
+
+                if (quotationType == "C") {
+                    $('#contactor').css('display', 'none');
+                    $('#dvIsService').css('display', '');
+                    $('#dvGridProduct').css('display', 'none'); // HIDE DIV GRID
+                    $('#dvGridService').css('display', ''); // SHOW DIV GRID
+                    $('#dvIsAnnualService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', '');
+                    $('#btnAddQuotationDetail').inner
+                    $("#btnAddQuotationDetail").html('Service / Overhaul Motor');
+
+                }
+                if (quotationType == "D") {
+                    $('#contactor').css('display', 'none');
+                    $('#dvIsService').css('display', '');
+                    $('#dvGridProduct').css('display', 'none'); // HIDE DIV GRID
+                    $('#dvGridService').css('display', ''); // SHOW DIV GRID
+                    $('#dvIsAnnualService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', '');
+                    $("#btnAddQuotationDetail").html('เพิ่มสินค้า');
+
+
+                }
+                else if (quotationType == "O") {
+                    $('#contactor').css('display', '');
+                    $('#dvIsService').css('display', '');
+                    $('#dvGridProduct').css('display', 'none'); // HIDE DIV GRID
+                    $('#dvGridService').css('display', ''); // SHOW DIV GRID
+                    $('#dvIsAnnualService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', 'none');
+                    $("#btnAddQuotationDetail").html('เพิ่มสินค้า');
+
+
+                }
+                else if (quotationType == "P") {
+                    $('#contactor').css('display', '');
+                    $('#dvIsService').css('display', 'none');
+                    $('#dvGridProduct').css('display', ''); // HIDE DIV GRID
+                    $('#dvGridService').css('display', 'none'); // SHOW DIV GRID
+                    $('#dvIsProductDescription').css('display', '');
+                    $('#dvIsAnnualService').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', 'none');
+                    $("#btnAddQuotationDetail").html('เพิ่มสินค้า');
+                }
+                else if (quotationType == "S") {
+                    $('#contactor').css('display', 'none');
+                    $('#dvIsService').css('display', 'none');
+                    $('#dvIsAnnualService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', '');
+
+                    $('#btnAddAllPartList').css('display', '');
+                    $("#btnAddQuotationDetail").html('เลือก Model');
+                }
+                else if (quotationType == "M") {
+                    $('#contactor').css('display', 'none');
+                    $('#dvIsService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#tabOtherDetail').css('display', '');
+
+                    $('#btnAddPartList').css('display', '');
+                    $('#btnAddAllPartList').css('display', '');
+                    $("#btnAddQuotationDetail").html('เลือก Model');
+                }
+                else if (quotationType == "A") {
+                    //if (cbbCustomerID.GetValue() == null) {
+
+                    //    return;
+                    //}
+                    if (cbbCustomerID.GetValue() != null) {
+                        $.ajax({
+                            type: "POST",
+                            url: "Quotation.aspx/GetAnnualServiceHistory",
+                            data: '{customerId: "' + cbbCustomerID.GetValue() + '"}',
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            success: function (response) {
+                                setTimeout(function () {
+                                    gridViewAnnualServiceItem.PerformCallback();
+                                    gridviewAnnualServiceHistory.PerformCallback();
+                                }, 100);
+                                //var data = response.d;
+                                //$('#txtSubject').val(data);
+                                console.log("response AN = " + response.d);
+                            },
+                            failure: function (response) {
+
+                            }
+                        });
+                    }
+                    $('#contactor').css('display', 'none');
+                    $('#dvIsService').css('display', 'none');
+                    $('#dvIsProductDescription').css('display', 'none');
+                    $('#dvIsAnnualService').css('display', '');
+                    $('#dvIsAnnualService_Discount').css('display', '');
+
+                    $('#dvGridProduct').css('display', ''); // SHOW DIV GRID
+                    $('#dvGridService').css('display', 'none'); // HIDE DIV GRID
+
+                    $('#txtDiscountAmountItem').prop("readonly", true);
+                    $('#txtDiscountPercentItem').prop("readonly", true);
+                    $('#txtDiscountAmountItem').val(0);
+                    $('#txtDiscountPercentItem').val(0);
+                    $('#tabOtherDetail').css('display', '');
+                    //$('#cbDiscountByItem').attr('checked', false);
+                    //$('#cbDiscountByItem').prop('disabled', true);
+                    //$("#cbbDiscountByItem").prop("disabled", false);
+                    $("#btnAddQuotationDetail").html('เลือกรายการ');
+                    
                 }
                 $.LoadingOverlay("hide");
             }, 200);

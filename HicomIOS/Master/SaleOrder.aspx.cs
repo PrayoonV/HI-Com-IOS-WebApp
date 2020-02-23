@@ -581,6 +581,10 @@ namespace HicomIOS.Master
                         rdoQuotationLine.Checked = Convert.IsDBNull(data["is_product_description"]) ? false : Convert.ToBoolean(data["is_product_description"]);
 
                         hdQuotationType.Value = Convert.IsDBNull(data["quotation_type"]) ? string.Empty : Convert.ToString(data["quotation_type"]);
+
+                        
+                    
+
                         hdQuotationItemDiscount.Value = cbDiscountByItem.Checked ? "true" : "false";
 
                         txtTotal.Value = Convert.IsDBNull(data["total_amount"]) ? string.Empty : String.Format("{0:0,0.00}", Convert.ToDouble(data["total_amount"]));
@@ -809,6 +813,18 @@ namespace HicomIOS.Master
                         cbbDiscountByItem.Value = row.discount_type;
                         break;
                     }
+
+                    if (hdQuotationType.Value == "A")
+                    {
+                        gridViewDetailSaleOrder.Columns[1].Caption = "Model";
+                        gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+                    }
+                    else
+                    {
+                        gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
+                        gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
+                    }
+
 
                     if (cbDiscountByItem.Checked)
                     {
@@ -1552,6 +1568,18 @@ namespace HicomIOS.Master
         }
         protected void gridViewDetailSaleOrder_CustomCallback(object sender, ASPxGridViewCustomCallbackEventArgs e)
         {
+            if (hdQuotationType.Value == "A")
+            {
+                gridViewDetailSaleOrder.Columns[1].Caption = "Model";
+                gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+            }
+            else
+            {
+                gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
+                gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
+            }
+
+
             if (cbDiscountByItem.Checked)
             {
                 if (cbbDiscountByItem.Value == "P")
@@ -1577,6 +1605,18 @@ namespace HicomIOS.Master
         }
         protected void BindGridSaleOrderDetail()
         {
+            if (hdQuotationType.Value == "A")
+            {
+                gridViewDetailSaleOrder.Columns[1].Caption = "Model";
+                gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+            }
+            else
+            {
+                gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
+                gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
+            }
+
+
             if (cbDiscountByItem.Checked)
             {
                 if (cbbDiscountByItem.Value == "P")

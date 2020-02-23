@@ -625,7 +625,7 @@
                 success: function (response) {
                     var data = response.d;
                     $("#txtTotal").val(number_format(response.d.total_amount, 2));
-                    alert(number_format(response.d.total_amount, 2));
+                    
                     $("#txtSumDiscount1").val(number_format(response.d.discount1_total, 2));
                     $("#txtSumDiscount2").val(number_format(response.d.discount2_total, 2));
                     $("#txtGrandTotal").val(number_format(response.d.grand_total - response.d.vat_total, 2));
