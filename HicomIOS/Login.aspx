@@ -71,7 +71,7 @@
         </p>
 
          <p>
-            <small>System version Hi-Com IOS ( 1.0.0 )</small>
+            <small>System version Hi-Com IOS ( 1.0.2 )</small>
         </p>
     </div>
 </body>

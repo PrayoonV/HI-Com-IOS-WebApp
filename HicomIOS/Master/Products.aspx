@@ -502,7 +502,6 @@
                                                     </dx:GridViewDataTextColumn>
                                                     <dx:GridViewDataTextColumn FieldName="display_issue_date" Caption="Issue Date" CellStyle-HorizontalAlign="Left" Width="90">
                                                     </dx:GridViewDataTextColumn>
-
                                                     <dx:GridViewDataTextColumn FieldName="issue_no" Caption="Reference Document(OUT)" CellStyle-HorizontalAlign="Left" Width="170">
                                                         <DataItemTemplate>
                                                             <a href="Issue.aspx?dataId=<%# Eval("issue_id")%>" target="_blank" title="<%# Eval("issue_no")%>"><%# Eval("issue_no")%></a>
