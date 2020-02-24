@@ -183,36 +183,20 @@ namespace HicomIOS.Master
             CUSTOMER_CODE = 7,
             CUSTOMER_NAME = 8,
             PROJECT_NAME = 9,
-            PRODUCT_NAME = 10,
-            CONTACT = 11,
-            QTY = 12,
-            UNIT_PRICE = 13,
-            DISCOUNT = 14,
-            TOTAL_AMOUNT = 15,
-            TYPE_OF_CONTRACT = 16,
-            STARTIING_DATE = 17,
-            STARTIING_MM = 18,
-            STARTIING_YY = 19,
-            EXPIRE_DATE = 20,
-            EXPIRE_MM = 21,
-            EXPIRE_YY = 22,
-            DETAIL_STATUS = 23,
-            DETAIL_DATE = 24,
-            DETAIL_MM = 25,
-            DETAIL_YY = 26,
-            PO_NO = 27,
-            AMOUNT_PO = 28,
-            INVOICE_DATE = 29,
-            INVOICE_MM   = 30,
-            INVOICE_YY   = 31,
-            INVOICE_NO = 32,
-            SCHEDULE_MM_FROM = 33,
-            SCHEDULE_YY_FROM = 34,
-            SCHEDULE_MM_TO = 35,
-            SCHEDULE_YY_TO = 36, 
-            Contract_MM = 37,
-            Contract_YY = 38,
-            REMARK=39,
+            CONTACT = 10,
+            QTY = 11,
+            TYPE_OF_CONTRACT = 12,
+            STARTIING_DATE = 13,
+            QUSTATUS = 14,
+            UPDATE_DD = 15,
+            UPDATE_MM = 16,
+            UPDATE_YY = 17,
+            PO_NO = 18,
+            PO_DATE = 19,
+            AMOUNTPO = 20,
+            INVDATE   = 21,
+            INVOICE_NO = 22,
+            REMARK=23,
         }
 
         [WebMethod]
@@ -264,9 +248,11 @@ namespace HicomIOS.Master
                     };
                         conn.Open();
                         dsResult = SqlHelper.ExecuteDataset(conn, "sp_report_quotation_summary_service_contract", arrParm.ToArray());
+                        var i = 0;
                         foreach (DataRow row in dsResult.Tables[0].Rows)
                         {
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.NO].Value = row["quotation_no"].ToString();
+                            i++;
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.NO].Value = i;
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.CONTRACT_NO].Value = row["contract_no"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.QUOTATION_No].Value = row["quotation_no"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.ISSUE_DATE].Value = row["quotation_date_dd"].ToString();
@@ -275,37 +261,22 @@ namespace HicomIOS.Master
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.CUSTOMER_CODE].Value = row["customer_code"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.CUSTOMER_NAME].Value = row["customer_name"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PROJECT_NAME].Value = row["project_name"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PRODUCT_NAME].Value = "";// row["product_name"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.CONTACT].Value = row["attention"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.QTY].Value = row["qty"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.UNIT_PRICE].Value = row["unit_price"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.DISCOUNT].Value = row["discount"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.TOTAL_AMOUNT].Value = row["total_amount"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.TYPE_OF_CONTRACT].Value = row["contract_type"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.STARTIING_DATE].Value = row["starting_date_dd"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.STARTIING_MM].Value = row["starting_date_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.STARTIING_YY].Value = row["starting_date_yy"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.EXPIRE_DATE].Value = row["expire_date_dd"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.EXPIRE_MM].Value = row["expire_date_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.EXPIRE_YY].Value = row["expire_date_yy"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.DETAIL_STATUS].Value = row["status_name"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.DETAIL_DATE].Value = row["po_date_dd"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.DETAIL_MM].Value = row["po_date_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.DETAIL_YY].Value = row["po_date_yy"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.TYPE_OF_CONTRACT].Value = row["remark1"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.STARTIING_DATE].Value = row["remark2"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.QUSTATUS].Value = row["status_name"].ToString();
+
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.UPDATE_DD].Value = row["updated_date_dd"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.UPDATE_MM].Value = row["updated_date_mm"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.UPDATE_YY].Value = row["updated_date_yy"].ToString();
 
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PO_NO].Value = "";// row["inv_no"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.AMOUNT_PO].Value = "";// row["po_no"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PO_DATE].Value = "";// row["po_no"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.AMOUNTPO].Value = "";// row["po_no"].ToString();
 
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVOICE_DATE].Value = "";//row["amount_po"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVOICE_MM].Value = "";// row["sent_by"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVOICE_YY].Value = "";// row["customer_request_date"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVDATE].Value = "";//row["amount_po"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVOICE_NO].Value = row["inv_no"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.SCHEDULE_MM_FROM].Value = row["schedule_date_min_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.SCHEDULE_YY_FROM].Value = row["schedule_date_min_yy"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.SCHEDULE_MM_TO].Value = row["schedule_date_max_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.SCHEDULE_YY_TO].Value = row["schedule_date_max_yy"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.Contract_MM].Value = row["new_contract_date_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.Contract_YY].Value = row["new_contract_date_yy"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.REMARK].Value = row["remark_status"].ToString();
 
 

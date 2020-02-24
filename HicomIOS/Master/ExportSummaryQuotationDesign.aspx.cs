@@ -174,26 +174,21 @@ namespace HicomIOS.Master
             ISSUE_YY = 5,
             CUSTOMER_NAME = 6,
             PROJECT_NAME = 7,
-            DESCRIPTION = 8,
-            MODEL = 9,
+            SUbJECT = 8,
+            DESCRIPTION = 9,
             SALES = 10,
             PRICE_LIST = 11,
             DISCOUNT = 12,
             FINAL_PRICE = 13,
             CONTACT_PERSON = 14,
-            DETAIL_STATUS = 15,
-            DETAIL_DD = 16,
-            DETAIL_MM = 17,
-            DETAIL_YY = 18,
+            QUSTATUS = 15,
+            UPDATE_DD= 16,
+            UPDATE_MM= 17,
+            UPDATE_YY = 18,
             PO_NO = 19,
-            AMOUNT_PO = 20,
+            PODATE = 20,
             INVOICE = 21,
-            STATUS = 22,
-            TEL = 23,
-            FAX = 24,
-            EMAIL = 25,
-            REMARK = 26,
-            
+            TEL = 22,
         }
 
         [WebMethod]
@@ -246,30 +241,26 @@ namespace HicomIOS.Master
                         {
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.COUNT_CALL].Value = i - 1;
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.QUOTATION_NO].Value = row["quotation_no"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_DD].Value = row["issue_stock_date_dd"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_MM].Value = row["issue_stock_date_mm"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_YY].Value = row["issue_stock_date_yy"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_DD].Value = row["quotation_date_dd"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_MM].Value = row["quotation_date_mm"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.ISSUE_YY].Value = row["quotation_date_yy"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.CUSTOMER_NAME].Value = row["customer_name"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PROJECT_NAME].Value = row["project_name"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.DESCRIPTION].Value = row["province_name"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.MODEL].Value = row["customer_address"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.SALES].Value = row["model_list_air_compressor"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PRICE_LIST].Value = row["model_list_air_compressor_pressure"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.SUbJECT].Value = row["quotation_subject"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.DESCRIPTION].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.SALES].Value = row["created_by"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PRICE_LIST].Value = row["total_amount"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.DISCOUNT].Value = row["total_discount"].ToString();
-                            // workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.FINAL_PRICE].Value = row["model_list_air_dryer"].ToString();
+                               workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.FINAL_PRICE].Value = row["grand_total"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.CONTACT_PERSON].Value = row["contact_name"].ToString();
-                            // workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.DETAIL_STATUS].Value = row["model_list_line_filter"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.DETAIL_DD].Value = row["model_list_line_filter_qty"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.DETAIL_MM].Value = row["model_list_mist_filter"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.DETAIL_YY].Value = row["model_list_mist_filter_qty"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PO_NO].Value = row["po_no"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.AMOUNT_PO].Value = row["amount_po"].ToString();
-                            //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.INVOICE].Value = row["model_list_other"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.STATUS].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.QUSTATUS].Value = row["status_name"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_DD].Value = row["updated_date_dd"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_MM].Value = row["updated_date_mm"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_YY].Value = row["updated_date_yy"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PO_NO].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PODATE].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.INVOICE].Value = "";
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.TEL].Value = row["customer_tel"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.FAX].Value = row["customer_fax"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.EMAIL].Value = row["customer_email"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.REMARK].Value = row["remark"].ToString();
 
                             intStartRow++; i++;
                         }
@@ -338,7 +329,7 @@ namespace HicomIOS.Master
                             }
                         }
                     }
-                    HttpContext.Current.Session["SESSION_EXPORT_SUMMARY_QUOTATION_PRODUCT"] = summaryQuotationDesignData;
+                    HttpContext.Current.Session["SESSION_EXPORT_SUMMARY_QUOTATION_DESIGN"] = summaryQuotationDesignData;
                 }
 
                 catch (Exception ex)

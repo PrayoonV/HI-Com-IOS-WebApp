@@ -338,17 +338,17 @@ namespace HicomIOS.Master
             STATUS_NAME = 30,
             PO_NUMBER = 31,
             PO_AMOUNT = 32,
-            CUSTOMER_REQUEST_BY = 33,
-            CUSTOMER_REQUEST_DATE_DD = 34,
-            CUSTOMER_REQUEST_DATE_MM = 35,
-            CUSTOMER_REQUEST_DATE_YY = 36,
-            TEST_RUN_DATE_DD = 37,
-            TEST_RUN_DATE_MM = 38,
-            TEST_RUN_DATE_YY = 39,
-            CUSTOMER_TEL = 40,
-            CUSTOMER_FAX = 41,
-            CUSTOMER_EMAIL = 42,
-            REMARK = 43
+            //CUSTOMER_REQUEST_BY = 33,
+            //CUSTOMER_REQUEST_DATE_DD = 34,
+            //CUSTOMER_REQUEST_DATE_MM = 35,
+            //CUSTOMER_REQUEST_DATE_YY = 36,
+            //TEST_RUN_DATE_DD = 37,
+            //TEST_RUN_DATE_MM = 38,
+            //TEST_RUN_DATE_YY = 39,
+            CUSTOMER_TEL = 33,
+            CUSTOMER_FAX = 34,
+            CUSTOMER_EMAIL = 35,
+            REMARK = 36
         }
 
         [WebMethod]
@@ -446,13 +446,13 @@ namespace HicomIOS.Master
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.STATUS_NAME].Value = row["status_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PO_NUMBER].Value = row["po_no"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PO_AMOUNT].Value = row["amount_po"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_BY].Value = row["sent_by"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_DD].Value = row["customer_request_date"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_MM].Value = row["customer_request_month"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_YY].Value = row["customer_request_year"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_DD].Value = row["test_run_date"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_MM].Value = row["test_run_month"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_YY].Value = row["test_run_year"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_BY].Value = row["sent_by"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_DD].Value = row["customer_request_date"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_MM].Value = row["customer_request_month"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_DATE_YY].Value = row["customer_request_year"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_DD].Value = row["test_run_date"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_MM].Value = row["test_run_month"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.TEST_RUN_DATE_YY].Value = row["test_run_year"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_TEL].Value = row["customer_tel"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_FAX].Value = row["customer_fax"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_EMAIL].Value = row["customer_email"].ToString();

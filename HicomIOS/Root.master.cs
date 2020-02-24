@@ -18,7 +18,7 @@ namespace HicomIOS
 {
     public partial class RootMaster : System.Web.UI.MasterPage
     {
-  
+
         protected void Page_Load(object sender, EventArgs e)
         {
             //if (string.IsNullOrEmpty(ConstantClass.SESSION_USER_ID)) //call session ,check NullOrEmpty
@@ -55,7 +55,7 @@ namespace HicomIOS
                     img_user.Src = "/Images/" +
                         (string.IsNullOrEmpty(ConstantClass.SESSION_PICTURE) ? "Default.png" : ConstantClass.SESSION_PICTURE);
                 }
-                ASPxLabel2.Text = DateTime.Now.Year + Server.HtmlDecode(" &copy; Copyright by Hi-Com Corporation (Thailand). [เว็บไซต์นี้เหมาะกับจอความละเอียดกว้าง 1366px ขึ้นไป]");
+                ASPxLabel2.Text = DateTime.Now.Year + Server.HtmlDecode(" &copy; Copyright by Hi-Com Corporation (Thailand). [เว็บไซต์นี้เหมาะกับจอความละเอียดกว้าง 1366px ขึ้นไป] v1.0.0.1");
                 LoadTopMenu();
             }
             catch (Exception ex)
@@ -104,7 +104,7 @@ namespace HicomIOS
                             new SqlParameter("@user_agent", SqlDbType.VarChar,500) { Value = Convert.ToString(HttpContext.Current.Request.UserAgent) },
                             new SqlParameter("@browser_version", SqlDbType.VarChar,200) { Value = Convert.ToString(strBrowserInfo) }
                         };
-                        dsDataPermission = SqlHelper.ExecuteDataset(conn, "sp_security_permission_screen_list", arrParm.ToArray());
+                    dsDataPermission = SqlHelper.ExecuteDataset(conn, "sp_security_permission_screen_list", arrParm.ToArray());
 
                     string groupId = "";
                     if (dsDataPermission.Tables[0].Rows.Count > 0)
@@ -119,7 +119,7 @@ namespace HicomIOS
                             groupId = "2";
                         }
                     }
-                    
+
                     //  Screen list
                     List<SqlParameter> arrParm2 = new List<SqlParameter>
                     {
@@ -239,7 +239,8 @@ namespace HicomIOS
                                     }
                                 }
 
-                                if (currentChildIndex > 0) {
+                                if (currentChildIndex > 0)
+                                {
                                     newSideMenu += "</ul></li>";
                                 }
                             }
@@ -264,6 +265,6 @@ namespace HicomIOS
             {
                 throw ex;
             }
-        }       
+        }
     }
 }

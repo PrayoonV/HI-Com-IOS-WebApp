@@ -343,7 +343,7 @@
                 </dx:PanelContent>
             </PanelCollection>
         </dx:ASPxPanel>
-        
+
         <%-- DXCOMMENT: Configure a datasource for the header menu --%>
         <%--  <asp:XmlDataSource ID="XmlDataSourceHeader" runat="server" 
             XPath="/items/*"></asp:XmlDataSource>--%>

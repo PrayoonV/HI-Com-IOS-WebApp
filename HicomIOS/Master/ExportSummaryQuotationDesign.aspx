@@ -211,12 +211,8 @@
                             </DataItemTemplate>
                         </dx:GridViewDataTextColumn>
                         <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_air_compressor" Caption="Model List Air Compressor" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_air_dryer" Caption="Model List Air Dryer" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_line_filter" Caption="Model List Line Filter" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_mist_filter" Caption="Model List Mist Filter" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_air_tank" Caption="Model List Air Tank" />
-                        <dx:GridViewDataTextColumn FieldName="model_list_other" Caption="Model List Other" />
+                     <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" />
+                        <dx:GridViewDataTextColumn FieldName="project_name" Caption="Project" />
                     </Columns>
                     <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
                     <SettingsPopup>
