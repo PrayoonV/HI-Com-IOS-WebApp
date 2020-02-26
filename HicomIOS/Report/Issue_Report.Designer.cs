@@ -94,7 +94,6 @@
             this.xrCrossBandLine6 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine1 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine3 = new DevExpress.XtraReports.UI.XRCrossBandLine();
-            this.xrCrossBandLine7 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine9 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine10 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine11 = new DevExpress.XtraReports.UI.XRCrossBandLine();
@@ -134,10 +133,10 @@
             this.xrLabel30.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_issue_report.remark_detail", "{0:n}")});
             this.xrLabel30.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel30.LocationFloat = new DevExpress.Utils.PointFloat(612.1631F, 0F);
+            this.xrLabel30.LocationFloat = new DevExpress.Utils.PointFloat(612.5637F, 0F);
             this.xrLabel30.Name = "xrLabel30";
             this.xrLabel30.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 10, 0, 0, 100F);
-            this.xrLabel30.SizeF = new System.Drawing.SizeF(113.7403F, 24.50007F);
+            this.xrLabel30.SizeF = new System.Drawing.SizeF(113.3396F, 24.50007F);
             this.xrLabel30.StylePriority.UseBorders = false;
             this.xrLabel30.StylePriority.UseFont = false;
             this.xrLabel30.StylePriority.UsePadding = false;
@@ -166,10 +165,10 @@
             this.xrLabel6.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_issue_report.product_unit")});
             this.xrLabel6.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel6.LocationFloat = new DevExpress.Utils.PointFloat(561.9672F, 6.357829E-05F);
+            this.xrLabel6.LocationFloat = new DevExpress.Utils.PointFloat(561.9672F, 6.692451E-05F);
             this.xrLabel6.Name = "xrLabel6";
             this.xrLabel6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 10, 0, 0, 100F);
-            this.xrLabel6.SizeF = new System.Drawing.SizeF(49.49329F, 24.50007F);
+            this.xrLabel6.SizeF = new System.Drawing.SizeF(48.41797F, 24.50007F);
             this.xrLabel6.StylePriority.UseBorders = false;
             this.xrLabel6.StylePriority.UseFont = false;
             this.xrLabel6.StylePriority.UsePadding = false;
@@ -260,7 +259,7 @@
             // 
             this.xrLine1.BorderDashStyle = DevExpress.XtraPrinting.BorderDashStyle.Dot;
             this.xrLine1.ForeColor = System.Drawing.Color.Black;
-            this.xrLine1.LocationFloat = new DevExpress.Utils.PointFloat(271.4795F, 75.01322F);
+            this.xrLine1.LocationFloat = new DevExpress.Utils.PointFloat(300.743F, 75.01322F);
             this.xrLine1.Name = "xrLine1";
             this.xrLine1.SizeF = new System.Drawing.SizeF(158.88F, 2.083332F);
             this.xrLine1.StylePriority.UseBorderDashStyle = false;
@@ -270,7 +269,7 @@
             // 
             this.xrLabel29.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrLabel29.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel29.LocationFloat = new DevExpress.Utils.PointFloat(271.4795F, 77.09656F);
+            this.xrLabel29.LocationFloat = new DevExpress.Utils.PointFloat(300.743F, 77.09656F);
             this.xrLabel29.Multiline = true;
             this.xrLabel29.Name = "xrLabel29";
             this.xrLabel29.SizeF = new System.Drawing.SizeF(158.88F, 22.46535F);
@@ -284,7 +283,7 @@
             // 
             this.xrLabel26.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrLabel26.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel26.LocationFloat = new DevExpress.Utils.PointFloat(47.30848F, 77.09656F);
+            this.xrLabel26.LocationFloat = new DevExpress.Utils.PointFloat(76.57199F, 77.09656F);
             this.xrLabel26.Multiline = true;
             this.xrLabel26.Name = "xrLabel26";
             this.xrLabel26.SizeF = new System.Drawing.SizeF(158.88F, 22.46535F);
@@ -298,7 +297,7 @@
             // 
             this.xrLine2.BorderDashStyle = DevExpress.XtraPrinting.BorderDashStyle.Dot;
             this.xrLine2.ForeColor = System.Drawing.Color.Black;
-            this.xrLine2.LocationFloat = new DevExpress.Utils.PointFloat(47.30848F, 75.01322F);
+            this.xrLine2.LocationFloat = new DevExpress.Utils.PointFloat(76.57199F, 75.01322F);
             this.xrLine2.Name = "xrLine2";
             this.xrLine2.SizeF = new System.Drawing.SizeF(158.88F, 2.083332F);
             this.xrLine2.StylePriority.UseBorderDashStyle = false;
@@ -480,11 +479,13 @@
             this.xrLabel25.BorderColor = System.Drawing.Color.Transparent;
             this.xrLabel25.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_issue_report.project_name")});
+            this.xrLabel25.Font = new System.Drawing.Font("Tahoma", 8F);
             this.xrLabel25.LocationFloat = new DevExpress.Utils.PointFloat(579.0515F, 41.22909F);
             this.xrLabel25.Name = "xrLabel25";
             this.xrLabel25.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel25.SizeF = new System.Drawing.SizeF(146.8519F, 19.41802F);
             this.xrLabel25.StylePriority.UseBorderColor = false;
+            this.xrLabel25.StylePriority.UseFont = false;
             this.xrLabel25.Text = "xrLabel25";
             // 
             // xrLabel24
@@ -492,11 +493,11 @@
             this.xrLabel24.BorderColor = System.Drawing.Color.Transparent;
             this.xrLabel24.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_issue_report.quotation_subject")});
-            this.xrLabel24.Font = new System.Drawing.Font("Times New Roman", 8F);
-            this.xrLabel24.LocationFloat = new DevExpress.Utils.PointFloat(81.9177F, 99.64336F);
+            this.xrLabel24.Font = new System.Drawing.Font("Tahoma", 8F);
+            this.xrLabel24.LocationFloat = new DevExpress.Utils.PointFloat(81.9177F, 101.6433F);
             this.xrLabel24.Name = "xrLabel24";
             this.xrLabel24.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.xrLabel24.SizeF = new System.Drawing.SizeF(318.518F, 23F);
+            this.xrLabel24.SizeF = new System.Drawing.SizeF(318.518F, 17.34034F);
             this.xrLabel24.StylePriority.UseBorderColor = false;
             this.xrLabel24.StylePriority.UseFont = false;
             this.xrLabel24.Text = "xrLabel24";
@@ -918,16 +919,6 @@
             this.xrCrossBandLine3.StartPointFloat = new DevExpress.Utils.PointFloat(62.39124F, 0F);
             this.xrCrossBandLine3.WidthF = 1.096493F;
             // 
-            // xrCrossBandLine7
-            // 
-            this.xrCrossBandLine7.EndBand = this.Detail;
-            this.xrCrossBandLine7.EndPointFloat = new DevExpress.Utils.PointFloat(611.4816F, 2.00001F);
-            this.xrCrossBandLine7.LocationFloat = new DevExpress.Utils.PointFloat(611.4816F, 0F);
-            this.xrCrossBandLine7.Name = "xrCrossBandLine7";
-            this.xrCrossBandLine7.StartBand = this.Detail;
-            this.xrCrossBandLine7.StartPointFloat = new DevExpress.Utils.PointFloat(611.4816F, 0F);
-            this.xrCrossBandLine7.WidthF = 1.096436F;
-            // 
             // xrCrossBandLine9
             // 
             this.xrCrossBandLine9.EndBand = this.Detail;
@@ -1020,25 +1011,25 @@
             this.GroupFooter2});
             this.DetailReport.DataMember = "sp_issue_report";
             this.DetailReport.DataSource = this.sqlDataSource1;
-            this.DetailReport.Expanded = false;
             this.DetailReport.Level = 0;
             this.DetailReport.Name = "DetailReport";
             this.DetailReport.Visible = false;
             // 
             // ReportFooter
             // 
+            this.ReportFooter.Expanded = false;
             this.ReportFooter.HeightF = 0F;
             this.ReportFooter.Name = "ReportFooter";
             // 
             // xrCrossBandLine13
             // 
             this.xrCrossBandLine13.EndBand = this.Detail;
-            this.xrCrossBandLine13.EndPointFloat = new DevExpress.Utils.PointFloat(611.4816F, 30.75294F);
-            this.xrCrossBandLine13.LocationFloat = new DevExpress.Utils.PointFloat(611.4816F, 0.2470652F);
+            this.xrCrossBandLine13.EndPointFloat = new DevExpress.Utils.PointFloat(610.3852F, 31.00001F);
+            this.xrCrossBandLine13.LocationFloat = new DevExpress.Utils.PointFloat(610.3852F, 0F);
             this.xrCrossBandLine13.Name = "xrCrossBandLine13";
             this.xrCrossBandLine13.StartBand = this.Detail;
-            this.xrCrossBandLine13.StartPointFloat = new DevExpress.Utils.PointFloat(611.4816F, 0.2470652F);
-            this.xrCrossBandLine13.WidthF = 1.096471F;
+            this.xrCrossBandLine13.StartPointFloat = new DevExpress.Utils.PointFloat(610.3852F, 0F);
+            this.xrCrossBandLine13.WidthF = 1.096191F;
             // 
             // xrSubreport1
             // 
@@ -1083,7 +1074,6 @@
             this.xrCrossBandLine6,
             this.xrCrossBandLine1,
             this.xrCrossBandLine3,
-            this.xrCrossBandLine7,
             this.xrCrossBandLine8,
             this.xrCrossBandLine9,
             this.xrCrossBandLine10,
@@ -1163,7 +1153,6 @@
         private DevExpress.XtraReports.UI.XRLabel xrLabel6;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine1;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine3;
-        private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine7;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine9;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine10;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine11;

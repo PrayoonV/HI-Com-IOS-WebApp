@@ -58,7 +58,6 @@
             this.xrLabel17 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel8 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel9 = new DevExpress.XtraReports.UI.XRLabel();
-            this.xrLabel27 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel5 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel28 = new DevExpress.XtraReports.UI.XRLabel();
@@ -112,6 +111,8 @@
             this.DetailReport = new DevExpress.XtraReports.UI.DetailReportBand();
             this.GroupFooter1 = new DevExpress.XtraReports.UI.GroupFooterBand();
             this.xrCrossBandLine22 = new DevExpress.XtraReports.UI.XRCrossBandLine();
+            this.calculatedField1 = new DevExpress.XtraReports.UI.CalculatedField();
+            this.xrLabel4 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrSubreport1 = new DevExpress.XtraReports.UI.XRSubreport();
             this.xrSubreport3 = new DevExpress.XtraReports.UI.XRSubreport();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
@@ -366,11 +367,11 @@
             | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.xrPanel4.BorderWidth = 1F;
             this.xrPanel4.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+            this.xrLabel4,
             this.xrLabel20,
             this.xrLabel17,
             this.xrLabel8,
             this.xrLabel9,
-            this.xrLabel27,
             this.xrLabel5,
             this.xrLabel1,
             this.xrLabel28,
@@ -420,13 +421,13 @@
             // 
             this.xrLabel8.Borders = DevExpress.XtraPrinting.BorderSide.None;
             this.xrLabel8.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.xrLabel8.LocationFloat = new DevExpress.Utils.PointFloat(494.1584F, 1.055082F);
+            this.xrLabel8.LocationFloat = new DevExpress.Utils.PointFloat(519.1583F, 1.055082F);
             this.xrLabel8.Name = "xrLabel8";
-            this.xrLabel8.SizeF = new System.Drawing.SizeF(94.2243F, 19.34039F);
+            this.xrLabel8.SizeF = new System.Drawing.SizeF(69.22427F, 19.34038F);
             this.xrLabel8.StylePriority.UseBorders = false;
             this.xrLabel8.StylePriority.UseFont = false;
             this.xrLabel8.StylePriority.UseTextAlignment = false;
-            this.xrLabel8.Text = "เลขที่ใบคืนสินค้า :";
+            this.xrLabel8.Text = "เลขที่ใบคืน :";
             this.xrLabel8.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel9
@@ -443,19 +444,6 @@
             this.xrLabel9.StylePriority.UseFont = false;
             this.xrLabel9.StylePriority.UseTextAlignment = false;
             this.xrLabel9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
-            // 
-            // xrLabel27
-            // 
-            this.xrLabel27.Borders = DevExpress.XtraPrinting.BorderSide.None;
-            this.xrLabel27.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.xrLabel27.LocationFloat = new DevExpress.Utils.PointFloat(527.1445F, 21.45151F);
-            this.xrLabel27.Name = "xrLabel27";
-            this.xrLabel27.SizeF = new System.Drawing.SizeF(61.23816F, 19.34039F);
-            this.xrLabel27.StylePriority.UseBorders = false;
-            this.xrLabel27.StylePriority.UseFont = false;
-            this.xrLabel27.StylePriority.UseTextAlignment = false;
-            this.xrLabel27.Text = "วันที่รับคืน :";
-            this.xrLabel27.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft;
             // 
             // xrLabel5
             // 
@@ -659,7 +647,7 @@
             // report_title
             // 
             this.report_title.DataMember = "sp_return_report";
-            this.report_title.Expression = "Iif([product_type] = \'P\',  \'ใบรับคืน\', \'ใบรับคืน\')";
+            this.report_title.Expression = "Iif([product_type] = \'P\',  \'ใบรับคืน\', \'ใบส่งคืน\')";
             this.report_title.Name = "report_title";
             // 
             // xrCrossBandLine12
@@ -1074,6 +1062,28 @@
             this.xrCrossBandLine22.StartPointFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrCrossBandLine22.WidthF = 727.0001F;
             // 
+            // calculatedField1
+            // 
+            this.calculatedField1.DataMember = "sp_return_report";
+            this.calculatedField1.Expression = "Iif([product_type] = \'P\',  \'วันที่รับคืน :\', \'วันที่คืน :\')";
+            this.calculatedField1.Name = "calculatedField1";
+            // 
+            // xrLabel4
+            // 
+            this.xrLabel4.BorderWidth = 0F;
+            this.xrLabel4.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
+            new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_return_report.calculatedField1")});
+            this.xrLabel4.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
+            this.xrLabel4.LocationFloat = new DevExpress.Utils.PointFloat(518.1704F, 25.39547F);
+            this.xrLabel4.Name = "xrLabel4";
+            this.xrLabel4.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.xrLabel4.SizeF = new System.Drawing.SizeF(70.21216F, 19.34035F);
+            this.xrLabel4.StylePriority.UseBorderWidth = false;
+            this.xrLabel4.StylePriority.UseFont = false;
+            this.xrLabel4.StylePriority.UseTextAlignment = false;
+            this.xrLabel4.Text = "xrLabel4";
+            this.xrLabel4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
+            // 
             // xrSubreport1
             // 
             this.xrSubreport1.LocationFloat = new DevExpress.Utils.PointFloat(34.86354F, 28.74998F);
@@ -1101,7 +1111,8 @@
             this.DetailReport,
             this.GroupFooter1});
             this.CalculatedFields.AddRange(new DevExpress.XtraReports.UI.CalculatedField[] {
-            this.report_title});
+            this.report_title,
+            this.calculatedField1});
             this.ComponentStorage.AddRange(new System.ComponentModel.IComponent[] {
             this.sqlDataSource1});
             this.CrossBandControls.AddRange(new DevExpress.XtraReports.UI.XRCrossBandControl[] {
@@ -1163,7 +1174,6 @@
         private DevExpress.XtraReports.UI.PageHeaderBand PageHeader;
         private DevExpress.XtraReports.UI.ReportFooterBand ReportFooter;
         private DevExpress.XtraReports.UI.XRPanel xrPanel4;
-        private DevExpress.XtraReports.UI.XRLabel xrLabel27;
         private DevExpress.XtraReports.UI.XRLabel xrLabel28;
         private DevExpress.XtraReports.UI.XRLabel xrLabel35;
         private DevExpress.XtraReports.UI.XRLabel xrLabel3;
@@ -1231,5 +1241,7 @@
         private DevExpress.XtraReports.UI.DetailReportBand DetailReport;
         private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;
         private DevExpress.XtraReports.UI.XRCrossBandLine xrCrossBandLine22;
+        private DevExpress.XtraReports.UI.XRLabel xrLabel4;
+        private DevExpress.XtraReports.UI.CalculatedField calculatedField1;
     }
 }

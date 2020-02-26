@@ -433,7 +433,8 @@ namespace HicomIOS.Master
                                                                data_value = t.Field<int>("data_value").ToString()
                                                            }).Distinct().ToList();
                             }
-                            else {
+                            else
+                            {
                                 cbbQuotation.DataSource = (from t in dsQuotationDoc.Tables[0].AsEnumerable()
                                                            where t.Field<string>("quotation_status") == "PO"
                                                            select new
@@ -582,8 +583,8 @@ namespace HicomIOS.Master
 
                         hdQuotationType.Value = Convert.IsDBNull(data["quotation_type"]) ? string.Empty : Convert.ToString(data["quotation_type"]);
 
-                        
-                    
+
+
 
                         hdQuotationItemDiscount.Value = cbDiscountByItem.Checked ? "true" : "false";
 
@@ -617,7 +618,7 @@ namespace HicomIOS.Master
 
                         var status = Convert.IsDBNull(data["sale_order_status"]) ? string.Empty : Convert.ToString(data["sale_order_status"]);
                         hdSaleOrderStatus.Value = status;
-                        
+
                         if (status == "FL")
                         {
                             btnCancel.Visible = false;
@@ -818,9 +819,13 @@ namespace HicomIOS.Master
                     {
                         gridViewDetailSaleOrder.Columns[1].Caption = "Model";
                         gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+                        gridViewDetailList.Columns[2].Caption = "Model";
+                        gridViewDetailList.Columns[3].Caption = "MFG No";
                     }
                     else
                     {
+                        gridViewDetailList.Columns[2].Caption = "Product No";
+                        gridViewDetailList.Columns[3].Caption = "Product Name";
                         gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
                         gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
                     }
@@ -1130,6 +1135,8 @@ namespace HicomIOS.Master
             {
                 if (dsResult != null)
                 {
+
+
                     quotationData = new List<QuotationDetail>();
                     var row = (from t in dsResult.Tables[0].AsEnumerable() select t).ToList();
                     foreach (var detail in row)
@@ -1572,13 +1579,16 @@ namespace HicomIOS.Master
             {
                 gridViewDetailSaleOrder.Columns[1].Caption = "Model";
                 gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+                gridViewDetailList.Columns[2].Caption = "Model";
+                gridViewDetailList.Columns[3].Caption = "MFG No";
             }
             else
             {
+                gridViewDetailList.Columns[2].Caption = "Product No";
+                gridViewDetailList.Columns[3].Caption = "Product Name";
                 gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
                 gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
             }
-
 
             if (cbDiscountByItem.Checked)
             {
@@ -1609,9 +1619,13 @@ namespace HicomIOS.Master
             {
                 gridViewDetailSaleOrder.Columns[1].Caption = "Model";
                 gridViewDetailSaleOrder.Columns[2].Caption = "MFG No";
+                gridViewDetailList.Columns[2].Caption = "Model";
+                gridViewDetailList.Columns[3].Caption = "MFG No";
             }
             else
             {
+                gridViewDetailList.Columns[2].Caption = "Product No";
+                gridViewDetailList.Columns[3].Caption = "Product Name";
                 gridViewDetailSaleOrder.Columns[1].Caption = "Product No";
                 gridViewDetailSaleOrder.Columns[2].Caption = "Product Name";
             }
@@ -2287,7 +2301,8 @@ namespace HicomIOS.Master
             {
                 msg += "กรุณาเลือกเงือนไขการชำระเงิน\n";
             }
-            else {//if (status == "FL")
+            else
+            {//if (status == "FL")
                 foreach (var item in dataPO)
                 {
                     if (item.ref_po_no == "" || item.ref_po_date == "")
@@ -2707,7 +2722,7 @@ namespace HicomIOS.Master
                             {
                                 cmd.CommandType = CommandType.StoredProcedure;
                                 cmd.Parameters.Add("@id", SqlDbType.Int).Value = dataId;
-                                
+
                                 //  On payment, po exists => confirm, invoice exists => complete
                                 if (status != "FL")
                                 {

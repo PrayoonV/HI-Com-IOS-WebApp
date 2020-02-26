@@ -276,8 +276,9 @@
                 alertWarning("กรุณากรอกข้อมูลให้ครบ");
                 return;
             }
-            else if (service_time != "1" && service_type != "1" && setting_date != "")
+            else if ((service_time != "1" || service_type != "1") && setting_date != "")
             {
+                alert(service_type)
                 $.LoadingOverlay("hide");
                 alertWarning("กรุณาลบ Test Run Date (วันเครื่องรัน) เนื่องจากไม่ใช้ Service Year : 1 , Service Type : Free Service");
                 return;

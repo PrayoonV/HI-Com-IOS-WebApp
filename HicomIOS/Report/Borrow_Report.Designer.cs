@@ -36,7 +36,9 @@
             this.Detail = new DevExpress.XtraReports.UI.DetailBand();
             this.TopMargin = new DevExpress.XtraReports.UI.TopMarginBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
+            this.xrSubreport1 = new DevExpress.XtraReports.UI.XRSubreport();
             this.borrow_no = new DevExpress.XtraReports.Parameters.Parameter();
+            this.xrSubreport4 = new DevExpress.XtraReports.UI.XRSubreport();
             this.sqlDataSource1 = new DevExpress.DataAccess.Sql.SqlDataSource(this.components);
             this.Title = new DevExpress.XtraReports.UI.XRControlStyle();
             this.DetailCaption3 = new DevExpress.XtraReports.UI.XRControlStyle();
@@ -67,6 +69,7 @@
             this.xrLabel4 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel6 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrBarCode1 = new DevExpress.XtraReports.UI.XRBarCode();
+            this.xrSubreport3 = new DevExpress.XtraReports.UI.XRSubreport();
             this.ReportFooter = new DevExpress.XtraReports.UI.ReportFooterBand();
             this.xrCrossBandLine3 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.GroupHeader1 = new DevExpress.XtraReports.UI.GroupHeaderBand();
@@ -101,9 +104,6 @@
             this.xrCrossBandLine13 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine15 = new DevExpress.XtraReports.UI.XRCrossBandLine();
             this.xrCrossBandLine14 = new DevExpress.XtraReports.UI.XRCrossBandLine();
-            this.xrSubreport1 = new DevExpress.XtraReports.UI.XRSubreport();
-            this.xrSubreport4 = new DevExpress.XtraReports.UI.XRSubreport();
-            this.xrSubreport3 = new DevExpress.XtraReports.UI.XRSubreport();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // Detail
@@ -131,10 +131,26 @@
             this.BottomMargin.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
             this.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
             // 
+            // xrSubreport1
+            // 
+            this.xrSubreport1.LocationFloat = new DevExpress.Utils.PointFloat(26.93284F, 35.17367F);
+            this.xrSubreport1.Name = "xrSubreport1";
+            this.xrSubreport1.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.borrow_no));
+            this.xrSubreport1.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
+            this.xrSubreport1.SizeF = new System.Drawing.SizeF(672.2771F, 23F);
+            // 
             // borrow_no
             // 
             this.borrow_no.Description = "borrow_no";
             this.borrow_no.Name = "borrow_no";
+            // 
+            // xrSubreport4
+            // 
+            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(122.8697F, 82.29166F);
+            this.xrSubreport4.Name = "xrSubreport4";
+            this.xrSubreport4.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_footer", this.borrow_no));
+            this.xrSubreport4.ReportSource = new HicomIOS.Report.Quotation_Footer();
+            this.xrSubreport4.SizeF = new System.Drawing.SizeF(480F, 21.45836F);
             // 
             // sqlDataSource1
             // 
@@ -530,7 +546,7 @@
             this.xrLabel6.StylePriority.UseFont = false;
             this.xrLabel6.StylePriority.UseForeColor = false;
             this.xrLabel6.StylePriority.UseTextAlignment = false;
-            this.xrLabel6.Text = "ใบยืมสินค้า /";
+            this.xrLabel6.Text = "ใบยืม /";
             this.xrLabel6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight;
             // 
             // xrBarCode1
@@ -548,6 +564,14 @@
             this.xrBarCode1.StylePriority.UsePadding = false;
             this.xrBarCode1.StylePriority.UseTextAlignment = false;
             this.xrBarCode1.Symbology = qrCodeGenerator1;
+            // 
+            // xrSubreport3
+            // 
+            this.xrSubreport3.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
+            this.xrSubreport3.Name = "xrSubreport3";
+            this.xrSubreport3.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_Header", this.borrow_no));
+            this.xrSubreport3.ReportSource = new HicomIOS.Report.Quotation_Header();
+            this.xrSubreport3.SizeF = new System.Drawing.SizeF(550F, 112.5F);
             // 
             // ReportFooter
             // 
@@ -610,7 +634,7 @@
             this.xrLabel28.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
             this.xrLabel28.LocationFloat = new DevExpress.Utils.PointFloat(167.5863F, 0F);
             this.xrLabel28.Name = "xrLabel28";
-            this.xrLabel28.SizeF = new System.Drawing.SizeF(310.2736F, 35.02491F);
+            this.xrLabel28.SizeF = new System.Drawing.SizeF(267.4687F, 35.02491F);
             this.xrLabel28.StylePriority.UseBorders = false;
             this.xrLabel28.StylePriority.UseFont = false;
             this.xrLabel28.StylePriority.UseTextAlignment = false;
@@ -621,9 +645,9 @@
             // 
             this.xrLabel35.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.xrLabel35.Font = new System.Drawing.Font("Tahoma", 8F, System.Drawing.FontStyle.Bold);
-            this.xrLabel35.LocationFloat = new DevExpress.Utils.PointFloat(478.9564F, 0F);
+            this.xrLabel35.LocationFloat = new DevExpress.Utils.PointFloat(436.1515F, 0F);
             this.xrLabel35.Name = "xrLabel35";
-            this.xrLabel35.SizeF = new System.Drawing.SizeF(71.04361F, 35.02491F);
+            this.xrLabel35.SizeF = new System.Drawing.SizeF(113.8485F, 35.02491F);
             this.xrLabel35.StylePriority.UseBorders = false;
             this.xrLabel35.StylePriority.UseFont = false;
             this.xrLabel35.StylePriority.UseTextAlignment = false;
@@ -681,11 +705,11 @@
             // xrCrossBandLine4
             // 
             this.xrCrossBandLine4.EndBand = this.GroupHeader1;
-            this.xrCrossBandLine4.EndPointFloat = new DevExpress.Utils.PointFloat(477.8599F, 35.02491F);
-            this.xrCrossBandLine4.LocationFloat = new DevExpress.Utils.PointFloat(477.8599F, 0F);
+            this.xrCrossBandLine4.EndPointFloat = new DevExpress.Utils.PointFloat(435.055F, 35.02491F);
+            this.xrCrossBandLine4.LocationFloat = new DevExpress.Utils.PointFloat(435.055F, 0F);
             this.xrCrossBandLine4.Name = "xrCrossBandLine4";
             this.xrCrossBandLine4.StartBand = this.GroupHeader1;
-            this.xrCrossBandLine4.StartPointFloat = new DevExpress.Utils.PointFloat(477.8599F, 0F);
+            this.xrCrossBandLine4.StartPointFloat = new DevExpress.Utils.PointFloat(435.055F, 0F);
             this.xrCrossBandLine4.WidthF = 1.096527F;
             // 
             // xrCrossBandLine5
@@ -783,10 +807,10 @@
             this.xrLabel29.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_borrow_report.item_name")});
             this.xrLabel29.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel29.LocationFloat = new DevExpress.Utils.PointFloat(167.5864F, 2.903779F);
+            this.xrLabel29.LocationFloat = new DevExpress.Utils.PointFloat(167.5864F, 2.903748F);
             this.xrLabel29.Name = "xrLabel29";
             this.xrLabel29.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 2, 0, 0, 100F);
-            this.xrLabel29.SizeF = new System.Drawing.SizeF(310.2735F, 24.50006F);
+            this.xrLabel29.SizeF = new System.Drawing.SizeF(267.4686F, 24.50006F);
             this.xrLabel29.StylePriority.UseBorders = false;
             this.xrLabel29.StylePriority.UseFont = false;
             this.xrLabel29.StylePriority.UsePadding = false;
@@ -799,10 +823,10 @@
             this.xrLabel17.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_borrow_report.qty")});
             this.xrLabel17.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel17.LocationFloat = new DevExpress.Utils.PointFloat(478.9564F, 2.903832F);
+            this.xrLabel17.LocationFloat = new DevExpress.Utils.PointFloat(436.1515F, 2.903875F);
             this.xrLabel17.Name = "xrLabel17";
             this.xrLabel17.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 2, 0, 0, 100F);
-            this.xrLabel17.SizeF = new System.Drawing.SizeF(34.79001F, 24.50006F);
+            this.xrLabel17.SizeF = new System.Drawing.SizeF(50.25061F, 24.50006F);
             this.xrLabel17.StylePriority.UseBorders = false;
             this.xrLabel17.StylePriority.UseFont = false;
             this.xrLabel17.StylePriority.UsePadding = false;
@@ -847,10 +871,10 @@
             this.xrLabel31.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
             new DevExpress.XtraReports.UI.XRBinding("Text", null, "sp_borrow_report.unit_code")});
             this.xrLabel31.Font = new System.Drawing.Font("Tahoma", 8F);
-            this.xrLabel31.LocationFloat = new DevExpress.Utils.PointFloat(513.7464F, 2.903832F);
+            this.xrLabel31.LocationFloat = new DevExpress.Utils.PointFloat(486.4021F, 2.903875F);
             this.xrLabel31.Name = "xrLabel31";
             this.xrLabel31.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 2, 0, 0, 100F);
-            this.xrLabel31.SizeF = new System.Drawing.SizeF(36.2536F, 24.50006F);
+            this.xrLabel31.SizeF = new System.Drawing.SizeF(63.59787F, 24.50006F);
             this.xrLabel31.StylePriority.UseBorders = false;
             this.xrLabel31.StylePriority.UseFont = false;
             this.xrLabel31.StylePriority.UsePadding = false;
@@ -907,11 +931,11 @@
             // xrCrossBandLine11
             // 
             this.xrCrossBandLine11.EndBand = this.Detail1;
-            this.xrCrossBandLine11.EndPointFloat = new DevExpress.Utils.PointFloat(477.8599F, 28.10891F);
-            this.xrCrossBandLine11.LocationFloat = new DevExpress.Utils.PointFloat(477.8599F, 0F);
+            this.xrCrossBandLine11.EndPointFloat = new DevExpress.Utils.PointFloat(435.0551F, 28.10891F);
+            this.xrCrossBandLine11.LocationFloat = new DevExpress.Utils.PointFloat(435.0551F, 0F);
             this.xrCrossBandLine11.Name = "xrCrossBandLine11";
             this.xrCrossBandLine11.StartBand = this.Detail1;
-            this.xrCrossBandLine11.StartPointFloat = new DevExpress.Utils.PointFloat(477.8599F, 0F);
+            this.xrCrossBandLine11.StartPointFloat = new DevExpress.Utils.PointFloat(435.0551F, 0F);
             this.xrCrossBandLine11.WidthF = 1.096436F;
             // 
             // xrCrossBandLine12
@@ -953,30 +977,6 @@
             this.xrCrossBandLine14.StartBand = this.GroupFooter2;
             this.xrCrossBandLine14.StartPointFloat = new DevExpress.Utils.PointFloat(0F, 0F);
             this.xrCrossBandLine14.WidthF = 727F;
-            // 
-            // xrSubreport1
-            // 
-            this.xrSubreport1.LocationFloat = new DevExpress.Utils.PointFloat(26.93284F, 35.17367F);
-            this.xrSubreport1.Name = "xrSubreport1";
-            this.xrSubreport1.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.borrow_no));
-            this.xrSubreport1.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
-            this.xrSubreport1.SizeF = new System.Drawing.SizeF(672.2771F, 23F);
-            // 
-            // xrSubreport4
-            // 
-            this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(122.8697F, 82.29166F);
-            this.xrSubreport4.Name = "xrSubreport4";
-            this.xrSubreport4.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_footer", this.borrow_no));
-            this.xrSubreport4.ReportSource = new HicomIOS.Report.Quotation_Footer();
-            this.xrSubreport4.SizeF = new System.Drawing.SizeF(480F, 21.45836F);
-            // 
-            // xrSubreport3
-            // 
-            this.xrSubreport3.LocationFloat = new DevExpress.Utils.PointFloat(0F, 0F);
-            this.xrSubreport3.Name = "xrSubreport3";
-            this.xrSubreport3.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_Header", this.borrow_no));
-            this.xrSubreport3.ReportSource = new HicomIOS.Report.Quotation_Header();
-            this.xrSubreport3.SizeF = new System.Drawing.SizeF(550F, 112.5F);
             // 
             // Borrow_Report
             // 
