@@ -1107,6 +1107,7 @@
                         <dx:GridViewDataTextColumn FieldName="project" Caption="Project" Width="50px" />
                         <dx:GridViewDataTextColumn FieldName="model" Caption="Model" Width="50px" />
                         <dx:GridViewDataTextColumn FieldName="mfg" Caption="MFG No" Width="50px" />
+                        <dx:GridViewDataTextColumn FieldName="delivery_date" Caption="Delivery Date" Width="50px" />
                         <dx:GridViewDataTextColumn FieldName="startup_date" Caption="Test Run Date" Width="50px" />
                         <dx:GridViewDataTextColumn Caption=" " FieldName="id" CellStyle-HorizontalAlign="Center" Width="55px" Settings-AllowSort="False">
                             <DataItemTemplate>

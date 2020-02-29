@@ -97,6 +97,9 @@ namespace HicomIOS.Master
                     cbbCustomer.ValueField = "id";
                     cbbCustomer.DataBind();
 
+                    cbbProject.Items.Insert(0, new ListEditItem("", ""));
+                    cbbProject.SelectedIndex = 0;
+
                 }
                 // Get Permission and if no permission, will redirect to another page.
                 if (!Permission.GetPermission())
@@ -109,6 +112,37 @@ namespace HicomIOS.Master
                 gridAnnualServiceList.DataBind();
             }
         }
+
+        protected void cbbProject_Callback(object sender, CallbackEventArgsBase e)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                //Create array of Parameters
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                {
+                    new SqlParameter("@lang_id", SqlDbType.VarChar, 3) { Value = "tha" },
+                    new SqlParameter("@customer_id", SqlDbType.Int) { Value = cbbCustomer.Value },
+                };
+                conn.Open();
+                var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_annual_customer_project", arrParm.ToArray());
+
+                conn.Close();
+                if (dsResult.Tables.Count > 0)
+                {
+                    if (dsResult.Tables[0].Rows.Count > 0)
+                    {
+                        cbbProject.DataSource = dsResult;
+                        cbbProject.TextField = "data_text";
+                        cbbProject.ValueField = "data_text";
+                        cbbProject.DataBind();
+
+                        cbbProject.Items.Insert(0, new ListEditItem("", ""));
+                        cbbProject.SelectedIndex = 0;
+                    }
+                }
+            }
+        }
+
 
         [WebMethod]
         public static void GetViewGrid(AnnualServiceListData[] masterData)
@@ -257,7 +291,6 @@ namespace HicomIOS.Master
                     {
                         i++;
                         templateSheet.SelectedRange["A5:XFA5"].Copy(workSheet.SelectedRange[intStartRow, 1]);
-
 
                         workSheet.Cells[intStartRow, (int)Column_AnnualServiceList.COUNT_CALL].Value = i;
                         workSheet.Cells[intStartRow, (int)Column_AnnualServiceList.CUSTOMER_NAME].Value = row["cust_name"].ToString();

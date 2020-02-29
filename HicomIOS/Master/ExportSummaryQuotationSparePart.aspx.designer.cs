@@ -130,6 +130,15 @@ namespace HicomIOS.Master {
         protected global::System.Web.UI.HtmlControls.HtmlInputText Txtother;
         
         /// <summary>
+        /// cbbproducttype control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::DevExpress.Web.ASPxComboBox cbbproducttype;
+        
+        /// <summary>
         /// dvGridProduct control.
         /// </summary>
         /// <remarks>

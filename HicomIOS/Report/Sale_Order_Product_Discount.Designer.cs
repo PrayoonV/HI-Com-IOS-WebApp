@@ -152,9 +152,9 @@
             this.formattingRule4 = new DevExpress.XtraReports.UI.FormattingRule();
             this.parameter_period = new DevExpress.XtraReports.Parameters.Parameter();
             this.parameter_payment = new DevExpress.XtraReports.Parameters.Parameter();
+            this.xrSubreport2 = new DevExpress.XtraReports.UI.XRSubreport();
             this.xrSubreport4 = new DevExpress.XtraReports.UI.XRSubreport();
             this.xrSubreport3 = new DevExpress.XtraReports.UI.XRSubreport();
-            this.xrSubreport2 = new DevExpress.XtraReports.UI.XRSubreport();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.xrTable1)).BeginInit();
@@ -1096,7 +1096,6 @@
             this.GroupFooter4.HeightF = 26.00158F;
             this.GroupFooter4.Level = 3;
             this.GroupFooter4.Name = "GroupFooter4";
-            this.GroupFooter4.Visible = false;
             // 
             // xrLabel55
             // 
@@ -1599,6 +1598,14 @@
             this.parameter_payment.Type = typeof(int);
             this.parameter_payment.ValueInfo = "0";
             // 
+            // xrSubreport2
+            // 
+            this.xrSubreport2.LocationFloat = new DevExpress.Utils.PointFloat(58.61568F, 9.999974F);
+            this.xrSubreport2.Name = "xrSubreport2";
+            this.xrSubreport2.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.parameter_sale));
+            this.xrSubreport2.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
+            this.xrSubreport2.SizeF = new System.Drawing.SizeF(649.9999F, 23F);
+            // 
             // xrSubreport4
             // 
             this.xrSubreport4.LocationFloat = new DevExpress.Utils.PointFloat(134.6402F, 92.70834F);
@@ -1614,14 +1621,6 @@
             this.xrSubreport3.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameter_header_shot", this.parameter_sale));
             this.xrSubreport3.ReportSource = new HicomIOS.Report.Header_Shot();
             this.xrSubreport3.SizeF = new System.Drawing.SizeF(550.0001F, 87F);
-            // 
-            // xrSubreport2
-            // 
-            this.xrSubreport2.LocationFloat = new DevExpress.Utils.PointFloat(58.61568F, 9.999974F);
-            this.xrSubreport2.Name = "xrSubreport2";
-            this.xrSubreport2.ParameterBindings.Add(new DevExpress.XtraReports.UI.ParameterBinding("parameterApprove_Qu", this.parameter_sale));
-            this.xrSubreport2.ReportSource = new HicomIOS.Report.Quotation_Approve_Qu();
-            this.xrSubreport2.SizeF = new System.Drawing.SizeF(649.9999F, 23F);
             // 
             // Sale_Order_Product_Discount
             // 

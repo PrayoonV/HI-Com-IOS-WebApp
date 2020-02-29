@@ -55,7 +55,7 @@
     <div id="div-content">
         <div class="row">
             <fieldset>
-                <legend>S200ummary Quotation SparePart</legend>
+                <legend>Summary Quotation SparePart</legend>
                 <div class="col-xs-12 no-padding">
                     <div class="col-xs-4 no-padding">
                         <div class="row form-group">
@@ -194,6 +194,18 @@
                             </div>
                         </div>
                     </div>
+                     <div class="col-xs-4 no-padding">
+                        <div class="row form-group">
+                            <label class="col-xs-3 text-right label-rigth">Quotation Type :</label>
+                            <div class="col-xs-9 no-padding">
+                                <dx:ASPxComboBox ID="cbbproducttype" CssClass="form-control"
+                                    runat="server" ClientInstanceName="cbbproducttype" TextField="data_text"
+                                    EnableCallbackMode="true"
+                                    ValueField="data_value">
+                                </dx:ASPxComboBox>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-xs-4 no-padding">
                         <div class="row form-group">
                             <div class="col-xs-2 no-padding">
@@ -285,6 +297,7 @@
             cbbQuotation.SetValue(" ");
             cbbModel.SetValue(" ");
             cbbMfg.SetValue(" ");
+            cbbproducttype.SetValue(" ");
             $('#datepickerFrom').val(" ");
             $('#datepickerTo').val(" ");
             $('#PoDateFrom').val(" ");
@@ -307,6 +320,7 @@
             var po_date_from = $('#PoDateFrom').val() == "" || $('#PoDateFrom').val() == null ? "" : $('#PoDateFrom').val();
             var po_date_to = $('#PoDateTo').val() == "" || $('#PoDateTo').val() == null ? "" : $('#PoDateTo').val();
             var other = $('#Txtother').val() == "" || $('#Txtother').val() == null ? "" : $('#Txtother').val();
+            var producttyle = cbbproducttype.GetValue() == "" || cbbproducttype.GetValue() == null ? "" : cbbproducttype.GetValue();
 
             if (quotation_date_from == "" || quotation_date_to == "") {
                 if (po_date_from == "" || po_date_to == "") {
@@ -343,6 +357,7 @@
                     po_date_from: po_date_from,
                     po_date_to: po_date_to,
                     other: other,
+                    producttype : producttyle
                 }]
             };
             $.ajax({

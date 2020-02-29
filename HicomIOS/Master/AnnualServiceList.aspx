@@ -77,6 +77,52 @@
             color: #5bc0de !important;
         }
     </style>
+     <script type="text/javascript">
+
+         function changeSelectCustomerMFG() {
+            /*$.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = cbbCustomerMFG.GetValue();
+            var project = "";
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/GetMFGData",
+                data: '{id: "' + key + '", project: "' + project + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    cbbProject.PerformCallback();
+                    gridViewCustomerMFG.PerformCallback();
+                }
+
+            });
+
+            $.LoadingOverlay("hide");*/
+            cbbProject.PerformCallback();
+         }
+
+            function changeSelectProject() {
+            /*$.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+            var key = cbbCustomerMFG.GetValue();
+            var project = cbbProject.GetValue() == null ? "" : cbbProject.GetValue();
+            $.ajax({
+                type: "POST",
+                url: "AnnualService.aspx/GetMFGData",
+                data: '{id: "' + key + '", project: "' + project + '" }',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridViewCustomerMFG.PerformCallback();
+                }
+
+            });
+
+            $.LoadingOverlay("hide");*/
+        }
+    </script>
     <fieldset>
         <legend>Annual Service List</legend>
         <div class="col-xs-12 no-padding">
@@ -142,13 +188,20 @@
                     <div class="col-xs-2 no-padding">
                         <dx:ASPxComboBox ID="cbbCustomer" CssClass="form-control"
                             runat="server" ClientInstanceName="cbbCustomer" TextField="data_text"
-                            EnableCallbackMode="true"
+                            ClientSideEvents-ValueChanged="changeSelectCustomerMFG"
                             ValueField="data_value">
+
                         </dx:ASPxComboBox>
                     </div>
                     <label class="col-xs-2 text-center">Project : </label>
                     <div class="col-xs-2 no-padding">
-                        <input class="form-control" id="txtproject" runat="server" />
+                          <dx:ASPxComboBox ID="cbbProject" CssClass="form-control" runat="server"
+                                    ClientInstanceName="cbbProject" TextField="data_text"
+                                    OnCallback="cbbProject_Callback"
+                                    ClientSideEvents-ValueChanged="changeSelectProject" ValueField="data_value">
+                                </dx:ASPxComboBox>
+
+
                     </div>
                 </div>
             </div>
@@ -310,7 +363,7 @@
             var scheduleFrom = $('#scheduleFrom').val() == "" || $('#scheduleFrom').val() == null ? "" : $('#scheduleFrom').val();
             var scheduleTo = $('#scheduleTo').val() == "" || $('#scheduleTo').val() == null ? "" : $('#scheduleTo').val();
             var customer_id = cbbCustomer.GetValue() == "" || cbbCustomer.GetValue() == null ? 0 : cbbCustomer.GetValue();
-            var project_search =  $('#txtproject').val() == "" || $('#txtproject').val() == null ? "" : $('#txtproject').val();
+            var project_search = cbbProject.GetValue() == "" || cbbProject.GetValue() == null ? "" : cbbProject.GetValue();
 
             var parametersAdd = {
                 masterData: [

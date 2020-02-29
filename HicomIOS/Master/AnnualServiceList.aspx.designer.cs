@@ -94,13 +94,13 @@ namespace HicomIOS.Master {
         protected global::DevExpress.Web.ASPxComboBox cbbCustomer;
         
         /// <summary>
-        /// txtproject control.
+        /// cbbProject control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputText txtproject;
+        protected global::DevExpress.Web.ASPxComboBox cbbProject;
         
         /// <summary>
         /// gridAnnualServiceList control.

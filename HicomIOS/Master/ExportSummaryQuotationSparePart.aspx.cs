@@ -35,6 +35,7 @@ namespace HicomIOS.Master
             public int customer_group { get; set; }
             public string quotation { get; set; }
             public string other { get; set; }
+            public string producttype { get; set; }
             public string po_date_from { get; set; }
             public string po_date_to { get; set; }
             public string model { get; set; }
@@ -194,6 +195,16 @@ namespace HicomIOS.Master
                     dtSource.Rows.Add("DL", "Delivery");
                     dtSource.Rows.Add("CP", "Completed");
                     dtSource.Rows.Add("LS", "Lose");
+                    var dtSource1 = new DataTable();
+                    dtSource1.Columns.Add("data_value", typeof(string));
+                    dtSource1.Columns.Add("data_text", typeof(string));
+                    dtSource1.Rows.Add("S", "Spare Part");
+                    dtSource1.Rows.Add("M", "Maintenance");
+                    dtSource1.Rows.Add("C", "Service Charge");
+
+                    cbbproducttype.DataSource = dtSource1;
+                    cbbproducttype.DataBind();
+
                     cbbStatus.DataSource = dtSource;
                     cbbStatus.DataBind();
                 }
@@ -283,6 +294,7 @@ namespace HicomIOS.Master
                         new SqlParameter("@po_date_from", SqlDbType.VarChar,20) { Value = SPlanetUtil.Convert_ddmmyyyy_to_yyyymmdd(data.po_date_from) },
                         new SqlParameter("@po_date_to", SqlDbType.VarChar,20) { Value = SPlanetUtil.Convert_ddmmyyyy_to_yyyymmdd(data.po_date_to) },
                         new SqlParameter("@other", SqlDbType.VarChar,200) { Value = data.other },
+                        new SqlParameter("@producttype", SqlDbType.VarChar,200) { Value = data.producttype },
                     };
                     conn.Open();
                     dsResult = SqlHelper.ExecuteDataset(conn, "sp_report_quotation_summary_spare_part", arrParm.ToArray());
@@ -373,6 +385,7 @@ namespace HicomIOS.Master
                              new SqlParameter("@po_date_from", SqlDbType.VarChar,20) { Value = SPlanetUtil.Convert_ddmmyyyy_to_yyyymmdd(data.po_date_from) },
                              new SqlParameter("@po_date_to", SqlDbType.VarChar,20) { Value = SPlanetUtil.Convert_ddmmyyyy_to_yyyymmdd(data.po_date_to) },
                              new SqlParameter("@other", SqlDbType.VarChar,200) { Value = data.other },
+                             new SqlParameter("@producttype", SqlDbType.VarChar,200) { Value = data.producttype },
 
                         };
                         conn.Open();

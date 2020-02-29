@@ -61,7 +61,7 @@ namespace HicomIOS.Report
                 value += Convert.ToString(this.DetailReport.GetCurrentColumnValue("other_description"));
             }
             xrLabel17.Text = value;
-
+            GroupFooter4.Visible = true;
             //if (Convert.ToDecimal(this.DetailReport.GetCurrentColumnValue("totalheader")) == Convert.ToDecimal(this.DetailReport.GetCurrentColumnValue("grand_total")))
             //{
             //    xrLabel30.Visible =  xrTableCell8.Visible= false;

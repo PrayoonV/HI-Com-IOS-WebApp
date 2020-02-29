@@ -34,6 +34,8 @@ namespace HicomIOS.Master
             public int customer_mfg_id { get; set; }
             public string startup_date { get; set; }
 
+            public string delivery_date { get; set; }
+
         }
         public class AnnualServiceList
         {
@@ -412,6 +414,7 @@ namespace HicomIOS.Master
                             model = Convert.IsDBNull(row["model"]) ? string.Empty : Convert.ToString(row["model"]),
                             mfg = Convert.IsDBNull(row["mfg"]) ? string.Empty : Convert.ToString(row["mfg"]),
                             startup_date = Convert.IsDBNull(row["startup_date"]) ? string.Empty : Convert.ToString(row["startup_date"]),
+                            delivery_date = Convert.IsDBNull(row["delivery_date"]) ? string.Empty : Convert.ToString(row["delivery_date"]),
                         });
                     }
                 }

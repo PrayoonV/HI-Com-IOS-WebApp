@@ -245,6 +245,9 @@
                 $('#formradio').next().remove('.help-block');
             });
 
+            var h = window.innerHeight;
+            gridViewDetailSaleOrder.SetHeight(h - 490);
+
             //$('#tabSaleOrder').css('display', 'none');
             //$('#btnService').css('display', 'none');
 
@@ -1554,7 +1557,7 @@
                     <li><a data-toggle="tab" href="#orderHistory">ประวัติสั่งซื้อ</a></li>
                     <li><a data-toggle="tab" href="#notice">แจ้งเตือน</a></li>
                 </ul>
-                <div class="tab-content" style="overflow: auto; height: 292px">
+                <div class="tab-content" style="overflow: auto; height: 550px">
                     <div id="detailList" class="tab-pane fade in active">
                         <div class="col-xs-6 no-padding">
                             <div class="row form-group">
