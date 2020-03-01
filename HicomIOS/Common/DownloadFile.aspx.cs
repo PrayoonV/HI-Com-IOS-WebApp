@@ -20,14 +20,27 @@ namespace HicomIOS.Common
                 return;
             }
 
-            HttpResponse respone = HttpContext.Current.Response;
-            respone.ClearContent();
-            respone.Clear();
-            respone.AppendHeader("content-disposition", "attachment; filename=" + Uri.EscapeUriString(fileName));
-            respone.ContentType = "text/plain";
-            respone.WriteFile(localPath);
-            respone.Flush();
-            respone.Close();
+            Response.ContentType = "application/ms-excel";
+            //Response.ContentType = @"application/vnd.ms-excel";
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + fileName);
+            Response.TransmitFile(localPath);
+            Response.End();
+
+            //HttpResponse respone = HttpContext.Current.Response;
+            //respone.ClearContent();
+            //respone.Clear();
+
+            ////Response.ContentType = "application/ms-excel";
+            ////Response.ContentType = @"application/vnd.ms-excel";
+            ////            respone.AppendHeader("Content-Disposition", "attachment; filename=" + "AnnualService.xlsx");
+            //respone.ContentType = "application/ms-excel";
+            //respone.AppendHeader("Content-Disposition", "attachment; filename=" + Uri.EscapeUriString(fileName));
+            
+            ////respone.ContentType = "text/plain";
+            //respone.TransmitFile(localPath);
+            ////respone.WriteFile(localPath);
+            //respone.Flush();
+            //respone.Close();
 
             return;
         }

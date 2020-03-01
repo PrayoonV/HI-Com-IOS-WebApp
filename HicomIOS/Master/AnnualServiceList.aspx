@@ -223,7 +223,7 @@
                         <i class="fa fa-archive" aria-hidden="true"></i>&nbsp;
                                     Clear
                     </button>
-
+                    <%--<asp:Button ID="test" Text="excle" runat="server" OnClick="test_Click" />--%>
                 </div>
                 <div class="col-xs-4 no-padding">
                     <button type="button"
@@ -435,7 +435,6 @@
                 dataType: "json",
                 success: function (data) {
                     $.LoadingOverlay("hide");
-
                     window.open("../Common/DownloadFile.aspx?" + data.d, '_blank');
                 }
             });

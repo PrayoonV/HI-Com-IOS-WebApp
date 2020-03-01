@@ -104,6 +104,7 @@ namespace HicomIOS.Master
                 // Get Permission and if no permission, will redirect to another page.
                 if (!Permission.GetPermission())
                     Response.Redirect(ConstantClass.CONSTANT_NO_PERMISSION_PAGE);
+
             }
             else
             {
@@ -328,6 +329,40 @@ namespace HicomIOS.Master
                 string strErrorMsg = SPlanetUtil.LogErrorCollect(ex);
             }
             return strDownloadUrl;
+        }
+
+        protected void test_Click(object sender, EventArgs e)
+        {
+            string asdstrTemplatePath = "/Master/Template/";
+            string asdstrTemplatePath7 = "/Master/Template/";
+            string baseUrl = string.Empty;
+            String strExcelPath = string.Empty;
+            string strSummaryQUTemplateFile = "AnnualService-Template.xlsx";
+            int intStartRow = 2;
+            DataSet dsResult;
+
+
+            string excelTemplate = Path.Combine(HttpContext.Current.Server.MapPath(asdstrTemplatePath), strSummaryQUTemplateFile);
+            FileInfo templateFile = new FileInfo(excelTemplate);
+            ExcelPackage excel = new ExcelPackage(templateFile);
+            var templateSheet = excel.Workbook.Worksheets["Sheet1"];
+            var workSheet = excel.Workbook.Worksheets.Copy("Sheet1", "AnnualService");
+            workSheet.DeleteRow(5, 1048576 - 5);
+            var data = (from t in annualServiceListData select t).FirstOrDefault();
+
+            templateSheet = excel.Workbook.Worksheets["Sheet1"];
+            excel.Workbook.Worksheets.Delete(templateSheet);
+            asdstrTemplatePath = baseUrl + asdstrTemplatePath + "AnnualService.xlsx";
+            asdstrTemplatePath = Path.Combine(HttpContext.Current.Server.MapPath(asdstrTemplatePath7), "AnnualService.xlsx");
+            string pathTemp = Path.GetTempFileName();
+            excel.SaveAs(new FileInfo(asdstrTemplatePath));
+            //excel.SaveAs(new FileInfo(pathTemp));
+
+            Response.ContentType = "application/ms-excel";
+            //Response.ContentType = @"application/vnd.ms-excel";
+            Response.AppendHeader("Content-Disposition", "attachment; filename=" + "AnnualService.xlsx");
+            Response.TransmitFile(asdstrTemplatePath);
+            Response.End();
         }
     }
 }
