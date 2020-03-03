@@ -76,7 +76,7 @@
             });
 
             var h = window.innerHeight;
-            gridViewCustomerMFG.SetHeight(h-250);
+            gridViewCustomerMFG.SetHeight(h - 250);
 
             var height = $('#Splitter_1').height();
             $('#Splitter_1').height(height + 40);
@@ -276,9 +276,7 @@
                 alertWarning("กรุณากรอกข้อมูลให้ครบ");
                 return;
             }
-            else if ((service_time != "1" || service_type != "1") && setting_date != "")
-            {
-                alert(service_type)
+            else if ((service_time != "1" || service_type != "Free Service") && setting_date != "") {
                 $.LoadingOverlay("hide");
                 alertWarning("กรุณาลบ Test Run Date (วันเครื่องรัน) เนื่องจากไม่ใช้ Service Year : 1 , Service Type : Free Service");
                 return;
@@ -572,7 +570,13 @@
             var service_type = $('input[name=serviceType_edit]:checked').val()
             console.log("service_type==" + service_type);
 
-            if (contractstarting_date == "" || contractexpire_date == "") {
+
+            if ((service_time != "1" || service_type != "Free Service") && setting_date != "") {
+                $.LoadingOverlay("hide");
+                alertWarning("กรุณาลบ Test Run Date (วันเครื่องรัน) เนื่องจากไม่ใช้ Service Year : 1 , Service Type : Free Service");
+                return;
+            }
+            else if (contractstarting_date == "" || contractexpire_date == "") {
                 $.LoadingOverlay("hide");
                 alertWarning("กรุณากรอกข้อมูลวันที่สัญญา");
                 return;
@@ -636,7 +640,7 @@
             var description = $('#txtDescription').val();
             var starting_date = $('#txtstarting_date_edit').val();
             var mfg_number = $('#txtmfg_upload_edit').val();
-             var model_number = $('#txtmodel_upload_edit').val();
+            var model_number = $('#txtmodel_upload_edit').val();
 
             $.ajax({
                 type: "POST",
@@ -1020,7 +1024,7 @@
             });
         }
     </script>
-     <script type="text/javascript">
+    <script type="text/javascript">
         $('#gridViewCustomerMFG').css({
             'height': '550px;'
         });
@@ -1089,9 +1093,8 @@
         </div>
         <div class="row">
             <div class="col-xs-12" runat="server" id="dvGridProduct">
-         <dx:ASPxGridView ID="gridViewCustomerMFG" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridViewCustomerMFG"
+                <dx:ASPxGridView ID="gridViewCustomerMFG" runat="server" AutoGenerateColumns="False" ClientInstanceName="gridViewCustomerMFG"
                     Width="100%" KeyFieldName="id" EnableCallBacks="true"
-                    
                     OnCustomCallback="gridViewCustomerMFG_CustomCallback">
                     <SettingsAdaptivity AdaptivityMode="HideDataCells" />
                     <Paddings Padding="0px" />
@@ -1124,7 +1127,7 @@
                     <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"
                         CustomizationWindowCloseUp="SPlanet.GridCustomizationWindow_CloseUp" />
                 </dx:ASPxGridView>
-               
+
             </div>
         </div>
     </div>
