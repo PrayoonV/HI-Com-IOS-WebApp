@@ -97,7 +97,7 @@ namespace HicomIOS.Master
                     cbbCustomer.ValueField = "id";
                     cbbCustomer.DataBind();
 
-                    cbbProject.Items.Insert(0, new ListEditItem("", ""));
+                    cbbProject.Items.Insert(0, new ListEditItem("ทั้งหมด", ""));
                     cbbProject.SelectedIndex = 0;
 
                 }
@@ -137,7 +137,7 @@ namespace HicomIOS.Master
                         cbbProject.ValueField = "data_text";
                         cbbProject.DataBind();
 
-                        cbbProject.Items.Insert(0, new ListEditItem("", ""));
+                        cbbProject.Items.Insert(0, new ListEditItem("ทั้งหมด", ""));
                         cbbProject.SelectedIndex = 0;
                     }
                 }
