@@ -230,8 +230,8 @@ namespace HicomIOS.Master
             STARTING_DATE = 8,
             EXPIRE_DATE = 9,
 
-            REMARK = 11,
-            LOCATION = 12,
+            REMARK = 12,
+            LOCATION = 11,
 
         }
 
