@@ -847,8 +847,8 @@ namespace HicomIOS.Master
                                         cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
                                         cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
                                         cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty;
-                                        cmd.Parameters.Add("@unit_price", SqlDbType.Decimal).Value = row.unit_price;
-                                        cmd.Parameters.Add("@total_price", SqlDbType.Decimal).Value = row.total_price;
+                                        cmd.Parameters.Add("@unit_price", SqlDbType.Float).Value = row.unit_price;
+                                        cmd.Parameters.Add("@total_price", SqlDbType.Float).Value = row.total_price;
 
                                         cmd.Parameters.Add("@created_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
 
@@ -878,8 +878,8 @@ namespace HicomIOS.Master
                                         cmd.Parameters.Add("@item_type", SqlDbType.VarChar, 2).Value = row.item_type;
                                         cmd.Parameters.Add("@unit_code", SqlDbType.VarChar, 10).Value = row.unit_code;
                                         cmd.Parameters.Add("@qty", SqlDbType.Int).Value = row.qty;
-                                        cmd.Parameters.Add("@unit_price", SqlDbType.Decimal).Value = row.unit_price;
-                                        cmd.Parameters.Add("@total_price", SqlDbType.Decimal).Value = row.total_price;
+                                        cmd.Parameters.Add("@unit_price", SqlDbType.Float).Value = row.unit_price;
+                                        cmd.Parameters.Add("@total_price", SqlDbType.Float).Value = row.total_price;
                                         cmd.Parameters.Add("@is_delete", SqlDbType.Bit).Value = row.is_delete;
                                         cmd.Parameters.Add("@updated_by", SqlDbType.Int).Value = Convert.ToInt32(ConstantClass.SESSION_USER_ID);
 
