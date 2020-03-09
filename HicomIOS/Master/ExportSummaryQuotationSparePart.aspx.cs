@@ -222,37 +222,26 @@ namespace HicomIOS.Master
             QUOTATION_DATE_DD = 3,
             QUOTATION_DATE_MM = 4,
             QUOTATION_DATE_YY = 5,
-            CUSTOMER_GROUP = 6,
-            CUSTOMER_NAME = 7,
-            LOCATION_BILL = 8,
-            PROJECT_NAME = 9,
-            LOCATION_SETTING1 = 10,
-            LOCATION_SETTING2 = 11,
-            MODEL = 12,
-            MFG = 13,
-            MACHINE = 14,
-            PRESSURE = 15,
-            QUOTATION_TYPE = 16,//S-C
-            DETAIL_OF_PART = 17,
-            DISCOUNT = 18,
-            TOTAL_AMOUNT = 19,
-            ATTENTION_NAME = 20,
-            QUOTATION_STATUS = 21,
-            PO_DATE_DD = 22,
-            PO_DATE_MM = 23,
-            PO_DATE_YY = 24,
-            PO_NO = 25,
-            PO_AMOUNT = 26,
-            SALE_ORDER_NO = 27,
-            DELIVERY_DATE = 28,
-            INV = 29,
-            STATUS = 30,
-            REPORT_NOREPORT = 31,
-            ORDER = 32,
-            REMARK_STATUS = 33,
-            REF_RETURN_NO = 34,
-            RETURN_DETAIL = 35,
-            RETURN_AMOUNT = 36,
+            CUSTOMER_NAME = 6,
+            PROJECT_NAME = 7,
+            Subject = 8,
+            MODEL = 9,
+            MFG = 10,
+            Hour = 11,
+            MACHINE = 12,
+            PRESSURE = 13,
+            QUOTATION_TYPE = 14,//S-C
+            DETAIL_OF_PART = 15,
+            DISCOUNT = 16,
+            TOTAL_AMOUNT = 17,
+            ATTENTION_NAME = 18,
+            QUOTATION_STATUS = 19,
+            UPDATE_DD = 20,
+            UPDATE_MM = 21,
+            UPDATE_YY = 22,
+            PO_NO = 23,
+            PO_DATE = 24,
+            REMARK= 25,
         }
         [WebMethod]
         public static string Export_Quotation_Summary_SparePart(SummaryQuotationSparePartData[] dataSummaryQuotationSparePart)
@@ -305,17 +294,15 @@ namespace HicomIOS.Master
                         templateSheet.SelectedRange["A7:XFA7"].Copy(workSheet.SelectedRange[intStartRow, 1]);
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.COUNT_CALL].Value = i;
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_NO].Value = row["quotation_no"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_DD].Value = row["quotation_date_dd"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_MM].Value = row["quotation_date_mm"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_YY].Value = row["quotation_date_yy"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.CUSTOMER_GROUP].Value = row["group_name"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_DD].Value = row["created_date_dd"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_MM].Value = row["created_date_mm"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_DATE_YY].Value = row["created_date_yy"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.CUSTOMER_NAME].Value = row["customer_name"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.LOCATION_BILL].Value = row["location_bill"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PROJECT_NAME].Value = row["project_name"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.LOCATION_SETTING1].Value = row["location_setting"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.LOCATION_SETTING2].Value = row["location_setting2"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.Subject].Value = row["quotation_subject"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.MODEL].Value = row["model"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.MFG].Value = row["mfg"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.Hour].Value = row["hour_amount"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.MACHINE].Value = row["machine"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PRESSURE].Value = row["pressure"];
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_TYPE].Value = row["quotation_type"].ToString();
@@ -324,18 +311,12 @@ namespace HicomIOS.Master
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.TOTAL_AMOUNT].Value = row["total_amount"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.ATTENTION_NAME].Value = row["attention_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.QUOTATION_STATUS].Value = row["quotation_status"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_DATE_DD].Value = row["po_date_dd"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_DATE_MM].Value = row["po_date_mm"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_DATE_YY].Value = row["po_date_yy"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.UPDATE_DD].Value = row["updated_date_dd"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.UPDATE_MM].Value = row["updated_date_mm"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.UPDATE_YY].Value = row["updated_date_yy"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_NO].Value = row["po_no"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_AMOUNT].Value = row["po_amount"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.SALE_ORDER_NO].Value = row["sale_order_no"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.DELIVERY_DATE].Value = row["delivery_date"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.INV].Value = row["inv_no"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.STATUS].Value = row["status_all"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.REPORT_NOREPORT].Value = row["report"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.ORDER].Value = row["order_hicom"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.REMARK_STATUS].Value = row["remark_status"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.PO_DATE].Value = row["ref_po_date"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_SparePart.REMARK].Value = row["remark_status"].ToString();
 
                         intStartRow++;
                     }
