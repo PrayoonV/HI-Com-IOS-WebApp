@@ -55,7 +55,7 @@ namespace HicomIOS
                     img_user.Src = "/Images/" +
                         (string.IsNullOrEmpty(ConstantClass.SESSION_PICTURE) ? "Default.png" : ConstantClass.SESSION_PICTURE);
                 }
-                ASPxLabel2.Text = DateTime.Now.Year + Server.HtmlDecode(" &copy; Copyright by Hi-Com Corporation (Thailand). [เว็บไซต์นี้เหมาะกับจอความละเอียดกว้าง 1366px ขึ้นไป] v1.0.5");
+                ASPxLabel2.Text = DateTime.Now.Year + Server.HtmlDecode(" &copy; Copyright by Hi-Com Corporation (Thailand). [เว็บไซต์นี้เหมาะกับจอความละเอียดกว้าง 1366px ขึ้นไป] v1.0.6");
                 LoadTopMenu();
             }
             catch (Exception ex)

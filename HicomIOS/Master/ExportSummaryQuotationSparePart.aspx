@@ -206,6 +206,8 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-xs-5 no-padding">
+                        </div>
                     <div class="col-xs-4 no-padding">
                         <div class="row form-group">
                             <div class="col-xs-2 no-padding">
@@ -386,6 +388,7 @@
             var po_date_from = $('#PoDateFrom').val() == "" || $('#PoDateFrom').val() == null ? "" : $('#PoDateFrom').val();
             var po_date_to = $('#PoDateTo').val() == "" || $('#PoDateTo').val() == null ? "" : $('#PoDateTo').val();
             var other = $('#Txtother').val() == "" || $('#Txtother').val() == null ? "" : $('#Txtother').val();
+            var producttyle = cbbproducttype.GetValue() == "" || cbbproducttype.GetValue() == null ? "" : cbbproducttype.GetValue();
 
             if (quotation_date_from == "" || quotation_date_to == "") {
                 if (po_date_from == "" || po_date_to == "") {
@@ -422,6 +425,7 @@
                     po_date_from: po_date_from,
                     po_date_to: po_date_to,
                     other: other,
+                     producttype : producttyle
                 }]
             };
             $.LoadingOverlay("show");

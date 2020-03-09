@@ -247,7 +247,7 @@ namespace HicomIOS.Master
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.CUSTOMER_NAME].Value = row["customer_name"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PROJECT_NAME].Value = row["project_name"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.SUbJECT].Value = row["quotation_subject"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.DESCRIPTION].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.DESCRIPTION].Value = row["descirption"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.SALES].Value = row["created_by"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PRICE_LIST].Value = row["total_amount"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.DISCOUNT].Value = row["total_discount"].ToString();
@@ -257,9 +257,9 @@ namespace HicomIOS.Master
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_DD].Value = row["updated_date_dd"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_MM].Value = row["updated_date_mm"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.UPDATE_YY].Value = row["updated_date_yy"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PO_NO].Value = "";
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PODATE].Value = "";
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.INVOICE].Value = "";
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PO_NO].Value = row["po_no"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.PODATE].Value = row["po_date"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.INVOICE].Value = row["inv_no"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Design.TEL].Value = row["customer_tel"].ToString();
 
                             intStartRow++; i++;

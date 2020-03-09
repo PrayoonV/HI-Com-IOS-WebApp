@@ -421,7 +421,7 @@ namespace HicomIOS.Master
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.QUOTATION_DATE_YY].Value = row["quotation_date_yy"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_NAME].Value = row["customer_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PROJECT_NAME].Value = row["project_name"].ToString();
-                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PRODUCT_NAME].Value = row["product_name"].ToString();
+                        //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PRODUCT_NAME].Value = row["product_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PROVINCE_NAME].Value = row["province_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_ADDRESS].Value = row["customer_address"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CATEGORY_ALIAS_LIST].Value = row["cat_code"].ToString();
