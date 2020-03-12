@@ -319,7 +319,7 @@
                         <dx:GridViewDataTextColumn FieldName="customer_name" Caption="Customer Name" />
                         <dx:GridViewDataTextColumn FieldName="grand_total" Caption="Price List Air Compressor" />
                         <dx:GridViewDataTextColumn FieldName="po_no" Caption="Po No" />
-                        <dx:GridViewDataTextColumn FieldName="amount_po" Caption="AMOUNT PO" />
+                        <dx:GridViewDataTextColumn FieldName="amount_po" Caption="PO Date" />
                     </Columns>
                     <Settings VerticalScrollBarMode="Auto" VerticalScrollableHeight="<%$ appSettings:GridViewHeight %>" />
                     <SettingsPopup>

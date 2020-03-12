@@ -336,8 +336,9 @@ namespace HicomIOS.Master
             PRICE = 28,
             CONTACT_NAME = 29,
             STATUS_NAME = 30,
-            PO_NUMBER = 31,
-            PO_AMOUNT = 32,
+            UPDATE_DATE = 31,
+            PO_NUMBER = 32,
+            PO_AMOUNT = 33,
             //CUSTOMER_REQUEST_BY = 33,
             //CUSTOMER_REQUEST_DATE_DD = 34,
             //CUSTOMER_REQUEST_DATE_MM = 35,
@@ -345,10 +346,10 @@ namespace HicomIOS.Master
             //TEST_RUN_DATE_DD = 37,
             //TEST_RUN_DATE_MM = 38,
             //TEST_RUN_DATE_YY = 39,
-            CUSTOMER_TEL = 33,
-            CUSTOMER_FAX = 34,
-            CUSTOMER_EMAIL = 35,
-            REMARK = 36
+            CUSTOMER_TEL = 34,
+            CUSTOMER_FAX = 35,
+            CUSTOMER_EMAIL = 36,
+            REMARK = 37
         }
 
         [WebMethod]
@@ -444,6 +445,7 @@ namespace HicomIOS.Master
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PRICE].Value = row["grand_total"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CONTACT_NAME].Value = row["contact_name"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.STATUS_NAME].Value = row["status_name"].ToString();
+                        workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.UPDATE_DATE].Value = row["update_date"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PO_NUMBER].Value = row["po_no"].ToString();
                         workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.PO_AMOUNT].Value = row["amount_po"].ToString();
                         //workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Product.CUSTOMER_REQUEST_BY].Value = row["sent_by"].ToString();
