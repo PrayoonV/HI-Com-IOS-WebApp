@@ -273,9 +273,9 @@ namespace HicomIOS.Master
 
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PO_NO].Value = row["po_no"].ToString();// row["inv_no"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.PO_DATE].Value = row["po_date"].ToString();// row["po_no"].ToString();
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.AMOUNTPO].Value = "";// row["po_no"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.AMOUNTPO].Value =  row["total_amount"].ToString();
 
-                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVDATE].Value = "";//row["amount_po"].ToString();
+                            workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVDATE].Value = row["inv_date"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.INVOICE_NO].Value = row["inv_no"].ToString();
                             workSheet.Cells[intStartRow, (int)Column_QuotationSummary_Contract.REMARK].Value = row["remark_status"].ToString();
 
