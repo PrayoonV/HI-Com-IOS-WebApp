@@ -96,9 +96,10 @@
                     $.LoadingOverlay("hide");
                     return;
                 }
-                var date = $('#notice_date').handleDtpicker('getDate');
-                var notice_date = date.toISOString();
-
+                //var date = $('#notice_date').handleDtpicker('getDate');
+                //var notice_date = date.toISOString();
+                var date = $('#notice_date').val();
+                var notice_date = date;
                 var parametersNotic = {
                     dataNotic: [{
                         subject: $('#subject').val(),
@@ -117,6 +118,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data) {
+                        console.log(data);
                         location.reload();
                     }
                 });
@@ -143,6 +145,7 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (data) {
+                        console.log(data.notice_date)
                         location.reload();
                     }
                 });
@@ -332,7 +335,8 @@
                                     <div class="row form-group">
                                         <label class="col-xs-3 text-right label-rigth">NoticeDate :</label>
                                         <div class="col-xs-9">
-                                            <input type="text" class="form-control datepicker numberic" id="notice_date" runat="server" />
+                                            <%--<input type="text" class="form-control datepicker numberic" id="notice_date" runat="server" />--%>
+                                            <input type="text" class="form-control" id="notice_date" runat="server" autocomplete = "off"/>
                                         </div>
                                     </div>
                                 </div>
@@ -381,6 +385,12 @@
        $(document).ready(function () {
            var h = window.innerHeight;
            gridView.SetHeight(h - 155);
+
+           $('#notice_date').datepicker({
+               dateFormat: 'mm/dd/yy', "changeMonth": true,"changeYear": true
+
+           });
+           
        });
 
        ASPxClientControl.GetControlCollection().BrowserWindowResized.AddHandler(function (s, e) {

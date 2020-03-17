@@ -201,7 +201,8 @@
             $("#txtIssueDate").prop("readonly", "readonly");
 
             $("#txtIssueDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
             //  Check type

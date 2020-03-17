@@ -197,7 +197,8 @@
             gridView.SetHeight(h - 345);
 
             $("#dtAdjustDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
         });

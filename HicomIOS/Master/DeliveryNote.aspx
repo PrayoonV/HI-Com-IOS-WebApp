@@ -109,7 +109,8 @@
         $(document).ready(function () {
             $("#Splitter_0").parent().hide();
             $("#lbDeliveryDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
         });

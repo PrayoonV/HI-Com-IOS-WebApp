@@ -71,8 +71,12 @@
                         <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editItem(<%# Eval("id")%>)" title="Edit">
                             <i class="fa fa-pencil" aria-hidden="true"></i>
                         </a>|
+                        <%--<%# ((string)Eval("sale_order_status") == "FL") ? "|" : "" %>--%>
                         <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>)" title="Delete">
                             <i class="fa fa-trash-o" aria-hidden="true"></i>
+                            <%--<%# ((string)Eval("sale_order_status") == "FL") ? "<i class='fa fa-trash-o' aria-hidden='true'></i>" : "" %>--%>
+                        </a>
+
                     </DataItemTemplate>
                 </dx:GridViewDataTextColumn>
 

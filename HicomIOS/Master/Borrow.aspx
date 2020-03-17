@@ -198,16 +198,20 @@
             $("#txtDueDeliveryDate").prop("readonly", "readonly");
 
             $("#txtDueDeliveryDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
             $("#txtPODate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
             $("#txtReceiveDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
             $("#txtBorrowDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
 

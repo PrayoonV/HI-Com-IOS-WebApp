@@ -80,14 +80,17 @@
             $("#Splitter_0").parent().hide();
 
             $("#txtDateQuatationNo").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
             $("#dtInvoiceDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
             $("#txtPODate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
             $("#dtDateShipping").datepicker({
@@ -104,7 +107,8 @@
             });
 
             $("#txtDateCheckInAdvance").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
             $('#cbTypeSendTaxPost').change(function () {

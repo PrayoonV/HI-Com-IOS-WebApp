@@ -337,7 +337,8 @@
         });
         $(function () {
             $(".picker").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
         });
         function editNotice(e) {

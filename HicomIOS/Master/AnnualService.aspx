@@ -62,7 +62,8 @@
             $("input:radio[value='Free Service']").attr('checked', true);
 
             $('.selectDate').datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
             $('#modal_form').on('shown.bs.modal', function () {

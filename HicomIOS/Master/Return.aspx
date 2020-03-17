@@ -193,7 +193,8 @@
             $("#txtReturnDate").prop("readonly", "readonly");
 
             $("#txtReturnDate").datepicker({
-                dateFormat: 'dd/mm/yy'
+                dateFormat: 'dd/mm/yy', "changeMonth": true,
+                "changeYear": true
             });
 
 
