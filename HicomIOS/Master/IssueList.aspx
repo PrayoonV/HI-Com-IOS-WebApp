@@ -71,9 +71,10 @@
                     <DataItemTemplate>
                         <a id="btnEdit" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_edit) ? "" : "disabled" %>" onclick="editItem(<%# Eval("id")%>)" title="Edit">
                             <i class="fa fa-pencil" aria-hidden="true"></i>
-                        </a>|
+                        </a>
+<%--                        <%# ((string)Eval("quotation_type") == "P") ? "" : "|" %> 
                         <a id="btnDelete" class="btn btn-mini <%# ((bool)BasePage.SESSION_PERMISSION_SCREEN.is_del) ? "" : "disabled" %>" onclick="deleteItem(<%# Eval("id")%>)" title="Delete">
-                            <i class="fa fa-trash-o" aria-hidden="true"></i>
+                           <%# ((string)Eval("quotation_type") == "P") ? "" : "<i class='fa fa-trash-o' aria-hidden='true'></i>" %> --%>
                     </DataItemTemplate>
                 </dx:GridViewDataTextColumn>
                 <dx:GridViewDataTextColumn Caption="Print" FieldName="id" CellStyle-HorizontalAlign="Center" Width="30px">
