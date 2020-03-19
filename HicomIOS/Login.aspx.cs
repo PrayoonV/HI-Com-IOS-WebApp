@@ -102,14 +102,10 @@ namespace HicomIOS.Master
         public static string CheckLogout()
         {
             string status = "success";
-
-            //HttpContext.Current.Session.Clear();
-            //HttpContext.Current.Session.Abandon();
-
-            
-            CheckLogin("HI00008", "123456");
-            
-                return status;
+            HttpContext.Current.Session.Clear();
+            HttpContext.Current.Session.Abandon();
+            //CheckLogin("HI00008", "123456");
+            return status;
         }
     }
 }

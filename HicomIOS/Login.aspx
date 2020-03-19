@@ -71,7 +71,7 @@
         </p>
 
          <p>
-            <small>System version Hi-Com IOS ( 1.0.7 )</small>
+            <small>System version Hi-Com IOS ( 1.0.8 )</small>
         </p>
     </div>
 </body>
@@ -148,11 +148,11 @@
         $.ajax({
             type: "POST",
             url: "/Login.aspx/CheckLogout",
-            data: {},
+            data: { },
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function (data) {
-                window.location.href = "/Default.aspx"
+                //window.location.href = "/Default.aspx"
                 //if (data.d == 'success') {
                 //    location.reload();
                 //} else {

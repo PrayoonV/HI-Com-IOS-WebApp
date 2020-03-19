@@ -130,6 +130,7 @@
                 success: function (data) {
                     if (data.d == 'success') {
                         location.reload();
+                        //window.location.href = "/Login.aspx"
                     } else {
                         console.info("data", data.d);
                     }
