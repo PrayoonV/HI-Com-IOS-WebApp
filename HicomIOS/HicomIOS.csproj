@@ -1087,6 +1087,7 @@
     <Content Include="Master\Template\Template_QuotationSummaryReport-Contract.xlsx" />
     <Content Include="Report\Template\Temp_quotation_summary_product.xlsx" />
     <Content Include="Report\Template\Temp_quotation_summary_sparepart.xlsx" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
