@@ -349,10 +349,10 @@ namespace HicomIOS.Master
                                     project_name = Convert.IsDBNull(row["project_name"]) ? string.Empty : Convert.ToString(row["project_name"]),
                                     attention = Convert.IsDBNull(row["attention"]) ? string.Empty : Convert.ToString(row["attention"]),
                                     contract_type = Convert.IsDBNull(row["contract_type"]) ? string.Empty : Convert.ToString(row["contract_type"]),
-                                    starting_date = Convert.IsDBNull(row["starting_date"]) ? string.Empty : Convert.ToString(row["starting_date"]),
-                                    expire_date = Convert.IsDBNull(row["expire_date"]) ? string.Empty : Convert.ToString(row["expire_date"]),
-                                    schedule_date_min_mmyy = Convert.IsDBNull(row["schedule_date_min_mmyy"]) ? string.Empty : Convert.ToString(row["schedule_date_min_mmyy"]),
-                                    schedule_date_max_mmyy = Convert.IsDBNull(row["schedule_date_max_mmyy"]) ? string.Empty : Convert.ToString(row["schedule_date_max_mmyy"]),
+                                    //starting_date = Convert.IsDBNull(row["starting_date"]) ? string.Empty : Convert.ToString(row["starting_date"]),
+                                    //expire_date = Convert.IsDBNull(row["expire_date"]) ? string.Empty : Convert.ToString(row["expire_date"]),
+                                    //schedule_date_min_mmyy = Convert.IsDBNull(row["schedule_date_min_mmyy"]) ? string.Empty : Convert.ToString(row["schedule_date_min_mmyy"]),
+                                    //schedule_date_max_mmyy = Convert.IsDBNull(row["schedule_date_max_mmyy"]) ? string.Empty : Convert.ToString(row["schedule_date_max_mmyy"]),
                                 });
                             }
                         }
