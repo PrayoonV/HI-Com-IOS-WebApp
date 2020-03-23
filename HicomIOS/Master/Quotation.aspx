@@ -3435,6 +3435,15 @@
                         </div>
                     </div>
 
+                    <div class="row form-group">
+                        <div class="col-xs-5 form-inline label-rigth text-right">
+                            <label>สถานะ :</label>
+                        </div>
+                        <div class="col-xs-6 form-inline">                            
+                            <input type="text" readonly="" class="form-control" id="txtStatus" runat="server" />
+                        </div>
+                    </div>
+
 
                 </div>
             </fieldset>

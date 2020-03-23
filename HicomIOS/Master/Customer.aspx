@@ -607,6 +607,7 @@
                                                 </DataItemTemplate>
                                             </dx:GridViewDataTextColumn>
                                             <dx:GridViewDataTextColumn FieldName="date" Caption="Delivery Date" CellStyle-HorizontalAlign="Left" Width="60px" />
+                                            <dx:GridViewDataTextColumn FieldName="date" Caption="Tax Invoice Date" CellStyle-HorizontalAlign="Left" Width="60px" />
                                         </Columns>
                                         <SettingsSearchPanel CustomEditorID="SearchBox"></SettingsSearchPanel>
                                         <ClientSideEvents Init="SPlanet.Page.ControlGrid_Init" ContextMenuItemClick="SPlanet.Page.ControlGrid_ContextMenuItemClick"

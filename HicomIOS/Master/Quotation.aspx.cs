@@ -959,6 +959,9 @@ namespace HicomIOS.Master
                         txtSumDiscount1.Value = Convert.IsDBNull(data["discount1_total"]) ? "0" : String.Format("{0:n}", Convert.ToDouble(data["discount1_total"]));
                         txtSumDiscount2.Value = Convert.IsDBNull(data["discount2_total"]) ? "0" : String.Format("{0:n}", Convert.ToDouble(data["discount2_total"]));
 
+
+                        txtStatus.Value = Convert.ToString(data["quotation_status_display"]);
+
                         using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
                         {
                             //Create array of Parameters
@@ -5234,6 +5237,8 @@ namespace HicomIOS.Master
                             }
                             txtSumDiscount1.Value = Convert.IsDBNull(data["discount1_total"]) ? "0" : String.Format("{0:n}", Convert.ToDouble(data["discount1_total"]));
                             txtSumDiscount2.Value = Convert.IsDBNull(data["discount2_total"]) ? "0" : String.Format("{0:n}", Convert.ToDouble(data["discount2_total"]));
+
+                            //txtStatus.Value = Convert.ToString(data["quotation_status_display"]);
 
                             using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
                             {
