@@ -67,7 +67,7 @@
 
         </form>
         <p>
-            <small>Copyrights &copy; 2018 Hi-Com. All Rights Reserved. <br />Designed by S-Planet</small>
+            <small>Copyrights &copy; 2018 Hi-Com. All Rights Reserved. <br />Designed by big bear software solutions co;,ltd.</small>
         </p>
 
          <p>

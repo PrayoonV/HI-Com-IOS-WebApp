@@ -1826,7 +1826,7 @@
                                                         <label class="col-xs-3 text-right label-rigth">เลขที่ใบส่งของชั่วคราว:</label>
                                                         <div class="col-xs-7 no-padding">
                                                             <input type="text" class="form-control" id="txtTempNoDelivery"
-                                                                runat="server" />
+                                                                runat="server" readonly="true" />
                                                         </div>
                                                     </div>
                                                 </div>

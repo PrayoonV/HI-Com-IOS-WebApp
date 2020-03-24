@@ -656,6 +656,8 @@ namespace HicomIOS.Master
 
                         var created_by = Convert.IsDBNull(data["created_by"]) ? 0 : Convert.ToInt32(data["created_by"]);
                         CheckPermission(created_by);
+
+                        txtTempNoDelivery.Value = Convert.ToString(data["delivery_no"]); 
                     }
                     #endregion
 

@@ -939,7 +939,7 @@
                             <div class="col-xs-9 no-padding">
                                 <!--<input type="text" class="form-control" id="txtSaleOrderNo" runat="server" />-->
                                 <dx:ASPxComboBox ID="cbbSaleOrder" CssClass="form-control" runat="server"
-                                    ClientInstanceName="cbbSaleOrder" TextField="data_text"
+                                    ClientInstanceName="cbbSaleOrder" TextField="data_text" 
                                     ClientSideEvents-ValueChanged="changedSaleOrderSelected" ValueField="data_value">
                                 </dx:ASPxComboBox>
                             </div>

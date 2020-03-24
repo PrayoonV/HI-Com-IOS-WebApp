@@ -331,7 +331,15 @@ namespace HicomIOS.Master
                             btnSaleOrderDetail.Visible = false;
                             gridViewIssue.Columns[0].Visible = false;
                             Button3.Visible = false;
-                            btnCancelItem.Visible = true;
+                            btnCancelItem.Visible = false;
+                            cbbIssueFor.Disabled = true;
+                            cbbSaleOrder.Enabled = false;
+                            lbCustomerFirstName.Enabled = false;
+                            txtRemark.Disabled = true;
+                            cbbProductType.Disabled = true;
+                            chkIssueDate.Disabled = true;
+                            txtIssueDate.Disabled = true;
+                            cbbIssueType.Disabled = true;
                         }
                         else if (status == "CP" || status == "RE")
                         {
@@ -340,6 +348,12 @@ namespace HicomIOS.Master
                             btnSaleOrderDetail.Visible = false;
                             gridViewIssue.Columns[0].Visible = false;
                             Button3.Visible = false;
+                            btnCancelItem.Visible = true;
+                        }
+                        else if (status == "FL")
+                        {
+
+                            btnNew.Visible = false;
                             btnCancelItem.Visible = true;
                         }
                         else
