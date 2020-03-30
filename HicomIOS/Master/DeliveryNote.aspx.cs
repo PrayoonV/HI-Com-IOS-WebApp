@@ -1081,7 +1081,7 @@ namespace HicomIOS.Master
 
         protected void btnConfirm_Click(object sender, EventArgs e)
         {
-            SaveData("CF");
+            SaveData("CP");
         }
         [WebMethod]
         public static string SelectAllDetailDeliveryNoteList(bool selected)

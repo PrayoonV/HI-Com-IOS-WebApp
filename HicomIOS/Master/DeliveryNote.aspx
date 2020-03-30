@@ -113,7 +113,27 @@
                 "changeYear": true
             });
 
+            $(".isValidTelephone").keypress(function (e) {
+                //if ((this.value.length < 11)) {
+                //    alert(1)
+                //    if (this.value.length == 3)
+                //        $("#" + this.id).val(data) + '-';
+                //    $("#" + this.id).val(data);
+                //    //$("#" + this.id).focus();
+                //}
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    return false;
+                }
+                else if (this.value.length == 2) {
+                    $("#" + this.id).val($("#" + this.id).val() + '-');
+
+                }
+            });
+
         });
+
+       
+
         function deleteDeliveryNote(s, e) {
             var elm = s.GetMainElement();
             var id_delivery = $(elm).attr("deliveryid");
@@ -464,7 +484,7 @@
                 <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;Save
             </button>
             <button type="button" runat="server" id="btnSave" onclick="confirmSave()" class="btn-addItem">
-                <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Confirm
+                <i class="fa fa-check-square-o" aria-hidden="true"></i>&nbsp;Complete
             </button>
             <button type="button" runat="server" id="btnReportClient" onclick="callReport()" class="btn-addItem">
                 <i class="fa fa-list-alt" aria-hidden="true"></i>&nbsp;Report
@@ -531,7 +551,7 @@
                         <div class="row form-group">
                             <label class="col-xs-3 text-right label-rigth">เบอร์โทร :</label>
                             <div class="col-xs-9 no-padding">
-                                <input type="text" class="form-control" id="lbtel" runat="server" />
+                                <input type="text" class="form-control isValidTelephone" id="lbtel" runat="server"  maxlength="10" />
                             </div>
                         </div>
                     </div>

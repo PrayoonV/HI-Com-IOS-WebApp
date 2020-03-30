@@ -70,6 +70,11 @@ namespace HicomIOS.Master
                                 ConstantClass.SESSION_PICTURE = objRow["cover_image"].ToString();
                                 ConstantClass.SESSION_DEPARTMENT_NAME = objRow["department_name"].ToString();
                                 ConstantClass.SESSION_DEPARTMENT_SERVICE_TYPE = objRow["department_service_type"].ToString();
+
+                                if ("ฝ่ายบริหาร".Equals(ConstantClass.SESSION_DEPARTMENT_NAME))
+                                {
+                                    ConstantClass.SESSION_DEPARTMENT_NAME = "เมนูระบบ";
+                                }
                             }
                         }
                     }

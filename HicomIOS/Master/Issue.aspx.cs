@@ -1151,6 +1151,7 @@ namespace HicomIOS.Master
                 {
                     foreach (var row in (from t in dsResult.Tables[0].AsEnumerable()
                                          where t.Field<string>("issue_no") == "" || t.Field<string>("issue_no") == issue_no
+                                         //where t.Field<string>("issue_no") == ""
                                          select t).ToList())
                     {
                         mfgDetailData.Add(new MFGDetail()
@@ -2520,7 +2521,7 @@ namespace HicomIOS.Master
                             product_id = Convert.IsDBNull(detail["id"]) ? 0 : Convert.ToInt32(detail["id"]),
                             saleorder_description = Convert.IsDBNull(detail["part_name_tha"]) ? string.Empty : Convert.ToString(detail["part_name_tha"]),
                             is_selected = false,
-                            qty = 1,//Convert.IsDBNull(detail["qty_remain"]) ? 0 : Convert.ToInt32(detail["qty_remain"]),
+                            qty = Convert.IsDBNull(detail["quantity"]) ? 0 : Convert.ToInt32(detail["quantity"]),
                             so_qty = 0,//Convert.IsDBNull(detail["so_qty"]) ? 0 : Convert.ToInt32(detail["so_qty"]),
                             unit_price = Convert.IsDBNull(detail["selling_price"]) ? 0 : Convert.ToDecimal(detail["selling_price"]),
                             unit_code = Convert.IsDBNull(detail["unit_code"]) ? string.Empty : Convert.ToString(detail["unit_code"]),
