@@ -78,6 +78,37 @@
             gridView.SetHeight(h - 250);
         });
 
+
+        function changedProductCat() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "StockCard.aspx/ChangedData",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridView.PerformCallback()
+                },
+                failure: function (response) {
+                }
+            });
+            
+            cbbProduct.PerformCallback();
+            var key = cbbProductType.GetValue();
+            if (key == "PP") {
+                console.log("pp");
+                cbbProductModel.PerformCallback();
+            }
+
+            console.log("xxx");
+            $.LoadingOverlay("hide");
+
+        }
+
         function changedProductType() {
             $.LoadingOverlay("show", {
                 zIndex: 9999
@@ -147,7 +178,7 @@
                             <div class="col-xs-7 no-padding">
                                 <dx:ASPxComboBox ID="cbbProductCat" CssClass="form-control"
                                     runat="server" ClientInstanceName="cbbProductCat" TextField="data_text"
-                                    OnCallback="cbbProductCat_Callback"
+                                    OnCallback="cbbProductCat_Callback"  ClientSideEvents-ValueChanged="changedProductCat"
                                     ValueField="data_value">
                                 </dx:ASPxComboBox>
                             </div>
@@ -281,13 +312,13 @@
                             <PropertiesTextEdit DisplayFormatString="#,##0"></PropertiesTextEdit>
                         </dx:GridViewDataTextColumn>
                         --%>
-                        <dx:GridViewDataTextColumn FieldName="stock_current" Caption="รวมก่อนจอง" Width="35px">
+                        <dx:GridViewDataTextColumn FieldName="stock_current" Caption="เพื่อการตรวจนับ" Width="35px">
                             <PropertiesTextEdit DisplayFormatString="#,##0"></PropertiesTextEdit>
                         </dx:GridViewDataTextColumn>
                         <dx:GridViewDataTextColumn FieldName="reserve_" Caption="จอง" Width="35px">
                             <PropertiesTextEdit DisplayFormatString="#,##0"></PropertiesTextEdit>
                         </dx:GridViewDataTextColumn>
-                        <dx:GridViewDataTextColumn FieldName="stock_current_after" Caption="รวมหลังจอง" Width="35px">
+                        <dx:GridViewDataTextColumn FieldName="stock_current_after" Caption="คงเหลือ" Width="35px">
                             <PropertiesTextEdit DisplayFormatString="#,##0"></PropertiesTextEdit>
                         </dx:GridViewDataTextColumn>
                         <dx:GridViewDataDateColumn FieldName="transaction_date" Caption="เคลื่อนไหวล่าสุด" Width="80px" Settings-SortMode="Value" Settings-AllowSort="True" Visible="false">

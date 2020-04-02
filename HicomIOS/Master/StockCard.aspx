@@ -127,6 +127,33 @@
 
         }
 
+
+        function changedProductCat() {
+            $.LoadingOverlay("show", {
+                zIndex: 9999
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "StockCard.aspx/ChangedData",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    gridView.PerformCallback()
+                },
+                failure: function (response) {
+                }
+            });
+
+            console.log("xxx");
+            
+            cbbProduct.PerformCallback();
+
+            $.LoadingOverlay("hide");
+
+        }
+
     </script>
     <div id="div-content">
         <div class="row">
@@ -152,7 +179,7 @@
                             <div class="col-xs-7 no-padding">
                                 <dx:ASPxComboBox ID="cbbProductCat" CssClass="form-control"
                                     runat="server" ClientInstanceName="cbbProductCat" TextField="data_text"
-                                    OnCallback="cbbProductCat_Callback"
+                                    OnCallback="cbbProductCat_Callback" ClientSideEvents-ValueChanged="changedProductCat"
                                     ValueField="data_value">
                                 </dx:ASPxComboBox>
                             </div>
@@ -276,9 +303,9 @@
                         <PageSizeItemSettings Items="10, 20, 50" />
                     </SettingsPager>
                     <Columns>
-                        <dx:GridViewDataTextColumn FieldName="cat_name" Caption="ประเภทสินค้า" Width="70px" />
+                        <dx:GridViewDataTextColumn FieldName="cat_name" Caption="ประเภทสินค้า" Width="70px" Visible="false" />
                         <dx:GridViewDataTextColumn FieldName="no_" Caption="รหัสสินค้า" Width="70px" />
-                        <dx:GridViewDataTextColumn FieldName="name_" Caption="ชื่อสินค้า/อะไหล่" Width="180px" />
+                        <dx:GridViewDataTextColumn FieldName="name_" Caption="ชื่อสินค้า/รายการ" Width="180px" />
                         <dx:GridViewDataTextColumn FieldName="in_" Caption="ขาเข้า" Width="30px" >
                             <PropertiesTextEdit DisplayFormatString="#,##0"></PropertiesTextEdit>
                         </dx:GridViewDataTextColumn>

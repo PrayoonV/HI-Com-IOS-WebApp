@@ -249,9 +249,10 @@ namespace HicomIOS.Master
                 List<SqlParameter> arrParm = new List<SqlParameter>
                     {
                         new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                        new SqlParameter("@cat_id", SqlDbType.Int) { Value = cbbProductCat.Value == null? 0 : Convert.ToInt32(cbbProductCat.Value)},
                     };
                 conn.Open();
-                var storeName = cbbProductType.Value.ToString() == "PP" ? "sp_dropdown_product" : "sp_dropdown_product_spare_part";
+                var storeName = cbbProductType.Value.ToString() == "PP" ? "sp_dropdown_product_byCat" : "sp_dropdown_product_spare_part_byCat";
                 var dsResult = SqlHelper.ExecuteDataset(conn, storeName, arrParm.ToArray());
                 conn.Close();
                 cbbProduct.DataSource = dsResult;
@@ -271,10 +272,11 @@ namespace HicomIOS.Master
                 List<SqlParameter> arrParm = new List<SqlParameter>
                     {
                         new SqlParameter("@cat_cade", SqlDbType.VarChar,2) { Value = "AC" },
+                        new SqlParameter("@cat_id", SqlDbType.Int) { Value = cbbProductCat.Value == null? 0 : Convert.ToInt32(cbbProductCat.Value)},
                     };
                 conn.Open();
 
-                var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product_model", arrParm.ToArray());
+                var dsResult = SqlHelper.ExecuteDataset(conn, "sp_dropdown_product_model_byCat", arrParm.ToArray());
                 conn.Close();
                 cbbProductModel.DataSource = dsResult;
                 cbbProductModel.TextField = "product_model";

@@ -372,9 +372,10 @@ namespace HicomIOS.Master
                 List<SqlParameter> arrParm = new List<SqlParameter>
                     {
                         new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                        new SqlParameter("@cat_id", SqlDbType.Int) { Value = cbbProductCat.Value == null? 0 : Convert.ToInt32(cbbProductCat.Value)},
                     };
                 conn.Open();
-                var storeName = cbbProductType.Value.ToString() == "PP" ? "sp_dropdown_product" : "sp_dropdown_product_spare_part";
+                var storeName = cbbProductType.Value.ToString() == "PP" ? "sp_dropdown_product_byCat" : "sp_dropdown_product_spare_part_byCat";
                 var dsResult = SqlHelper.ExecuteDataset(conn, storeName, arrParm.ToArray());
                 conn.Close();
                 cbbProduct.DataSource = dsResult;
@@ -697,6 +698,28 @@ namespace HicomIOS.Master
             gridViewExporter.WriteXlsxToResponse(DateTime.Now.ToString("yyyy-MM-dd") + "-Stock Card");
         }
 
+        protected void cbbProductCat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            using (SqlConnection conn = new SqlConnection(SPlanetUtil.GetConnectionString()))
+            {
+                List<SqlParameter> arrParm = new List<SqlParameter>
+                    {
+                        new SqlParameter("@lang_id", SqlDbType.VarChar,3) { Value = ""},
+                        new SqlParameter("@cat_id", SqlDbType.Int) { Value = cbbProductCat.SelectedItem == null? 0 : Convert.ToInt32(cbbProductCat.SelectedItem.Value)},
+                    };
+                conn.Open();
+                var storeName = cbbProductType.Value.ToString() == "PP" ? "sp_dropdown_product_byCat" : "sp_dropdown_product_spare_part_byCat";
+                var dsResult = SqlHelper.ExecuteDataset(conn, storeName, arrParm.ToArray());
+                conn.Close();
+                cbbProduct.DataSource = dsResult;
+                cbbProduct.TextField = "data_text";
+                cbbProduct.ValueField = "data_value";
+                cbbProduct.DataBind();
+
+                var text = (cbbProductType.Value.ToString() == "PP" ? "All Product" : "All Part");
+                cbbProduct.Items.Insert(0, new ListEditItem(text, "0"));
+            }
+        }
     }
 
 }
